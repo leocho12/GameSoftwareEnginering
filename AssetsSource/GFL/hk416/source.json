@@ -1,0 +1,42 @@
+{
+  "bundle": "5N13OfS1PhjwAo6Jz96a0Q081FpWZeC6b5vtT14f2kb2tQhfRzN06ndg93ngKSMEcharacterhk416spine.ab",
+  "sha256": "ba35936283e9ea474150937d7a99b489a215575d10b47136b275f0f3f3afafa4",
+  "assets": [
+    {
+      "file": "RHK416.skel",
+      "type": "TextAsset",
+      "bytes": 75676,
+      "sha256": "4612cb1a207ef8251ba977722fe6f82cb94919ae81d67f7dc28de5678de45b11"
+    },
+    {
+      "file": "HK416.png",
+      "type": "Texture2D",
+      "bytes": 72365,
+      "sha256": "7f8d1ae23cbce693b1cb89a2365a1a67f823f88db0423dc4375e9bd3c14af034"
+    },
+    {
+      "file": "HK416.atlas",
+      "type": "TextAsset",
+      "bytes": 4044,
+      "sha256": "5ea3ee319a58abfa4802e0f4602d8d13e5b381ef86cd2581197ff4fcd04be48b"
+    },
+    {
+      "file": "HK416.skel",
+      "type": "TextAsset",
+      "bytes": 103489,
+      "sha256": "d6cd2261beabd6a717ddec366fcc1868971416b2a99946c3f44a4caf9384a5d4"
+    },
+    {
+      "file": "RHK416.atlas",
+      "type": "TextAsset",
+      "bytes": 3859,
+      "sha256": "9454d0b98b80962a67fc49b979bfdc7b0b875274e78c3e8f9ae5bd7e37cd3179"
+    },
+    {
+      "file": "RHK416.png",
+      "type": "Texture2D",
+      "bytes": 67117,
+      "sha256": "75174339f1affeb2eccb13db96dbabcd2c4decccdc78617f39d2cdac4aab46f6"
+    }
+  ]
+}

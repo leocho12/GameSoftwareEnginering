@@ -1,0 +1,30 @@
+{
+  "bundle": "1yYk6DCsW7HuHnFfV2gY6n8VGfs4BLE2fRO6BmTfRqxlIoN2bIztU79PA6YJYgcharacter4typespine.ab",
+  "sha256": "99c2ab6b2ad0237c6d88f7be46beb175078cbdd0bdc7032dc73203eb40188c7e",
+  "assets": [
+    {
+      "file": "4type.skel",
+      "type": "TextAsset",
+      "bytes": 77392,
+      "sha256": "fa830cc2389420e21cc8050558fffe6e8cf96ad732c7131da7b9935b56c693fe"
+    },
+    {
+      "file": "4type.atlas",
+      "type": "TextAsset",
+      "bytes": 3374,
+      "sha256": "bd56a727453999a32e142983d3ac3e93f36ae39a7aab01db55cb799e89f9d221"
+    },
+    {
+      "file": "R4type.skel",
+      "type": "TextAsset",
+      "bytes": 55588,
+      "sha256": "1c772ec6eb5570eceb7935262f369b8d69087e3d99f8bd048d5e68719d0e6400"
+    },
+    {
+      "file": "4type.png",
+      "type": "Texture2D",
+      "bytes": 73821,
+      "sha256": "0233e1e8fb4fb5f932cef8c55714289f8c2707852d30c588f28737b391476c20"
+    }
+  ]
+}

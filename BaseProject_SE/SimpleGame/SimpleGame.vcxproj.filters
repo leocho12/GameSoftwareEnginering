@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="소스 파일">
@@ -30,6 +30,9 @@
     <ClInclude Include="Renderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CharacterAnimation.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="TowerDefense.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="TutorialGame.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="RenderEffects.h"><Filter>헤더 파일</Filter></ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -41,6 +44,9 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterAnimation.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="TowerDefense.cpp"><Filter>소스 파일</Filter></ClCompile><ClCompile Include="TutorialGame.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RenderEffects.cpp"><Filter>소스 파일</Filter></ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\SolidRect.fs">

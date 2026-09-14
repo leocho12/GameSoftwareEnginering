@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# Local asset extraction dependencies
+.asset-tools/
+__pycache__/
+BaseProject_SE/SimpleGame/.build/

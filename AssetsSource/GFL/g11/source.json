@@ -1,0 +1,42 @@
+{
+  "bundle": "dsxDntwwxOhNdFxrcLy1IB4yKC3RIGnvwrsFdtQhlNGF76ecfHxTHlSaTfDCIcharacterg11spine.ab",
+  "sha256": "e3199a1e7ebe9e72ea7e392dcac92c1209e24c680da32072717fe6726731b4cf",
+  "assets": [
+    {
+      "file": "G11.atlas",
+      "type": "TextAsset",
+      "bytes": 3690,
+      "sha256": "7e59bff263831faeb7a873ddc68ab7d6a79f627ec22af0230da56dd996bf384a"
+    },
+    {
+      "file": "RG11.atlas",
+      "type": "TextAsset",
+      "bytes": 3593,
+      "sha256": "a806e62051d3efb46cc9543666857d3dd5e5ae66f8386e88ff31ea1b9c8342db"
+    },
+    {
+      "file": "RG11.png",
+      "type": "Texture2D",
+      "bytes": 75112,
+      "sha256": "e2a4d84d9d9d675ff8d670ba56785c0c137ae4f205fc3701c8d47a853c0199e6"
+    },
+    {
+      "file": "RG11.skel",
+      "type": "TextAsset",
+      "bytes": 44074,
+      "sha256": "0e0a689b4f687849766c62dac5ad050813e3265ad9a8f1801ab0e8b4fbd9abab"
+    },
+    {
+      "file": "G11.png",
+      "type": "Texture2D",
+      "bytes": 78621,
+      "sha256": "91e90a82cf805fa389306a57db21fecfa87134f32e3e7d23f3b9f2cc2c51e6c7"
+    },
+    {
+      "file": "G11.skel",
+      "type": "TextAsset",
+      "bytes": 60492,
+      "sha256": "cf16c39ccb6fe9f9ccbd33731632938e1d9245cda075a2b8e75b3a691e00be8c"
+    }
+  ]
+}

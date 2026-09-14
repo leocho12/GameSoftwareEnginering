@@ -1,0 +1,42 @@
+{
+  "bundle": "Vm3BI11oVXshbNTnKc56m10RO37spfjkrIC58kJxo3uzFyXTw6rWM4vpSPtVW4characterump45spine.ab",
+  "sha256": "b01a1230c1e096db75b58b5fc1b26e4e13ea5d00ef3e2e2d90f68ea13c745134",
+  "assets": [
+    {
+      "file": "UMP45.atlas",
+      "type": "TextAsset",
+      "bytes": 4060,
+      "sha256": "8aa1ba0c9d8c08a88330a8971665dcdd6f43038196b5e30e790bfa07133e8bd4"
+    },
+    {
+      "file": "RUMP45.atlas",
+      "type": "TextAsset",
+      "bytes": 3974,
+      "sha256": "3cdfa5f268a8f8f34d5660aa07ee90c1fcfe1e192a95c59efe5e380672c1d023"
+    },
+    {
+      "file": "UMP45.png",
+      "type": "Texture2D",
+      "bytes": 64102,
+      "sha256": "366cfd937757ca24473cefbb1f6cb07babe1f896891e71e231769b316082a127"
+    },
+    {
+      "file": "RUMP45.png",
+      "type": "Texture2D",
+      "bytes": 60359,
+      "sha256": "6e13b66448103e9af0da895395194ad970a04277cfc59e0d07b2580364123a56"
+    },
+    {
+      "file": "RUMP45.skel",
+      "type": "TextAsset",
+      "bytes": 76281,
+      "sha256": "e83469b3c8868a3931393a2110ac98aa02878974f866ff1d17cc9b202e5f15ff"
+    },
+    {
+      "file": "UMP45.skel",
+      "type": "TextAsset",
+      "bytes": 109855,
+      "sha256": "efb3652fc01771ec0b0e2f0bc18a6285a802465f900465078312ac17cff26f25"
+    }
+  ]
+}
