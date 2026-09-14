@@ -31,7 +31,7 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="CharacterAnimation.h"><Filter>헤더 파일</Filter></ClInclude>
-    <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="TowerDefense.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="TutorialGame.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="RpgGame.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="RenderEffects.h"><Filter>헤더 파일</Filter></ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -45,7 +45,7 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CharacterAnimation.cpp"><Filter>소스 파일</Filter></ClCompile>
-    <ClCompile Include="TowerDefense.cpp"><Filter>소스 파일</Filter></ClCompile><ClCompile Include="TutorialGame.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RpgGame.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RenderEffects.cpp"><Filter>소스 파일</Filter></ClCompile>
   </ItemGroup>
   <ItemGroup>

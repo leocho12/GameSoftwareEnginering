@@ -1,1 +1,37 @@
-﻿C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(473,5): error MSB8020: Visual Studio 2022에 대한 빌드 도구(플랫폼 도구 집합 = 'v143')를 찾을 수 없습니다. v143 빌드 도구를 사용하여 빌드하려면 Visual Studio 2022 빌드 도구를 설치하십시오.  [프로젝트] 메뉴를 선택하거나 솔루션을 마우스 오른쪽 단추로 클릭한 다음 "솔루션 대상 변경"을 선택하여 현재 Visual Studio 도구로 업그레이드할 수도 있습니다.
+﻿  Renderer.cpp
+C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\SimpleGame\Renderer.cpp(75,85): warning C4244: '=': 'const int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\SimpleGame\Renderer.cpp(75,129): warning C4244: '=': 'const int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\SimpleGame\Renderer.cpp(144,33): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\SimpleGame\Renderer.cpp(144,84): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\SimpleGame\Renderer.cpp(152,34): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\SimpleGame\Renderer.cpp(152,48): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+  CharacterAnimation.cpp
+  TutorialGame.cpp
+  TowerDefense.cpp
+  SimpleGame.cpp
+  코드를 생성하고 있습니다...
+LINK : warning LNK4004: ilk 파일 'x64\Debug\SimpleGame.ilk'을(를) 축소할 수 없습니다. 파일이 필요한 것보다 클 수 있지만 여전히 유효합니다. 오류 코드: 1224
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003: 지정한 작업 실행 파일 "link.exe"을(를) 실행할 수 없습니다. System.IO.IOException: 요청한 작업은, 사용자가 매핑한 구역이 열려 있는 상태인 파일에서 수행할 수 없습니다.
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003: 
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: System.IO.File.InternalWriteAllText(String path, String contents, Encoding encoding, Boolean checkHost)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: Microsoft.Build.Utilities.CanonicalTrackedOutputFiles.SaveTlog(DependencyFilter includeInTLog)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: Microsoft.Build.CPPTasks.TrackedVCToolTask.PostExecuteTool(Int32 exitCode, Boolean preservePartialSuccess)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: Microsoft.Build.CPPTasks.TrackedVCToolTask.ExecuteTool(String pathToTool, String responseFileCommands, String commandLineCommands)
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(1196,5): error MSB6003:    위치: Microsoft.Build.Utilities.ToolTask.Execute()

@@ -1,0 +1,157 @@
+[
+  {
+    "model": "4type",
+    "texture": "4type.png",
+    "clips": {
+      "wait": {
+        "duration": 1.1666666269302368,
+        "frames": 36
+      },
+      "move": {
+        "duration": 0.6000000238418579,
+        "frames": 20
+      },
+      "attack": {
+        "duration": 0.5,
+        "frames": 16
+      },
+      "die": {
+        "duration": 1.7000000476837158,
+        "frames": 53
+      },
+      "victory": {
+        "duration": 3.1666667461395264,
+        "frames": 97
+      },
+      "victoryloop": {
+        "duration": 1.3333333730697632,
+        "frames": 42
+      }
+    },
+    "bytes": 6261272
+  },
+  {
+    "model": "M4A1",
+    "texture": "m4a1.png",
+    "clips": {
+      "wait": {
+        "duration": 1.0,
+        "frames": 31
+      },
+      "move": {
+        "duration": 0.6000000238418579,
+        "frames": 20
+      },
+      "attack": {
+        "duration": 0.8333333134651184,
+        "frames": 26
+      },
+      "die": {
+        "duration": 1.100000023841858,
+        "frames": 35
+      },
+      "victory": {
+        "duration": 2.6666667461395264,
+        "frames": 82
+      },
+      "victoryloop": {
+        "duration": 0.6666666865348816,
+        "frames": 22
+      }
+    },
+    "bytes": 7072088
+  },
+  {
+    "model": "UMP45",
+    "texture": "ump45.png",
+    "clips": {
+      "wait": {
+        "duration": 1.0,
+        "frames": 31
+      },
+      "move": {
+        "duration": 0.6000000238418579,
+        "frames": 20
+      },
+      "attack": {
+        "duration": 0.3333333432674408,
+        "frames": 12
+      },
+      "die": {
+        "duration": 1.2000000476837158,
+        "frames": 38
+      },
+      "victory": {
+        "duration": 1.5,
+        "frames": 46
+      },
+      "victoryloop": {
+        "duration": 1.0,
+        "frames": 31
+      }
+    },
+    "bytes": 5691264
+  },
+  {
+    "model": "HK416",
+    "texture": "hk416.png",
+    "clips": {
+      "wait": {
+        "duration": 1.0,
+        "frames": 31
+      },
+      "move": {
+        "duration": 0.6000000238418579,
+        "frames": 20
+      },
+      "attack": {
+        "duration": 0.8333333134651184,
+        "frames": 26
+      },
+      "die": {
+        "duration": 1.7666666507720947,
+        "frames": 54
+      },
+      "victory": {
+        "duration": 3.799999952316284,
+        "frames": 115
+      },
+      "victoryloop": {
+        "duration": 1.3333333730697632,
+        "frames": 42
+      }
+    },
+    "bytes": 12359864
+  },
+  {
+    "model": "G11",
+    "texture": "g11.png",
+    "clips": {
+      "wait": {
+        "duration": 1.3333333730697632,
+        "frames": 42
+      },
+      "move": {
+        "duration": 0.6000000238418579,
+        "frames": 20
+      },
+      "attack": {
+        "duration": 0.8333333134651184,
+        "frames": 26
+      },
+      "die": {
+        "duration": 0.5333333611488342,
+        "frames": 18
+      },
+      "victory": {
+        "duration": 2.3333332538604736,
+        "frames": 71
+      },
+      "victoryloop": {
+        "duration": 1.3333333730697632,
+        "frames": 42
+      }
+    },
+    "bytes": 4563332
+  }
+]

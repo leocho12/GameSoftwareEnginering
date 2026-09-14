@@ -157,7 +157,7 @@
   <ItemGroup>
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="CharacterAnimation.h" />
-    <ClInclude Include="TutorialGame.h" /><ClInclude Include="GridTypes.h" /><ClInclude Include="TowerDefense.h" />
+    <ClInclude Include="RpgGame.h" /><ClInclude Include="GridTypes.h" />
     <ClInclude Include="RenderEffects.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -165,7 +165,7 @@
   <ItemGroup>
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="CharacterAnimation.cpp" />
-    <ClCompile Include="TutorialGame.cpp" /><ClCompile Include="TowerDefense.cpp" />
+    <ClCompile Include="RpgGame.cpp" />
     <ClCompile Include="RenderEffects.cpp" />
     <ClCompile Include="SimpleGame.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -7,7 +7,8 @@
 #include "GridTypes.h"
 #include "TowerDefense.h"
 
-struct Unit {
+struct Unit
+{
     std::string name;
     Cell cell;
     float x = 0, z = 0;
@@ -15,13 +16,33 @@ struct Unit {
     bool ally = true, skillUsed = false;
 };
 
-struct Npc { std::string name, dialogue; Cell cell; };
-struct Wildlife { Cell home, cell; float x=0,z=0; int hp=12; };
-enum class Phase { Briefing, Supply, Approach, Battle, Restore, Complete, Defeat, Explore };
+struct Npc
+{
+    std::string name, dialogue;
+    Cell cell;
+};
 
+struct Wildlife
+{
+    Cell home, cell;
+    float x = 0, z = 0;
+    int hp = 12;
+};
+enum class Phase
+{
+    Briefing,
+    Supply,
+    Approach,
+    Battle,
+    Restore,
+    Complete,
+    Defeat,
+    Explore
+};
 
-class TutorialGame {
-public:
+class TutorialGame
+{
+  public:
     static constexpr int Width = 28, Depth = 24;
     static constexpr Cell SupplyCell{3, 8};
     static constexpr Cell TerminalCell{11, 1};
@@ -50,7 +71,12 @@ public:
     int UnitAt(Cell c, int except = -1) const;
     std::vector<Cell> Path(Cell from, Cell to, int mover, int limit = 999) const;
     std::string Objective() const;
-    bool Busy() const { return !route.empty() || effectTime > 0; }
+
+    bool Busy() const
+    {
+        return !route.empty() || effectTime > 0;
+    }
+
     int Distance(Cell a, Cell b) const;
 
     Phase phase = Phase::Briefing;
@@ -69,19 +95,18 @@ public:
     int effectFrom = -1, effectTo = -1;
     bool healingEffect = false;
     int shots = 0;
-    bool yardCleared=false;
-    std::array<Npc,8> npcs;
-    std::array<Wildlife,4> wildlife;
-    int wildEncounter=-1;
-    float animationTime=0;
+    bool yardCleared = false;
+    std::array<Npc, 8> npcs;
+    std::array<Wildlife, 4> wildlife;
+    int wildEncounter = -1;
+    float animationTime = 0;
 
-private:
+  private:
     Cell interaction;
 
-
-    std::array<Unit,5> fieldCheckpoint;
-    float wildlifeTick=0;
-    int patrolStep=0;
+    std::array<Unit, 5> fieldCheckpoint;
+    float wildlifeTick = 0;
+    int patrolStep = 0;
     void BeginWildlife(int index);
     void BeginBattle();
 
