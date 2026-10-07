@@ -276,11 +276,13 @@ void Renderer::Camera(const RpgGame &game)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    auto target = game.dollTraining.active ? WorldPoint{3, 3} : game.player;
+    float cameraZoom = game.dollTraining.active ? 5.0f : zoom;
     float aspect = float(width) / height;
-    glOrtho(-zoom * aspect, zoom * aspect, -zoom, zoom, .1, 100);
+    glOrtho(-cameraZoom * aspect, cameraZoom * aspect, -cameraZoom, cameraZoom, .1, 100);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(game.player.x + 17, 20, game.player.z + 19, game.player.x, 0, game.player.z, 0, 1, 0);
+    gluLookAt(target.x + 17, 20, target.z + 19, target.x, 0, target.z, 0, 1, 0);
     glGetDoublev(GL_MODELVIEW_MATRIX, model);
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetIntegerv(GL_VIEWPORT, viewport);
@@ -305,7 +307,10 @@ WorldPoint Renderer::Pick(int x, int y) const
 bool Renderer::IsUi(int x, int y, const RpgGame &game) const
 {
     float px = UIX(x, width), py = UIY(y, height);
-    return py < 100 || py > 700 || (game.inventory && In(px, py, 950, 115, 310, 420));
+    return py < 100 || py > 700 ||
+           ((game.talkingActor || game.talkingNpc >= 0) && In(px, py, 745, 185, 520, 470)) ||
+           (game.worldDebug && In(px, py, 15, 180, 710, 495)) ||
+           (game.inventory && In(px, py, 950, 115, 310, 420));
 }
 
 int Renderer::ViewRadius() const
@@ -316,6 +321,18 @@ int Renderer::ViewRadius() const
 
 void Renderer::Environment(const RpgGame &game)
 {
+    if (game.dollTraining.active)
+    {
+        if (!shadowPass)
+        {
+            effects.Lit(model, game.dollTraining.report.elapsed, 5);
+            Cube(3, -.12f, 3, 7, .2f, 7, .24f, .3f, .27f);
+            effects.Material(4);
+            Cube(1, .25f, .6f, 1, .5f, .25f, .3f, .4f, .42f);
+            glUseProgram(0);
+        }
+        return;
+    }
     int centerX = int(std::floor(game.player.x)), centerZ = int(std::floor(game.player.z));
     int radius = ViewRadius();
     if (!shadowPass)
@@ -379,11 +396,17 @@ void Renderer::Environment(const RpgGame &game)
             effects.Material(4);
         Cube(p.x, .16f, p.z, .5f, .32f, .5f, .25f, .17f, .1f);
     }
+    TownBuildings(game);
     glUseProgram(0);
 }
 
 void Renderer::Actors(const RpgGame &game)
 {
+    if (game.dollTraining.active)
+    {
+        DollActors(game.dollTraining);
+        return;
+    }
     glUseProgram(0);
     glDisable(GL_LIGHTING);
     glDisable(GL_FOG);
@@ -391,12 +414,36 @@ void Renderer::Actors(const RpgGame &game)
     // Draw far-to-near so transparent borders blend over the objects behind them.
     std::vector<int> order;
     order.push_back(-1);
+    for (int i = 0; i < int(game.npcs.size()); ++i)
+        if (std::abs(game.npcs[i].position.x - game.player.x) < ViewRadius() &&
+            std::abs(game.npcs[i].position.z - game.player.z) < ViewRadius())
+            order.push_back(-2 - i);
     for (int i = 0; i < int(game.enemies.size()); ++i)
         if (game.enemies[i].hp > 0)
             order.push_back(i);
+    std::vector<narrative::ActorId> worldOrder;
+    for (const auto &entry : game.world.Actors())
+    {
+        const auto &actor = entry.second;
+        if (!actor.available || std::abs(actor.position.x - game.player.x) > ViewRadius() ||
+            std::abs(actor.position.z - game.player.z) > ViewRadius())
+            continue;
+        worldOrder.push_back(entry.first);
+        order.push_back(-1000 - int(worldOrder.size()) + 1);
+    }
     auto position = [&](int index)
     {
-        return index < 0 ? game.player : game.enemies[index].position;
+        if (index <= -1000)
+        {
+            auto p = game.world.Find(worldOrder[-1000 - index])->position;
+            return WorldPoint{p.x, p.z};
+        }
+        if (index < -1)
+        {
+            auto p = game.npcs[-2 - index].position;
+            return WorldPoint{p.x, p.z};
+        }
+        return index == -1 ? game.player : game.enemies[index].position;
     };
     std::sort(order.begin(),
               order.end(),
@@ -408,7 +455,32 @@ void Renderer::Actors(const RpgGame &game)
     for (int index : order)
     {
         auto p = position(index);
-        if (index < 0)
+        if (index <= -1000)
+        {
+            const auto &actor = *game.world.Find(worldOrder[-1000 - index]);
+            Sprite(p.x, 0, p.z, 1, actor.moving ? int(game.time * 8) % 8 : 0);
+            if (!shadowPass)
+                Ring(p.x, .04f, p.z, .4f, .3f, .85f, 1);
+        }
+        else if (index < -1)
+        {
+            const auto &npc = game.npcs[-2 - index];
+            // Town inhabitants use generic placeholders, not canonical doll personalities.
+            Sprite(p.x,
+                   npc.hp <= 0 ? -.35f : 0,
+                   p.z,
+                   int(npc.role) % 2,
+                   npc.moving ? int(game.time * 8) % 8 : 0);
+            if (!shadowPass)
+                Ring(p.x,
+                     .04f,
+                     p.z,
+                     .32f,
+                     npc.hostile ? 1 : .3f,
+                     npc.role == NpcRole::Merchant ? .9f : .5f,
+                     npc.role == NpcRole::Medic ? .9f : .3f);
+        }
+        else if (index == -1)
         {
             bool attack = game.time - game.attackStarted < .35f;
             std::string clip = game.hp <= 0  ? "die"
@@ -433,8 +505,10 @@ void Renderer::Actors(const RpgGame &game)
         }
         if (!shadowPass)
         {
-            float ratio = index < 0 ? float(game.hp) / game.MaxHp()
-                                    : float(game.enemies[index].hp) / game.enemies[index].maxHp;
+            float ratio = index <= -1000 ? game.world.Find(worldOrder[-1000 - index])->hp / 100
+                          : index < -1   ? game.npcs[-2 - index].hp / 100
+                          : index == -1 ? float(game.hp) / game.MaxHp()
+                                        : float(game.enemies[index].hp) / game.enemies[index].maxHp;
             Line(p.x - .3f, 1.95f, p.z + .27f, p.x + .3f, 1.95f, p.z - .27f, .12f, .12f, .12f);
             Line(p.x - .3f,
                  1.96f,
@@ -449,6 +523,13 @@ void Renderer::Actors(const RpgGame &game)
     }
     if (shadowPass)
         return;
+    if (game.world.Ready() && game.world.Event().playerAccepted &&
+        game.world.Event().state == narrative::EventState::Active)
+    {
+        auto target = game.world.Settings().search;
+        Ring(target.x, .06f, target.z, .8f, .3f, 1, .6f);
+        Sprite(target.x, .0f, target.z, 1, 0);
+    }
     for (const auto &drop : game.drops)
     {
         auto p = drop.position;
@@ -488,8 +569,13 @@ void Renderer::Actors(const RpgGame &game)
 
 void Renderer::Hud(const RpgGame &game)
 {
+    if (game.dollTraining.active)
+    {
+        DollHud(game.dollTraining, game.paused);
+        return;
+    }
     Panel(0, 0, 1280, 98, .035f, .065f, .08f, .96f);
-    Text(24, 16, "레벨 1 / 외곽 사냥터", 24, .95f, .87f, .67f);
+    Text(24, 16, "변경 마을 / 주변 사냥터", 24, .95f, .87f, .67f);
     Text(24, 53, "인간 지휘관 · 4식 SD 시험 외형", 13, .65f, .76f, .74f);
     Text(420,
          15,
@@ -539,18 +625,21 @@ void Renderer::Hud(const RpgGame &game)
         Text(975, 422, "가방을 열어도 전투는 계속됩니다", 12);
     }
     Panel(0, 704, 1280, 96, .035f, .065f, .08f, .96f);
-    Text(24,
-         717,
-         "WASD 이동 · 마우스 조준 · 좌클릭/Space 공격 · E 줍기 · Q 회복약 · I 가방 · Esc 정지",
-         16);
+    Text(
+        24,
+        717,
+        "WASD 이동 · 마우스 조준 · 좌클릭/Space 공격 · E 줍기 · Q 회복약 · I 가방 · F 대화 · Esc 정지",
+        16);
     Text(24,
          751,
-         game.message.empty() ? "휠 확대/축소 · F11 전체화면 · 적은 처치 후 18초 뒤 재등장합니다."
+         game.message.empty() ? "F6: Doll AI 구조 훈련 · 휠 확대/축소 · F11 전체화면"
                               : game.message,
          15,
          .9f,
          .79f,
          .51f);
+    TownHud(game);
+    WorldHud(game);
     if (game.paused || game.hp <= 0)
     {
         Panel(0, 0, 1280, 800, .01f, .025f, .035f, .65f);
@@ -571,7 +660,9 @@ void Renderer::Draw(const RpgGame &game, int, int)
     glActiveTexture(GL_TEXTURE0);
     glDisable(GL_TEXTURE_2D);
     glDepthMask(GL_TRUE);
-    if (effects.BeginShadow(game.player.x, game.player.z, float(ViewRadius() + 4)))
+    auto focus = game.dollTraining.active ? WorldPoint{3, 3} : game.player;
+    if (effects.BeginShadow(
+            focus.x, focus.z, game.dollTraining.active ? 8.0f : float(ViewRadius() + 4)))
     {
         shadowPass = true;
         Environment(game);

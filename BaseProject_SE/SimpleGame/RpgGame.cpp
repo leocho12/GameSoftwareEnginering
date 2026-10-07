@@ -40,6 +40,8 @@ int RpgGame::NextExperience() const
 
 RpgGame::Ground RpgGame::Terrain(int x, int z) const
 {
+    if (TownNpc::InTown(float(x), float(z)))
+        return Ground::Dirt;
     // Coordinate hashing generates the same world without storing visited ground.
     // Isolated obstacle cells leave two-cell-wide connected corridors everywhere.
     auto mod3 = [](int value)
@@ -62,6 +64,10 @@ RpgGame::Ground RpgGame::Terrain(int x, int z) const
 
 bool RpgGame::Walkable(int x, int z) const
 {
+    for (const auto &building : TownNpc::Buildings())
+        if (std::abs(float(x) - building.x) <= building.width * .5f &&
+            std::abs(float(z) - building.z) <= building.depth * .5f)
+            return false;
     return Terrain(x, z) == Ground::Dirt;
 }
 
@@ -114,6 +120,7 @@ bool RpgGame::Connected() const
 
 void RpgGame::Reset(uint32_t newSeed)
 {
+    dollTraining.Stop();
     seed = newSeed;
     random.seed(seed);
     player = {3, 3};
@@ -122,7 +129,8 @@ void RpgGame::Reset(uint32_t newSeed)
     experience = totalExperience = 0;
     hp = 100;
     potions = 3;
-    scrap = kills = 0;
+    scrap = 10;
+    kills = 0;
     time = attackCooldown = hurt = 0;
     attackStarted = -100;
     paused = inventory = moving = false;
@@ -131,7 +139,9 @@ void RpgGame::Reset(uint32_t newSeed)
     drops.clear();
     shots.clear();
     fires.clear();
-    for (int i = 0; i < 16; ++i)
+    InitializeTown();
+    InitializeWorld();
+    for (int i = 0; i < 32; ++i)
     {
         RpgEnemy e;
         e.position = Spawn();
@@ -139,7 +149,7 @@ void RpgGame::Reset(uint32_t newSeed)
     }
     fires = {{2, 5}, {5, 2}};
     drops.push_back({{4, 3}, true});
-    Notify("레벨 1 / 외곽 사냥터: 적을 처치하고 경험치를 모아 레벨 5에 도달하세요.");
+    Notify("변경 마을: F로 주민과 대화 · 부품 10개 지급 · 마을 밖 사냥터에서 성장하세요.");
 }
 
 void RpgGame::ClearInput()
@@ -153,11 +163,12 @@ WorldPoint RpgGame::Spawn()
 {
     std::vector<WorldPoint> candidates;
     int centerX = int(std::floor(player.x)), centerZ = int(std::floor(player.z));
-    for (int z = centerZ - 14; z <= centerZ + 14; ++z)
-        for (int x = centerX - 14; x <= centerX + 14; ++x)
+    for (int z = centerZ - 22; z <= centerZ + 22; ++z)
+        for (int x = centerX - 22; x <= centerX + 22; ++x)
         {
             WorldPoint p{float(x), float(z)};
-            if (!Fits(p) || Distance(p, player) < 7)
+            if (TownNpc::InTown(p.x, p.z) || !Fits(p) || Distance(p, player) < 7 ||
+                Distance(p, player) > 22)
                 continue;
             bool occupied = false;
             for (const auto &e : enemies)
@@ -235,7 +246,7 @@ void RpgGame::Attack()
     }
     dx /= length;
     dz /= length;
-    int target = -1;
+    int target = -1, npcTarget = -1;
     float nearest = 6;
     for (int i = 0; i < int(enemies.size()); ++i)
     {
@@ -250,8 +261,32 @@ void RpgGame::Attack()
             nearest = forward;
         }
     }
+    for (int i = 0; i < int(npcs.size()); ++i)
+    {
+        const auto &npc = npcs[i];
+        if (!npc.hostile || npc.hp <= 0 || TownNpc::InTown(npc.position.x, npc.position.z))
+            continue;
+        float ex = npc.position.x - player.x, ez = npc.position.z - player.z;
+        float forward = ex * dx + ez * dz, side = std::abs(ex * dz - ez * dx);
+        if (forward >= 0 && forward < nearest && side < .5f &&
+            LineOfSight(player, {npc.position.x, npc.position.z}))
+        {
+            npcTarget = i;
+            nearest = forward;
+        }
+    }
     WorldPoint end{player.x + dx * 6, player.z + dz * 6};
-    if (target >= 0)
+    if (npcTarget >= 0)
+    {
+        auto &npc = npcs[npcTarget];
+        end = {npc.position.x, npc.position.z};
+        npc.hp = std::max(0.0f, npc.hp - AttackPower());
+        npc.recovery = 0;
+        npc.Remember("player_retaliated");
+        if (npc.hp == 0)
+            Notify("적대 NPC를 제압했습니다. 이후 마을로 복귀합니다.");
+    }
+    else if (target >= 0)
     {
         auto &e = enemies[target];
         end = e.position;
@@ -259,7 +294,7 @@ void RpgGame::Attack()
         if (e.hp == 0)
         {
             ++kills;
-            e.respawn = 18;
+            e.respawn = 8;
             drops.push_back({e.position, random() % 3 == 0});
             // Keep the floor bounded during prolonged grinding.
             if (drops.size() > 128)
@@ -327,6 +362,12 @@ void RpgGame::Heal()
 
 void RpgGame::Update(float dt)
 {
+    if (dollTraining.active)
+    {
+        if (!paused)
+            dollTraining.Update(dt);
+        return;
+    }
     if (paused || hp <= 0)
         return;
     float remaining = std::clamp(dt, 0.0f, .1f);
@@ -364,8 +405,12 @@ void RpgGame::Step(float dt)
              (.745f * right - .667f * up) / length * 3.6f * dt,
              (-.667f * right - .745f * up) / length * 3.6f * dt);
     moving = Distance(before, player) > .00001f;
-    if (firing || keys[' '])
+    if (talkingNpc < 0 && talkingActor == 0 && (firing || keys[' ']))
         Attack();
+    UpdateTown(dt);
+    UpdateWorld(dt);
+    if (hp <= 0)
+        return;
     // A bounded local navigation window follows the player through the infinite world.
     int originX = int(std::floor(player.x + .5f)) - Size / 2;
     int originZ = int(std::floor(player.z + .5f)) - Size / 2;
@@ -426,6 +471,12 @@ void RpgGame::Step(float dt)
             continue;
         }
         e.cooldown = std::max(0.0f, e.cooldown - dt);
+        if (TownNpc::InTown(e.position.x, e.position.z))
+        {
+            e.position = Spawn();
+        }
+        if (TownNpc::InTown(player.x, player.z))
+            continue;
         float range = Distance(player, e.position);
         if (range > 10)
             continue;
@@ -462,10 +513,13 @@ void RpgGame::Step(float dt)
                     goal = pointOf(here);
             }
             float dx = goal.x - e.position.x, dz = goal.z - e.position.z, len = std::hypot(dx, dz);
+            auto beforeEnemy = e.position;
             if (len > .01f)
                 Move(e.position,
                      dx / len * std::min(len, 1.45f * dt),
                      dz / len * std::min(len, 1.45f * dt));
+            if (TownNpc::InTown(e.position.x, e.position.z))
+                e.position = beforeEnemy;
         }
         else if (e.cooldown == 0 && LineOfSight(player, e.position))
         {

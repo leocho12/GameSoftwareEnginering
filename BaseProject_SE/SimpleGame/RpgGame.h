@@ -1,4 +1,7 @@
 #pragma once
+#include "DollBehavior.h"
+#include "TownNpc.h"
+#include "WorldSimulation.h"
 #include <array>
 #include <cstdint>
 #include <random>
@@ -47,6 +50,23 @@ class RpgGame
     void Attack();
     void Pickup();
     void Heal();
+    void InteractNpc();
+    void NpcChoice(int choice);
+    int NearestNpc() const;
+    std::vector<TownNpc> npcs;
+    int talkingNpc = -1;
+    narrative::WorldSimulation world;
+    std::map<narrative::ActorId, TownNpc> worldBodies;
+    narrative::ActorId talkingActor = 0;
+    bool worldDebug = false;
+    narrative::ActorId selectedWorldActor = 0;
+    bool InteractWorldActor();
+    void WorldChoice(int choice);
+    bool WorldRescue();
+    void FastForwardWorld();
+    bool npcDebug = false;
+    bool townRadioConnected = true;
+    void HelpSelectedNpc();
     void AddExperience(int amount);
     bool Walkable(int x, int z) const;
     bool Fits(WorldPoint p) const;
@@ -58,6 +78,7 @@ class RpgGame
     int Defense() const;
     Ground Terrain(int x, int z) const;
 
+    DollBehaviorPrototype dollTraining;
     uint32_t seed = 0;
     WorldPoint player{3, 3}, aim{4, 3};
     std::array<bool, 256> keys{};
@@ -78,4 +99,18 @@ class RpgGame
     WorldPoint Spawn();
     void Notify(const std::string &text);
     void Step(float dt);
+    float npcUpdateCpuMs = 0, npcDecisionCpuMs = 0, npcPathCpuMs = 0, npcMetricsTimer = 0;
+    int npcDecisions = 0, npcPathReplans = 0;
+    void InitializeWorld();
+    void UpdateWorld(float dt);
+    void LogWorld();
+    std::size_t worldLogCursor = 0;
+    void InitializeTown();
+    void UpdateTown(float dt);
+    void PerceiveNpc(TownNpc &npc);
+    void CoordinateTown();
+    void DecideNpc(TownNpc &npc);
+    float townCoordinationTimer = 0;
+    void MoveNpc(TownNpc &npc, WorldPoint target, float dt);
+    void LogNpc(const TownNpc &npc, const char *event) const;
 };

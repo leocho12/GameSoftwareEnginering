@@ -157,14 +157,26 @@
   <ItemGroup>
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="CharacterAnimation.h" />
+    <ClInclude Include="DollBehavior.h" />
+    <ClInclude Include="TownNpc.h" />
+    <ClInclude Include="WorldSimulation.h" />
+    <ClInclude Include="NpcMind.h" />
     <ClInclude Include="RpgGame.h" /><ClInclude Include="GridTypes.h" />
     <ClInclude Include="RenderEffects.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="RendererDolls.cpp" />
+    <ClCompile Include="RendererTown.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="CharacterAnimation.cpp" />
+    <ClCompile Include="DollBehavior.cpp" />
+    <ClCompile Include="TownNpc.cpp" />
+    <ClCompile Include="WorldSimulation.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="RpgWorld.cpp" />
+    <ClCompile Include="RendererWorld.cpp" />
+    <ClCompile Include="TownKnowledge.cpp" />
     <ClCompile Include="RpgGame.cpp" />
     <ClCompile Include="RenderEffects.cpp" />
     <ClCompile Include="SimpleGame.cpp" />
@@ -193,10 +205,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CopyTutorialAssets" AfterTargets="Build">
     <ItemGroup>
+      <NarrativeAssets Include="$(ProjectDir)Assets\AI\*.tsv" />
       <TutorialAssets Include="$(ProjectDir)Assets\*.png" />
       <GflAssets Include="$(ProjectDir)Assets\GFL\*.png;$(ProjectDir)Assets\GFL\*.gfa;$(ProjectDir)Assets\GFL\manifest.json" />
     </ItemGroup>
     <MakeDir Directories="$(OutDir)Assets" />
+    <MakeDir Directories="$(OutDir)Assets\AI" />
+    <Copy SourceFiles="@(NarrativeAssets)" DestinationFolder="$(OutDir)Assets\AI" SkipUnchangedFiles="true" />
     <MakeDir Directories="$(OutDir)Assets\GFL" />
     <Copy SourceFiles="@(GflAssets)" DestinationFolder="$(OutDir)Assets\GFL" SkipUnchangedFiles="true" Condition="'@(GflAssets)' != ''" />
     <Copy SourceFiles="@(TutorialAssets)" DestinationFolder="$(OutDir)Assets" SkipUnchangedFiles="true" Condition="'@(TutorialAssets)' != ''" />

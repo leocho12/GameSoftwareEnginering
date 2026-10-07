@@ -36,6 +36,11 @@ class Renderer
     int ViewRadius() const;
     void Actors(const RpgGame &game);
     void Hud(const RpgGame &game);
+    void TownBuildings(const RpgGame &game);
+    void TownHud(const RpgGame &game);
+    void WorldHud(const RpgGame &game);
+    void DollActors(const DollBehaviorPrototype &training);
+    void DollHud(const DollBehaviorPrototype &training, bool paused);
     bool Character(int index,
                    const std::string &clip,
                    float time,

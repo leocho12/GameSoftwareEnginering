@@ -32,6 +32,7 @@ void Resize(int w, int h)
 
 void Close()
 {
+    game.dollTraining.Stop();
     renderer.reset();
 }
 
@@ -58,6 +59,8 @@ void Mouse(int button, int state, int x, int y)
         renderer->Zoom(button == 3 ? 1 : -1);
         return;
     }
+    if (game.dollTraining.active)
+        return;
     if (button == GLUT_LEFT_BUTTON)
         game.firing =
             state == GLUT_DOWN && !game.paused && game.hp > 0 && !renderer->IsUi(x, y, game);
@@ -77,6 +80,49 @@ void Key(unsigned char key, int, int)
         game.ClearInput();
         return;
     }
+    if (game.dollTraining.active)
+    {
+        if (game.paused)
+            return;
+        auto &training = game.dollTraining;
+        switch (key)
+        {
+        case '1':
+            training.SetCommand(DollCommand::Rescue);
+            break;
+        case '2':
+            training.SetCommand(DollCommand::Hold);
+            break;
+        case '3':
+            training.SetCommand(DollCommand::None);
+            break;
+        case 'r':
+            training.Start();
+            break;
+        case '\t':
+            training.Start(true);
+            break;
+        case '[':
+            training.selectedTrait = (training.selectedTrait + 4) % 5;
+            break;
+        case ']':
+            training.selectedTrait = (training.selectedTrait + 1) % 5;
+            break;
+        case '-':
+            training.AdjustTrait(-.1f);
+            break;
+        case '+':
+        case '=':
+            training.AdjustTrait(.1f);
+            break;
+        case '0':
+            training.RestoreTraits();
+            break;
+        default:
+            break;
+        }
+        return;
+    }
     if (game.paused || game.hp <= 0)
     {
         if (key == 13)
@@ -85,11 +131,69 @@ void Key(unsigned char key, int, int)
             game.Reset(std::random_device{}());
         return;
     }
+    if (key == 'v')
+    {
+        game.worldDebug = !game.worldDebug;
+        return;
+    }
+    if (key == 'b')
+    {
+        const auto &actors = game.world.Actors();
+        if (!actors.empty())
+        {
+            auto next = actors.upper_bound(game.selectedWorldActor);
+            game.selectedWorldActor = (next == actors.end() ? actors.begin() : next)->first;
+        }
+        return;
+    }
+    if (key == 't')
+    {
+        game.FastForwardWorld();
+        return;
+    }
+    if (game.talkingActor && (key == '1' || key == '2'))
+    {
+        game.WorldChoice(key - '0');
+        return;
+    }
+    if (game.talkingNpc >= 0 && (key == '1' || key == '2'))
+    {
+        game.NpcChoice(key - '0');
+        return;
+    }
+    if (key == 'h' && game.talkingNpc >= 0)
+    {
+        game.HelpSelectedNpc();
+        return;
+    }
+    if (key == 'j')
+    {
+        game.npcDebug = !game.npcDebug;
+        return;
+    }
+    if (key == 'k')
+    {
+        game.townRadioConnected = !game.townRadioConnected;
+        return;
+    }
+    if (key == 'f')
+    {
+        if (game.talkingActor)
+            game.talkingActor = 0;
+        else if (game.talkingNpc >= 0)
+            game.talkingNpc = -1;
+        else if (game.InteractWorldActor())
+            return;
+        else
+            game.InteractNpc();
+        return;
+    }
     game.keys[key] = true;
     switch (key)
     {
     case 'e':
-        game.Pickup();
+        if (!game.WorldRescue())
+            game.Pickup();
         break;
     case 'q':
         game.Heal();
@@ -105,6 +209,16 @@ void Key(unsigned char key, int, int)
 
 void Special(int key, int, int)
 {
+    if (key == GLUT_KEY_F6)
+    {
+        game.ClearInput();
+        if (game.dollTraining.active)
+            game.dollTraining.Stop();
+        else
+            game.dollTraining.Start();
+        game.paused = false;
+        return;
+    }
     if (key == GLUT_KEY_F11)
     {
         static bool full = false;
@@ -173,6 +287,9 @@ int main(int argc, char **argv)
         glutDestroyWindow(window);
         return 1;
     }
+    wchar_t executable[MAX_PATH]{};
+    GetModuleFileNameW(nullptr, executable, MAX_PATH);
+    game.dollTraining.SetLogDirectory(std::filesystem::path(executable).parent_path() / "Profiles");
     renderer = std::make_unique<Renderer>(initialW, initialH);
     glutDisplayFunc(Display);
     glutReshapeFunc(Resize);

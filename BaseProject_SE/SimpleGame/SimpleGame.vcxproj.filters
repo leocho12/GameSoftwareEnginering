@@ -31,7 +31,11 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="CharacterAnimation.h"><Filter>헤더 파일</Filter></ClInclude>
-    <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="RpgGame.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="DollBehavior.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="TownNpc.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="WorldSimulation.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="NpcMind.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="RpgGame.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="RenderEffects.h"><Filter>헤더 파일</Filter></ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -41,10 +45,22 @@
     <ClCompile Include="SimpleGame.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="RendererDolls.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererTown.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CharacterAnimation.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="DollBehavior.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="TownNpc.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="WorldSimulation.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RpgWorld.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RendererWorld.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="TownKnowledge.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RpgGame.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RenderEffects.cpp"><Filter>소스 파일</Filter></ClCompile>
   </ItemGroup>
