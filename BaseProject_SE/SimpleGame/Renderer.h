@@ -27,14 +27,16 @@ class Renderer
     bool cameraReady = false, shadowPass = false;
     float zoom = 9;
     RenderEffects effects;
-    std::array<CharacterAnimation, 5> characters;
-    std::array<GLuint, 5> characterTextures{};
+    std::array<CharacterAnimation, 8> characters;
+    std::array<GLuint, 8> characterTextures{};
     std::array<GLuint, 3> portraits{};
     std::array<float, 3> portraitAspects{{1, 1, 1}};
     void Camera(const RpgGame &game);
     void Environment(const RpgGame &game);
     int ViewRadius() const;
     void Actors(const RpgGame &game);
+    void ContactShadows(const RpgGame &game);
+    void StoryHud(const RpgGame &game);
     void Hud(const RpgGame &game);
     void TownBuildings(const RpgGame &game);
     void TownHud(const RpgGame &game);

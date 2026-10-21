@@ -26,6 +26,14 @@ int main(int argc, char **argv)
 {
     const auto assets = argc > 1 ? std::filesystem::path(argv[1])
                                  : std::filesystem::path("BaseProject_SE/SimpleGame/Assets/AI");
+    auto conversation = Create(assets);
+    conversation.SetConversation(1001);
+    conversation.Advance(30, true);
+    assert(conversation.Find(1001)->task == Task::Idle);
+    assert(conversation.Find(1002)->task == Task::Departing);
+    conversation.SetConversation(0);
+    conversation.Advance(10, true);
+    assert(conversation.Find(1001)->task == Task::Departing);
     auto unattended = Create(assets);
     unattended.Advance(30, true);
     assert(unattended.Find(1001)->brain.intention == Goal::Rescue);

@@ -1,0 +1,14 @@
+minute_seconds	1
+signal_minute	5
+decision_minute	30
+deadline_minutes	2880
+travel_minutes	60
+search_minutes	90
+return_minutes	60
+departure_timeout	90
+supplies	12
+difficulty	0.65
+exit_x	3
+exit_z	14
+search_x	3
+search_z	18

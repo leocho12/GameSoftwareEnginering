@@ -230,6 +230,7 @@ void WorldSimulation::Reset()
     targetMinute = 0;
     nextOrder = 1;
     playerAware = reported = false;
+    conversationActor = 0;
     nextRecovery = 10;
     updateMs = decisionMs = 0;
     processedEvents = 0;
@@ -395,7 +396,7 @@ void WorldSimulation::Evaluate()
     {
         auto &a = p.second;
         auto &b = a.brain;
-        if (a.task != Task::Idle || a.attempted || !b.belief.aware ||
+        if (a.id == conversationActor || a.task != Task::Idle || a.attempted || !b.belief.aware ||
             event.state != EventState::Active)
             continue;
         b.personalityScore = a.rescue * config.goalWeights[0] + a.autonomy * config.goalWeights[1];
@@ -443,8 +444,8 @@ void WorldSimulation::Evaluate()
         {
             auto &other = entry.second;
             const auto &source = actors.at(leader);
-            if (other.id == leader || !other.available || other.attempted ||
-                !other.brain.belief.aware ||
+            if (other.id == conversationActor || other.id == leader || !other.available ||
+                other.attempted || !other.brain.belief.aware ||
                 (!radioConnected && std::hypot(other.position.x - source.position.x,
                                                other.position.z - source.position.z) > 6))
                 continue;

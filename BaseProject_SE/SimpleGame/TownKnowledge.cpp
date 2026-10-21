@@ -21,7 +21,9 @@ void RpgGame::PerceiveNpc(TownNpc &npc)
     for (int i = 0; i < int(enemies.size()); ++i)
     {
         const auto &e = enemies[i];
-        if (Distance(npc.position, {e.position.x, e.position.z}) <= 10 &&
+        // Observers do not treat a distant, non-hostile patrol as an active combat target.
+        if (e.action == BanditAction::Attack &&
+            Distance(npc.position, {e.position.x, e.position.z}) <= 10 &&
             LineOfSight({npc.position.x, npc.position.z}, e.position))
             npc.mind.Observe({NpcFact::Enemy,
                               i,
@@ -44,7 +46,14 @@ void RpgGame::PerceiveNpc(TownNpc &npc)
                               1,
                               time,
                               true,
-                              other.hostile});
+                              other.hostile,
+                              other.scrap});
+    for (const auto &other : npcs)
+        if (other.criminalUntil > time && npc.mind.Find(NpcFact::Crime, other.id, time) &&
+            Distance(npc.position, other.position) < 8 &&
+            LineOfSight({npc.position.x, npc.position.z}, {other.position.x, other.position.z}))
+            npc.mind.Observe(
+                {NpcFact::Crime, other.id, npc.id, other.position, other.hp, 1, time, true, true});
     if (Distance(npc.position, {player.x, player.z}) <= 8 &&
         LineOfSight({npc.position.x, npc.position.z}, player))
         npc.mind.Observe({NpcFact::Commander,

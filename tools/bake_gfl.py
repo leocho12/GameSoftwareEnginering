@@ -242,13 +242,16 @@ class Baker:
         return result
 
 
-def bake(source, output, fps):
+def bake(source, output, fps, models=None):
     output.mkdir(parents=True, exist_ok=True)
-    report = []
-    for model in ('4type', 'M4A1', 'UMP45', 'HK416', 'G11'):
+    manifest = output/'manifest.json'
+    report = json.loads(manifest.read_text(encoding='utf-8')) if manifest.exists() else []
+    for model in models or ('4type', 'M4A1', 'UMP45', 'HK416', 'G11'):
         directory = source/model.lower()
         baker = Baker(directory/(model+'.json'), directory/(model+'.atlas'))
-        clips = ('wait', 'move', 'attack', 'die', 'victory', 'victoryloop')
+        clips = tuple(name for name in ('wait', 'move', 'attack', 'die', 'victory', 'victoryloop')
+                      if name in baker.data['animations'])
+        assert {'wait', 'move', 'attack'} <= set(clips)
         path = output/(model.lower()+'.gfa')
         record = dict(model=model, texture=model.lower()+'.png', clips={})
         with path.open('wb') as out:
@@ -265,6 +268,7 @@ def bake(source, output, fps):
                 record['clips'][clip] = dict(duration=length, frames=count)
         shutil.copyfile(baker.image_path, output/(model.lower()+'.png'))
         record['bytes'] = path.stat().st_size
+        report = [entry for entry in report if entry['model'].lower() != model.lower()]
         report.append(record)
         print(model, record['bytes'], record['clips'])
     (output/'manifest.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
@@ -275,6 +279,7 @@ if __name__ == '__main__':
     parser.add_argument('source', type=pathlib.Path)
     parser.add_argument('output', type=pathlib.Path)
     parser.add_argument('--fps', type=int, default=30)
+    parser.add_argument('--models', nargs='+')
     args = parser.parse_args()
     assert 1 <= args.fps <= 60
-    bake(args.source, args.output, args.fps)
+    bake(args.source, args.output, args.fps, args.models)

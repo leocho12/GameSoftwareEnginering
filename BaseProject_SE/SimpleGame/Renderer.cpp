@@ -51,8 +51,9 @@ Renderer::Renderer(int w, int h)
     portraits[0] = LoadPng(base + L"alpha.png", portraitAspects[0]);
     portraits[1] = LoadPng(base + L"bravo.png", portraitAspects[1]);
     portraits[2] = LoadPng(base + L"enemy.png", portraitAspects[2]);
-    const wchar_t *names[] = {L"4type", L"m4a1", L"ump45", L"hk416", L"g11"};
-    for (int i = 0; i < 5; ++i)
+    const wchar_t *names[] = {
+        L"4type", L"m4a1", L"ump45", L"hk416", L"g11", L"guard", L"ripper", L"jaeger"};
+    for (int i = 0; i < int(characters.size()); ++i)
     {
         std::wstring stem = base + L"GFL\\" + names[i];
         float aspect = 1;
@@ -307,7 +308,7 @@ WorldPoint Renderer::Pick(int x, int y) const
 bool Renderer::IsUi(int x, int y, const RpgGame &game) const
 {
     float px = UIX(x, width), py = UIY(y, height);
-    return py < 100 || py > 700 ||
+    return py < 100 || py > 700 || (game.storyJournalOpen && In(px, py, 120, 110, 1040, 575)) ||
            ((game.talkingActor || game.talkingNpc >= 0) && In(px, py, 745, 185, 520, 470)) ||
            (game.worldDebug && In(px, py, 15, 180, 710, 495)) ||
            (game.inventory && In(px, py, 950, 115, 310, 420));
@@ -356,7 +357,7 @@ void Renderer::Environment(const RpgGame &game)
                 continue;
             float variation = .5f + .5f * std::sin(float(x) * 1.73f + float(z) * 2.31f);
             if (!shadowPass)
-                effects.Material(5);
+                effects.Material(6);
             glPushMatrix();
             glTranslatef(float(x), 0, float(z));
             if (terrain == RpgGame::Ground::Tree)
@@ -458,19 +459,39 @@ void Renderer::Actors(const RpgGame &game)
         if (index <= -1000)
         {
             const auto &actor = *game.world.Find(worldOrder[-1000 - index]);
-            Sprite(p.x, 0, p.z, 1, actor.moving ? int(game.time * 8) % 8 : 0);
+            int appearance = 1 + int(actor.id % 4);
+            if (!Character(appearance,
+                           actor.moving ? "move" : "wait",
+                           game.time,
+                           p.x,
+                           0,
+                           p.z,
+                           game.worldBodies.at(actor.id).mirror))
+                Sprite(p.x, 0, p.z, 1, actor.moving ? int(game.time * 8) % 8 : 0);
             if (!shadowPass)
                 Ring(p.x, .04f, p.z, .4f, .3f, .85f, 1);
         }
         else if (index < -1)
         {
             const auto &npc = game.npcs[-2 - index];
-            // Town inhabitants use generic placeholders, not canonical doll personalities.
-            Sprite(p.x,
-                   npc.hp <= 0 ? -.35f : 0,
-                   p.z,
-                   int(npc.role) % 2,
-                   npc.moving ? int(game.time * 8) % 8 : 0);
+            // Shared original SD presentation; these are still separately authored NPCs.
+            int appearance = 1 + npc.id % 4;
+            bool attacking = npc.hp > 0 && game.time - npc.attackStarted < .35f;
+            const char *clip = attacking ? "attack" : npc.moving ? "move" : "wait";
+            float clock = attacking ? game.time - npc.attackStarted : game.time + npc.id * .13f;
+            if (!Character(appearance,
+                           clip,
+                           clock,
+                           p.x,
+                           npc.hp <= 0 ? -.35f : 0,
+                           p.z,
+                           npc.mirror,
+                           !attacking))
+                Sprite(p.x,
+                       npc.hp <= 0 ? -.35f : 0,
+                       p.z,
+                       int(npc.role) % 2,
+                       npc.moving ? int(game.time * 8) % 8 : 0);
             if (!shadowPass)
                 Ring(p.x,
                      .04f,
@@ -501,7 +522,26 @@ void Renderer::Actors(const RpgGame &game)
         }
         else
         {
-            Sprite(p.x, 0, p.z, 2, int(game.time * 8) % 8);
+            const auto &enemy = game.enemies[index];
+            bool attacking = game.time - enemy.attackStarted < .35f;
+            const char *clip = attacking ? "attack" : enemy.moving ? "move" : "wait";
+            if (!Character(enemy.appearance,
+                           clip,
+                           attacking ? game.time - enemy.attackStarted : game.time + index * .11f,
+                           p.x,
+                           0,
+                           p.z,
+                           enemy.mirror,
+                           !attacking))
+                Sprite(p.x, 0, p.z, 2, int(game.time * 8) % 8);
+            if (!shadowPass)
+                Ring(p.x,
+                     .04f,
+                     p.z,
+                     .35f,
+                     1,
+                     enemy.action == BanditAction::Attack ? .2f : .65f,
+                     .15f);
         }
         if (!shadowPass)
         {
@@ -528,7 +568,8 @@ void Renderer::Actors(const RpgGame &game)
     {
         auto target = game.world.Settings().search;
         Ring(target.x, .06f, target.z, .8f, .3f, 1, .6f);
-        Sprite(target.x, .0f, target.z, 1, 0);
+        if (!Character(1, "wait", game.time, target.x, -.35f, target.z))
+            Sprite(target.x, .0f, target.z, 1, 0);
     }
     for (const auto &drop : game.drops)
     {
@@ -598,37 +639,34 @@ void Renderer::Hud(const RpgGame &game)
          "처치 " + std::to_string(game.kills) + "  누적 경험치 " +
              std::to_string(game.totalExperience),
          14);
-    Panel(24, 115, 410, 65, .04f, .08f, .09f, .85f);
+    Panel(24, 115, 710, 115, .04f, .08f, .09f, .92f);
+    Text(38, 126, "첫 레벨 목표 | 외곽 순찰", 18, .95f, .85f, .55f);
+    Text(38, 154, game.PatrolObjective(), 16, .9f, .88f, .75f);
+    Text(38, 180, game.PatrolHint(), 12);
     Text(38,
-         127,
-         game.level >= 5 ? "레벨 5 목표 달성! 계속 사냥할 수 있습니다."
-                         : "목표: 적을 사냥해 레벨 5 달성",
-         16,
-         .88f,
-         .78f,
-         .45f);
-    Text(38,
-         153,
-         "무한 지형 / 위치 " + std::to_string(int(game.player.x)) + ", " +
-             std::to_string(int(game.player.z)),
+         204,
+         "진행: 레벨 " + std::to_string(game.level) + "/3 · 전리품 " +
+             std::to_string(std::min(game.itemsCollected, 2)) + "/2 · 보고 " +
+             (game.patrolReported ? "완료" : "대기") + " · I: 능력치 확인",
          12);
     if (game.inventory)
     {
         Panel(950, 115, 310, 420, .04f, .07f, .09f, .96f);
         Text(975, 139, "가방 / 능력치 [I]", 22);
         Text(975, 192, "회복약: " + std::to_string(game.potions), 18);
-        Text(975, 227, "회수 부품: " + std::to_string(game.scrap), 18);
+        Text(975, 227, "부품 (교환 재화): " + std::to_string(game.scrap), 18);
         Text(975, 279, "레벨업 자동 성장", 18, .9f, .77f, .45f);
         Text(975, 315, "최대 체력 +20", 16);
         Text(975, 346, "공격력 +3 / 방어력 +1", 16);
         Text(975, 390, "회복약은 최대 체력 50% 회복", 13);
-        Text(975, 422, "가방을 열어도 전투는 계속됩니다", 12);
+        Text(975, 422, "회복약 구매 3 · 판매 2 · 치료 2", 12);
+        Text(975, 450, "처치 전리품·임무 보상으로 부품 확보", 12);
     }
     Panel(0, 704, 1280, 96, .035f, .065f, .08f, .96f);
     Text(
         24,
         717,
-        "WASD 이동 · 마우스 조준 · 좌클릭/Space 공격 · E 줍기 · Q 회복약 · I 가방 · F 대화 · Esc 정지",
+        "WASD 이동 · 마우스 조준 · 좌클릭/Space 공격 · E 줍기 · Q 회복약 · I 가방 · F 대화 · L 일지 · Esc 정지",
         16);
     Text(24,
          751,
@@ -640,6 +678,7 @@ void Renderer::Hud(const RpgGame &game)
          .51f);
     TownHud(game);
     WorldHud(game);
+    StoryHud(game);
     if (game.paused || game.hp <= 0)
     {
         Panel(0, 0, 1280, 800, .01f, .025f, .035f, .65f);
@@ -675,6 +714,7 @@ void Renderer::Draw(const RpgGame &game, int, int)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     Camera(game);
     Environment(game);
+    ContactShadows(game);
     Actors(game);
     effects.Composite();
     glDisable(GL_DEPTH_TEST);
@@ -689,4 +729,50 @@ void Renderer::Draw(const RpgGame &game, int, int)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     Hud(game);
+}
+
+void Renderer::ContactShadows(const RpgGame &game)
+{
+    if (!effects.BeginContactShadows())
+        return;
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_FOG);
+    glDepthMask(GL_FALSE);
+    auto focus = game.dollTraining.active ? WorldPoint{3, 3} : game.player;
+    glBegin(GL_QUADS);
+    auto emit = [&](WorldPoint p)
+    {
+        if (std::abs(p.x - focus.x) > ViewRadius() || std::abs(p.z - focus.z) > ViewRadius())
+            return;
+        // Just above the plaza/road surface, centered at the same world-space foot anchor.
+        glTexCoord2f(0, 0);
+        glVertex3f(p.x - .34f, .028f, p.z - .24f);
+        glTexCoord2f(0, 1);
+        glVertex3f(p.x - .34f, .028f, p.z + .24f);
+        glTexCoord2f(1, 1);
+        glVertex3f(p.x + .34f, .028f, p.z + .24f);
+        glTexCoord2f(1, 0);
+        glVertex3f(p.x + .34f, .028f, p.z - .24f);
+    };
+    if (game.dollTraining.active)
+    {
+        for (const auto &doll : game.dollTraining.dolls)
+            emit({doll.position.x, doll.position.z});
+    }
+    else
+    {
+        emit(game.player);
+        for (const auto &npc : game.npcs)
+            emit({npc.position.x, npc.position.z});
+        for (const auto &enemy : game.enemies)
+            if (enemy.hp > 0)
+                emit(enemy.position);
+        for (const auto &entry : game.world.Actors())
+            if (entry.second.available)
+                emit({entry.second.position.x, entry.second.position.z});
+    }
+    glEnd();
+    glDepthMask(GL_TRUE);
+    glUseProgram(0);
 }

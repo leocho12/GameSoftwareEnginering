@@ -13,10 +13,94 @@ using std::max;
 #include <cmath>
 #include <cstdio>
 #include <vector>
+#include <chrono>
+#include <cstdint>
 #pragma comment(lib, "gdiplus.lib")
 
 namespace
 {
+constexpr int MaterialTextureSize = 1024;
+
+float MaterialHash(int x, int y)
+{
+    uint32_t value = uint32_t(x) * 0x9e3779b9u ^ uint32_t(y) * 0x85ebca6bu;
+    value ^= value >> 16;
+    value *= 0x7feb352du;
+    value ^= value >> 15;
+    return float(value & 0xffffu) / 65535.0f;
+}
+
+float MaterialNoise(int x, int y, int cellSize)
+{
+    int period = MaterialTextureSize / cellSize;
+    int ix = x / cellSize, iy = y / cellSize;
+    float fx = float(x % cellSize) / cellSize, fy = float(y % cellSize) / cellSize;
+    fx = fx * fx * (3 - 2 * fx);
+    fy = fy * fy * (3 - 2 * fy);
+    auto sample = [&](int dx, int dy)
+    {
+        return MaterialHash((ix + dx) % period, (iy + dy) % period);
+    };
+    float a = sample(0, 0) * (1 - fx) + sample(1, 0) * fx;
+    float b = sample(0, 1) * (1 - fx) + sample(1, 1) * fx;
+    return a * (1 - fy) + b * fy;
+}
+
+std::vector<unsigned char> MaterialPixels(int material)
+{
+    std::vector<unsigned char> pixels(MaterialTextureSize * MaterialTextureSize * 4);
+    for (int y = 0; y < MaterialTextureSize; ++y)
+        for (int x = 0; x < MaterialTextureSize; ++x)
+        {
+            float broad = MaterialNoise(x, y, 128), medium = MaterialNoise(x, y, 32);
+            float detail = MaterialNoise(x, y, 8), fine = MaterialNoise(x, y, 2);
+            float cell = MaterialHash(x / 16, y / 16);
+            float grain = .70f + .14f * medium + .12f * detail + .08f * fine;
+            std::array<float, 4> color{};
+            if (material == 0)
+            {
+                // Fine grass blades over soil patches, rather than one blurred noise layer.
+                float soil = std::clamp((broad * .6f + medium * .4f - .48f) * 3, 0.0f, 1.0f);
+                color = {{(.27f + soil * .08f) * grain,
+                          (.36f - soil * .05f) * grain,
+                          (.19f + soil * .02f) * grain,
+                          1}};
+                int bladeY = y % 16 - int(cell * 6);
+                int bladeX = x % 16 - (3 + int(cell * 8)) - bladeY / 4;
+                if (bladeY >= 0 && bladeY < 9 && bladeX >= 0 && bladeX <= 1)
+                {
+                    color[0] += .07f;
+                    color[1] += .10f;
+                    color[2] += .025f;
+                }
+            }
+            else if (material == 1)
+            {
+                // Small stones have a lit rim and a dark edge baked into the road material.
+                float dx = float(x % 16) - (5 + cell * 5);
+                float dy = float(y % 16) - (5 + MaterialHash(y / 16, x / 16 + 71) * 5);
+                float radius = 2 + cell * 3;
+                float stone = std::clamp(1 - (dx * dx + dy * dy) / (radius * radius), 0.0f, 1.0f);
+                float shade =
+                    grain + stone * (.22f + cell * .12f) - (stone > 0 && stone < .25f ? .12f : 0);
+                color = {{.46f * shade, .43f * shade, .34f * shade, 1}};
+            }
+            else
+            {
+                // Alpha stores rust coverage; RGB carries metal grain and fine scratches.
+                float scratch = x % 64 == int(MaterialHash(0, y / 96) * 64) ? .12f : 0;
+                float steel = .76f + detail * .18f + fine * .10f - scratch;
+                float rust = std::clamp((broad * .65f + medium * .35f - .55f) * 5, 0.0f, 1.0f);
+                color = {{steel, steel, steel, rust}};
+            }
+            std::size_t index = (std::size_t(y) * MaterialTextureSize + x) * 4;
+            for (int channel = 0; channel < 4; ++channel)
+                pixels[index + channel] =
+                    static_cast<unsigned char>(std::clamp(color[channel], 0.0f, 1.0f) * 255);
+        }
+    return pixels;
+}
+
 GLuint Program(const char *vs, const char *fs)
 {
     GLuint shaders[2] = {glCreateShader(GL_VERTEX_SHADER), glCreateShader(GL_FRAGMENT_SHADER)};
@@ -85,6 +169,7 @@ const char *litVs = R"GLSL(#version 130
 uniform mat4 shadowFromEye;
 uniform mat4 worldFromEye;
 out vec3 normalEye;
+out vec3 normalWorld;
 out vec3 world;
 out vec4 shadowPos;
 out vec4 tint;
@@ -93,6 +178,7 @@ void main(){
  vec4 eye=gl_ModelViewMatrix*gl_Vertex;
  gl_Position=gl_ProjectionMatrix*eye;
  normalEye=normalize(gl_NormalMatrix*gl_Normal);
+ normalWorld = mat3(worldFromEye) * normalEye;
  world=(worldFromEye*eye).xyz;
  shadowPos=shadowFromEye*eye;
  tint=gl_Color;
@@ -100,10 +186,13 @@ void main(){
 })GLSL";
 const char *litFs = R"GLSL(#version 130
 uniform sampler2D shadowMap;
+uniform sampler2D grassMaterial;
+uniform sampler2D roadMaterial;
+uniform sampler2D metalMaterial;
 uniform float clockTime;
 uniform int material;
 uniform int useShadow;
-in vec3 normalEye;in vec3 world;in vec4 shadowPos;in vec4 tint;in float distanceEye;
+in vec3 normalEye;in vec3 normalWorld;in vec3 world;in vec4 shadowPos;in vec4 tint;in float distanceEye;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1)),f.x),f.y);}
 void main(){
@@ -111,7 +200,7 @@ void main(){
  float nd=max(dot(n,l),0.0),shadow=1.0;
  vec3 sc=shadowPos.xyz/shadowPos.w*0.5+0.5;
  if(useShadow==1 && sc.x>0.0&&sc.x<1.0&&sc.y>0.0&&sc.y<1.0&&sc.z<1.0){
-  shadow=0.0;float bias=max(0.00015,0.0007*(1.0-nd));
+  shadow=0.0;float bias=max(0.000025,0.00015*(1.0-nd));
   for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++)shadow+=sc.z-bias<=texture2D(shadowMap,sc.xy+vec2(x,y)/2048.0).r?1.0:0.0;
   shadow/=9.0;
  }
@@ -121,7 +210,7 @@ void main(){
   base*=0.82+grain*0.30-seams;
   base=mix(base,vec3(0.14,0.19,0.12),noise(world.xz*0.5)*0.18);
  }else if(material==2){
-  base*=0.70+grain*0.40;
+  base = mix(base, texture2D(roadMaterial, world.xz * 0.25).rgb, 0.88);
   float marking=(1.0-step(0.075,abs(fract(world.x*0.25)-0.5)))*step(0.35,fract(world.z*0.28));
   base=mix(base,vec3(0.58,0.52,0.33),marking*0.65);
  }else if(material==3){
@@ -129,10 +218,28 @@ void main(){
   base=mix(vec3(0.035,0.15,0.16),vec3(0.18,0.39,0.37),waves*0.22+0.38);
   base+=vec3(0.50,0.45,0.28)*pow(max(0.0,sin(world.x*8.0+world.z*5.0-clockTime*2.0)),28.0)*0.5;
  }else if(material==4){
-  float ribs=0.82+0.18*step(0.18,fract((world.x+world.z)*5.0));
-  float rust=smoothstep(0.60,0.82,noise(world.xz*2.0+world.y));
-  base=mix(base*ribs,vec3(0.32,0.16,0.08),rust*0.58);
- }else if(material==5){base*=0.65+noise(world.xz*3.0)*0.55;}
+    // Project onto each face in world units, so tall walls do not stretch roof detail.
+    vec3 axis = abs(normalize(normalWorld));
+    vec2 surface = axis.y > axis.x && axis.y > axis.z ? world.xz :
+        (axis.x > axis.z ? world.zy : world.xy);
+    vec4 metal = texture2D(metalMaterial, surface * 0.25);
+    float ribCoordinate = surface.x * 5.0;
+    float ribWidth = max(fwidth(ribCoordinate), 0.001);
+    float rib = 1.0 - smoothstep(0.055 - ribWidth, 0.055 + ribWidth,
+        abs(fract(ribCoordinate) - 0.5));
+    rib *= 1.0 - smoothstep(0.2, 0.7, ribWidth);
+    base = mix(base * metal.rgb * (1.0 - rib * 0.18),
+        vec3(0.32, 0.16, 0.08), metal.a * 0.58);
+ }
+ else if (material == 5)
+ {
+    base = mix(base, texture2D(grassMaterial, world.xz * 0.25).rgb, 0.90);
+    base *= 0.88 + noise(world.xz * 0.18) * 0.24;
+ }
+ else if (material == 6)
+ {
+    base *= 0.80 + noise(world.xz * 8.0 + world.y * 5.0) * 0.30;
+ }
  vec3 lit=base*(vec3(0.36,0.44,0.48)+vec3(1.0,0.75,0.46)*nd*(0.20+0.80*shadow));
  float haze=smoothstep(30.0,67.0,distanceEye)*0.40;
  gl_FragColor=vec4(mix(lit,vec3(0.23,0.29,0.30),haze),1.0);
@@ -184,6 +291,16 @@ void main(){
  float vignette=1.0-0.20*dot(uv-0.5,uv-0.5)*2.0;
  gl_FragColor=vec4(c*vignette,1);
 })GLSL";
+
+const char *contactFs = R"GLSL(#version 130
+in vec2 uv;
+void main()
+{
+    float radius = length((uv - 0.5) * 2.0);
+    float alpha = (1.0 - smoothstep(0.08, 1.0, radius)) * 0.32;
+    gl_FragColor = vec4(0.015, 0.020, 0.025, alpha);
+}
+)GLSL";
 }
 
 void RenderEffects::Initialize()
@@ -191,6 +308,8 @@ void RenderEffects::Initialize()
     litProgram = Program(litVs, litFs);
     postProgram = Program(postVs, postFs);
     fireProgram = Program(fireVs, fireFs);
+    contactProgram = Program(fireVs, contactFs);
+    CreateTerrainMaterials();
     glGenFramebuffers(1, &shadowFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFbo);
     glGenTextures(1, &shadowDepth);
@@ -218,9 +337,58 @@ void RenderEffects::Initialize()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     CreateSprites();
-    status = litProgram && postProgram && shadowFbo && fireProgram
+    status = litProgram && postProgram && shadowFbo && fireProgram && contactProgram
                  ? "부드러운 그림자 · 후처리 활성"
                  : "일부 렌더 효과 초기화 실패 · 기본 렌더링";
+}
+
+void RenderEffects::CreateTerrainMaterials()
+{
+    auto started = std::chrono::steady_clock::now();
+    float anisotropy = 1;
+    if (GLEW_EXT_texture_filter_anisotropic)
+    {
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropy);
+        anisotropy = std::min(anisotropy, 8.0f);
+    }
+    glActiveTexture(GL_TEXTURE0);
+    glGenTextures(GLsizei(terrainMaterials.size()), terrainMaterials.data());
+    for (int material = 0; material < int(terrainMaterials.size()); ++material)
+    {
+        auto pixels = MaterialPixels(material);
+        glBindTexture(GL_TEXTURE_2D, terrainMaterials[material]);
+        glTexImage2D(GL_TEXTURE_2D,
+                     0,
+                     GL_RGBA8,
+                     MaterialTextureSize,
+                     MaterialTextureSize,
+                     0,
+                     GL_RGBA,
+                     GL_UNSIGNED_BYTE,
+                     pixels.data());
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        if (GLEW_EXT_texture_filter_anisotropic)
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+    float cpuMs =
+        std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - started)
+            .count();
+    std::size_t gpuBytes = 0;
+    for (int side = MaterialTextureSize; side > 0; side /= 2)
+        gpuBytes += std::size_t(side) * side * 4 * terrainMaterials.size();
+    std::fprintf(stdout,
+                 "{\"event\":\"terrain_materials_initialized\",\"texture_count\":3,"
+                 "\"texture_size_px\":%d,\"tile_world_units\":4,\"anisotropy\":%.1f,"
+                 "\"estimated_gpu_bytes\":%zu,\"cpu_initialize_ms\":%.3f}\n",
+                 MaterialTextureSize,
+                 anisotropy,
+                 gpuBytes,
+                 cpuMs);
 }
 
 void RenderEffects::FreeScene()
@@ -295,11 +463,12 @@ bool RenderEffects::BeginShadow(float centerX, float centerZ, float extent)
     glGetDoublev(GL_PROJECTION_MATRIX, p);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(centerX - 40, extent + 40, centerZ - 35, centerX, 0, centerZ, 0, 1, 0);
+    // Match the fixed world light (-10, 25, -8); zoom must not change shadow direction.
+    gluLookAt(centerX - 40, 100, centerZ - 32, centerX, 0, centerZ, 0, 1, 0);
     glGetDoublev(GL_MODELVIEW_MATRIX, v);
     Multiply(p, v, lightMatrix);
     glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.5f, 2);
+    glPolygonOffset(.8f, 1);
     return true;
 }
 
@@ -338,6 +507,14 @@ void RenderEffects::Lit(const GLdouble *view, float time, int material)
     glBindTexture(GL_TEXTURE_2D, shadowDepth);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(glGetUniformLocation(litProgram, "shadowMap"), 1);
+    const char *samplers[] = {"grassMaterial", "roadMaterial", "metalMaterial"};
+    for (int i = 0; i < int(terrainMaterials.size()); ++i)
+    {
+        glActiveTexture(GL_TEXTURE2 + i);
+        glBindTexture(GL_TEXTURE_2D, terrainMaterials[i]);
+        glUniform1i(glGetUniformLocation(litProgram, samplers[i]), 2 + i);
+    }
+    glActiveTexture(GL_TEXTURE0);
     Material(material);
 }
 
@@ -572,6 +749,11 @@ void RenderEffects::CreateSprites()
 
 void RenderEffects::Shutdown()
 {
+    if (contactProgram)
+        glDeleteProgram(contactProgram);
+    contactProgram = 0;
+    glDeleteTextures(GLsizei(terrainMaterials.size()), terrainMaterials.data());
+    terrainMaterials.fill(0);
     if (fireProgram)
         glDeleteProgram(fireProgram);
     fireProgram = 0;
@@ -595,6 +777,14 @@ void RenderEffects::Shutdown()
                 glDeleteTextures(1, &t);
             t = 0;
         }
+}
+
+bool RenderEffects::BeginContactShadows()
+{
+    if (!contactProgram)
+        return false;
+    glUseProgram(contactProgram);
+    return true;
 }
 
 void RenderEffects::Fire(float time)

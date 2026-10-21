@@ -58,7 +58,7 @@ const char *TownNpc::RoleName(NpcRole role)
 
 const char *TownNpc::ActionName(NpcAction action)
 {
-    const char *names[] = {"work", "patrol", "attack", "retreat", "help", "rest"};
+    const char *names[] = {"work", "patrol", "attack", "retreat", "help", "rest", "rob"};
     return names[int(action)];
 }
 
@@ -71,7 +71,7 @@ const char *TownNpc::RoleLabel(NpcRole role)
 
 const char *TownNpc::ActionLabel(NpcAction action)
 {
-    const char *names[] = {"업무", "순찰", "교전", "위험 회피", "동료 지원", "휴식·재장전"};
+    const char *names[] = {"업무", "순찰", "교전", "위험 회피", "동료 지원", "휴식·재장전", "약탈"};
     return names[int(action)];
 }
 
@@ -116,6 +116,11 @@ void RpgGame::InitializeTown()
         npc.id = i;
         npc.name = profiles[i].name;
         npc.role = profiles[i].role;
+        npc.scrap = npc.role == NpcRole::Merchant                               ? 20
+                    : npc.role == NpcRole::Outlaw || npc.role == NpcRole::Bully ? 2
+                                                                                : 8;
+        npc.potionStock = npc.role == NpcRole::Merchant ? 5 : 0;
+        npc.medicalSupplies = npc.role == NpcRole::Medic ? 5 : 0;
         npc.home = npc.position = {profiles[i].x, profiles[i].z};
         // Spawn on a verified walkable point near the requested workplace.
         for (int d = 0; d < 5 && !Fits(Point(npc.position)); ++d)
@@ -175,7 +180,7 @@ void RpgGame::DecideNpc(TownNpc &npc)
 {
     CpuTimer timer{npcDecisionCpuMs};
     ++npcDecisions;
-    npc.enemyTarget = npc.allyTarget = -1;
+    npc.enemyTarget = npc.allyTarget = npc.criminalTarget = -1;
     npc.playerTarget = false;
     float enemyDistance = 12;
     for (const auto &entry : npc.mind.knowledge)
@@ -234,6 +239,24 @@ void RpgGame::DecideNpc(TownNpc &npc)
     if (npc.ammo == 0 || npc.hp < 60)
         s[int(NpcAction::Rest)] =
             .4f + t.coverPreference * .3f + (npc.ammo == 0 ? .65f * t.ammoConservation : 0);
+    int previousRobberyTarget = npc.robberyTarget;
+    DecideRobbery(npc);
+    if (previousRobberyTarget != npc.robberyTarget)
+        npc.robberyProgress = 0;
+    if (npc.role == NpcRole::Guard)
+        for (const auto &entry : npc.mind.knowledge)
+        {
+            const auto &fact = entry.second;
+            if (fact.kind == NpcFact::Crime && fact.hp > 0 && fact.Confidence(time) > .25f)
+            {
+                npc.criminalTarget = fact.subject;
+                npc.goal = fact.position;
+                s[int(NpcAction::Attack)] = 1.1f;
+                break;
+            }
+        }
+    if (npc.robbedUntil > time)
+        s[int(NpcAction::Retreat)] = 1.3f;
     s[int(NpcAction::Patrol)] += needs.obeyCommander;
     auto next = NpcAction(std::distance(s.begin(), std::max_element(s.begin(), s.end())));
     npc.mind.selectionReason = "highest_utility";
@@ -253,32 +276,38 @@ void RpgGame::DecideNpc(TownNpc &npc)
         if (belief)
             npc.goal = belief->position;
     }
-    if (next == NpcAction::Attack)
+    if (next == NpcAction::Attack && npc.criminalTarget < 0)
     {
         const auto *belief =
             npc.playerTarget ? commander : npc.mind.Find(NpcFact::Enemy, npc.enemyTarget, time);
         if (belief)
             npc.goal = belief->position;
     }
-    npc.mind.task = next == NpcAction::Help      ? "approach_then_heal"
+    npc.mind.task = next == NpcAction::Rob       ? "approach_then_rob"
+                    : next == NpcAction::Help    ? "approach_then_heal"
                     : next == NpcAction::Attack  ? "approach_then_shoot"
                     : next == NpcAction::Retreat ? "return_to_safety"
                                                  : "routine_task";
-    npc.state = next == NpcAction::Attack    ? NpcState::Combat
-                : next == NpcAction::Retreat ? NpcState::Retreat
-                : npc.enemyTarget >= 0       ? NpcState::Alert
-                                             : NpcState::Idle;
+    npc.state = next == NpcAction::Attack                        ? NpcState::Combat
+                : next == NpcAction::Retreat                     ? NpcState::Retreat
+                : next == NpcAction::Rob || npc.enemyTarget >= 0 ? NpcState::Alert
+                                                                 : NpcState::Idle;
     npc.action = next;
+    if (next != NpcAction::Rob)
+        npc.robberyProgress = 0;
     LogNpc(npc, "decision");
 }
 
-void RpgGame::MoveNpc(TownNpc &npc, WorldPoint target, float dt)
+void RpgGame::MoveNpc(TownNpc &npc, WorldPoint target, float dt, bool profileNpc)
 {
     int tx = int(std::round(target.x)), tz = int(std::round(target.z));
     if ((tx != npc.pathX || tz != npc.pathZ || npc.path.empty()) && npc.pathTimer <= 0)
     {
-        CpuTimer pathTimer{npcPathCpuMs};
-        ++npcPathReplans;
+        CpuTimer pathTimer{profileNpc ? npcPathCpuMs : banditPathCpuMs};
+        if (profileNpc)
+            ++npcPathReplans;
+        else
+            ++banditPathReplans;
         npc.pathTimer = .75f;
         npc.pathX = tx;
         npc.pathZ = tz;
@@ -336,6 +365,8 @@ void RpgGame::MoveNpc(TownNpc &npc, WorldPoint target, float dt)
     Move(p, (next.x - p.x) / d * step, (next.z - p.z) / d * step);
     npc.position = {p.x, p.z};
     npc.moving = p.x != before.x || p.z != before.z;
+    if (npc.moving)
+        npc.mirror = p.x < before.x;
 }
 
 void RpgGame::UpdateTown(float dt)
@@ -361,9 +392,12 @@ void RpgGame::UpdateTown(float dt)
         npc.moving = false;
         npc.cooldown = std::max(0.0f, npc.cooldown - dt);
         npc.serviceCooldown = std::max(0.0f, npc.serviceCooldown - dt);
+        npc.robberyCooldown = std::max(0.0f, npc.robberyCooldown - dt);
         npc.pathTimer -= dt;
         if (npc.hp <= 0)
         {
+            if (!npc.stolenGoods.empty())
+                RecoverStolenGoods(npc);
             npc.state = NpcState::Disabled;
             npc.recovery += dt;
             if (npc.recovery >= 30)
@@ -377,161 +411,210 @@ void RpgGame::UpdateTown(float dt)
             }
             continue;
         }
-        npc.decisionTimer -= dt;
-        if (npc.decisionTimer <= 0)
+        if (talkingNpc >= 0 && &npc == &npcs[talkingNpc])
         {
-            DecideNpc(npc);
-            npc.decisionTimer = .5f;
+            npc.robberyProgress = 0;
+            npc.path.clear();
         }
-        switch (npc.action)
+        else
         {
-        case NpcAction::Work:
-            MoveNpc(npc, Point(npc.home), dt);
-            break;
-        case NpcAction::Patrol:
-        {
-            const DollPoint offsets[] = {{2, 0}, {0, 2}, {-2, 0}, {0, -2}};
-            auto o = offsets[npc.patrol % 4];
-            WorldPoint goal{npc.home.x + o.x, npc.home.z + o.z};
-            if (!Fits(goal))
+            npc.decisionTimer -= dt;
+            if (npc.decisionTimer <= 0)
             {
-                ++npc.patrol;
-                npc.path.clear();
+                DecideNpc(npc);
+                npc.decisionTimer = .5f;
+            }
+            switch (npc.action)
+            {
+            case NpcAction::Work:
+                MoveNpc(npc, Point(npc.home), dt);
+                break;
+            case NpcAction::Patrol:
+            {
+                const DollPoint offsets[] = {{2, 0}, {0, 2}, {-2, 0}, {0, -2}};
+                auto o = offsets[npc.patrol % 4];
+                WorldPoint goal{npc.home.x + o.x, npc.home.z + o.z};
+                if (!Fits(goal))
+                {
+                    ++npc.patrol;
+                    npc.path.clear();
+                    break;
+                }
+                if (Distance(npc.position, {goal.x, goal.z}) < .3f)
+                {
+                    ++npc.patrol;
+                    npc.path.clear();
+                }
+                MoveNpc(npc, goal, dt);
                 break;
             }
-            if (Distance(npc.position, {goal.x, goal.z}) < .3f)
-            {
-                ++npc.patrol;
-                npc.path.clear();
-            }
-            MoveNpc(npc, goal, dt);
-            break;
-        }
-        case NpcAction::Retreat:
-            MoveNpc(npc, {3, 3}, dt);
-            break;
-        case NpcAction::Rest:
-            if (Distance(npc.position, npc.home) > 1)
-                MoveNpc(npc, Point(npc.home), dt);
-            else
-            {
-                npc.hp = std::min(100.0f, npc.hp + 5 * dt);
-                if (npc.cooldown == 0)
+            case NpcAction::Retreat:
+                MoveNpc(npc, {3, 3}, dt);
+                break;
+            case NpcAction::Rest:
+                if (Distance(npc.position, npc.home) > 1)
+                    MoveNpc(npc, Point(npc.home), dt);
+                else
                 {
-                    npc.ammo = 8;
-                    npc.cooldown = 2;
+                    npc.hp = std::min(100.0f, npc.hp + 5 * dt);
+                    if (npc.cooldown == 0)
+                    {
+                        npc.ammo = 8;
+                        npc.cooldown = 2;
+                    }
                 }
-            }
-            break;
-        case NpcAction::Help:
-            if (npc.allyTarget >= 0 && npc.mind.assignedPatient == npc.allyTarget)
+                break;
+            case NpcAction::Help:
+                if (npc.allyTarget >= 0 && npc.mind.assignedPatient == npc.allyTarget)
+                {
+                    const auto *belief = npc.mind.Find(NpcFact::Ally, npc.allyTarget, time);
+                    if (!belief)
+                    {
+                        npc.decisionTimer = 0;
+                        break;
+                    }
+                    auto &ally = npcs[npc.allyTarget];
+                    if (Distance(npc.position, npc.goal) > 1.2f)
+                        MoveNpc(npc, Point(npc.goal), dt);
+                    else if (npc.cooldown == 0 && ally.hp < 80 &&
+                             Distance(npc.position, ally.position) <= 1.2f &&
+                             LineOfSight(Point(npc.position), Point(ally.position)))
+                    {
+                        ally.hp = std::min(100.0f, ally.hp + 35);
+                        ally.recovery = 0;
+                        npc.cooldown = 4;
+                        ++npc.helped;
+                        npc.Remember("help_ally_success");
+                        ally.Remember("received_ally_help");
+                        ally.mind.RescuedBy(npc.id, ally.id, time);
+                        npc.mind.Remember(
+                            NpcMemoryType::SuccessfulMission, npc.id, ally.id, time, .6f);
+                        npc.mind.relationships[ally.id].trust =
+                            std::min(1.0f, npc.mind.relationships[ally.id].trust + .02f);
+                        npc.mind.Observe({NpcFact::Ally,
+                                          ally.id,
+                                          npc.id,
+                                          ally.position,
+                                          ally.hp,
+                                          1,
+                                          time,
+                                          true,
+                                          ally.hostile});
+                        // Small observation-driven adaptation, constrained around personality.
+                        for (auto &observer : npcs)
+                            if (observer.hp > 0 && observer.id != npc.id &&
+                                Distance(observer.position, npc.position) < 8 &&
+                                LineOfSight(Point(observer.position), Point(npc.position)))
+                            {
+                                observer.traits.rescuePriority =
+                                    std::min(observer.personality.rescuePriority + .1f,
+                                             std::min(1.0f,
+                                                      observer.traits.rescuePriority +
+                                                          .02f * (1 - observer.resistance)));
+                                observer.Remember("observed_help_success");
+                            }
+                        LogNpc(npc, "help_success");
+                    }
+                }
+                break;
+            case NpcAction::Rob:
+                StepRobbery(npc, dt);
+                break;
+            case NpcAction::Attack:
             {
-                const auto *belief = npc.mind.Find(NpcFact::Ally, npc.allyTarget, time);
-                if (!belief)
+                if (npc.criminalTarget >= 0)
+                {
+                    auto found = std::find_if(npcs.begin(),
+                                              npcs.end(),
+                                              [&](const TownNpc &suspect)
+                                              {
+                                                  return suspect.id == npc.criminalTarget;
+                                              });
+                    if (found == npcs.end() || found->hp <= 0 || found->criminalUntil <= time)
+                    {
+                        npc.decisionTimer = 0;
+                        break;
+                    }
+                    WorldPoint target{found->position.x, found->position.z};
+                    if (Distance(npc.position, found->position) > 4 ||
+                        !LineOfSight(Point(npc.position), target))
+                        MoveNpc(npc, Point(npc.goal), dt);
+                    else if (npc.cooldown == 0 && npc.ammo > 0)
+                    {
+                        --npc.ammo;
+                        npc.cooldown = .9f;
+                        npc.attackStarted = time;
+                        shots.push_back({Point(npc.position), target, .12f});
+                        found->hp = std::max(0.0f, found->hp - 12);
+                        found->robberyProgress = 0;
+                        found->decisionTimer = 0;
+                        if (found->hp == 0)
+                        {
+                            RecoverStolenGoods(*found);
+                            LogNpc(npc, "criminal_subdued");
+                        }
+                    }
+                    break;
+                }
+                const auto *known = npc.playerTarget
+                                        ? npc.mind.Find(NpcFact::Commander, -1, time)
+                                        : npc.mind.Find(NpcFact::Enemy, npc.enemyTarget, time);
+                if (!known)
                 {
                     npc.decisionTimer = 0;
                     break;
                 }
-                auto &ally = npcs[npc.allyTarget];
-                if (Distance(npc.position, npc.goal) > 1.2f)
-                    MoveNpc(npc, Point(npc.goal), dt);
-                else if (npc.cooldown == 0 && ally.hp < 80 &&
-                         Distance(npc.position, ally.position) <= 1.2f &&
-                         LineOfSight(Point(npc.position), Point(ally.position)))
+                WorldPoint target = player;
+                if (!npc.playerTarget)
                 {
-                    ally.hp = std::min(100.0f, ally.hp + 35);
-                    ally.recovery = 0;
-                    npc.cooldown = 4;
-                    ++npc.helped;
-                    npc.Remember("help_ally_success");
-                    ally.Remember("received_ally_help");
-                    ally.mind.RescuedBy(npc.id, ally.id, time);
-                    npc.mind.Remember(NpcMemoryType::SuccessfulMission, npc.id, ally.id, time, .6f);
-                    npc.mind.relationships[ally.id].trust =
-                        std::min(1.0f, npc.mind.relationships[ally.id].trust + .02f);
-                    npc.mind.Observe({NpcFact::Ally,
-                                      ally.id,
-                                      npc.id,
-                                      ally.position,
-                                      ally.hp,
-                                      1,
-                                      time,
-                                      true,
-                                      ally.hostile});
-                    // Small observation-driven adaptation, constrained around personality.
-                    for (auto &observer : npcs)
-                        if (observer.hp > 0 && observer.id != npc.id &&
-                            Distance(observer.position, npc.position) < 8 &&
-                            LineOfSight(Point(observer.position), Point(npc.position)))
-                        {
-                            observer.traits.rescuePriority =
-                                std::min(observer.personality.rescuePriority + .1f,
-                                         std::min(1.0f,
-                                                  observer.traits.rescuePriority +
-                                                      .02f * (1 - observer.resistance)));
-                            observer.Remember("observed_help_success");
-                        }
-                    LogNpc(npc, "help_success");
+                    if (npc.enemyTarget < 0 || enemies[npc.enemyTarget].hp <= 0)
+                        break;
+                    target = enemies[npc.enemyTarget].position;
                 }
-            }
-            break;
-        case NpcAction::Attack:
-        {
-            const auto *known = npc.playerTarget
-                                    ? npc.mind.Find(NpcFact::Commander, -1, time)
-                                    : npc.mind.Find(NpcFact::Enemy, npc.enemyTarget, time);
-            if (!known)
-            {
-                npc.decisionTimer = 0;
-                break;
-            }
-            WorldPoint target = player;
-            if (!npc.playerTarget)
-            {
-                if (npc.enemyTarget < 0 || enemies[npc.enemyTarget].hp <= 0)
+                if (npc.playerTarget &&
+                    (TownNpc::InTown(player.x, player.z) || npc.serviceCooldown > 0))
                     break;
-                target = enemies[npc.enemyTarget].position;
-            }
-            if (npc.playerTarget &&
-                (TownNpc::InTown(player.x, player.z) || npc.serviceCooldown > 0))
-                break;
-            if (Distance(npc.position, npc.goal) > 5)
-                MoveNpc(npc, Point(npc.goal), dt);
-            else if (npc.cooldown == 0 && npc.ammo > 0 &&
-                     Distance(npc.position, {target.x, target.z}) <= 5 &&
-                     LineOfSight(Point(npc.position), target))
-            {
-                --npc.ammo;
-                npc.cooldown = .9f;
-                shots.push_back({Point(npc.position), target, .12f});
-                if (npc.playerTarget)
+                if (Distance(npc.position, npc.goal) > 5)
+                    MoveNpc(npc, Point(npc.goal), dt);
+                else if (npc.cooldown == 0 && npc.ammo > 0 &&
+                         Distance(npc.position, {target.x, target.z}) <= 5 &&
+                         LineOfSight(Point(npc.position), target))
                 {
-                    npc.hostile = true;
-                    hp = std::max(0, hp - 4);
-                    hurt = .2f;
-                }
-                else
-                {
-                    auto &e = enemies[npc.enemyTarget];
-                    e.hp = std::max(0, e.hp - 12);
-                    if (e.hp == 0)
+                    --npc.ammo;
+                    npc.attackStarted = time;
+                    npc.cooldown = .9f;
+                    shots.push_back({Point(npc.position), target, .12f});
+                    if (npc.playerTarget)
                     {
-                        e.respawn = 8;
-                        ++npc.kills;
-                        npc.Remember("hunt_success");
-                        npc.mind.Remember(NpcMemoryType::SuccessfulMission, npc.id, -1, time, .3f);
-                        LogNpc(npc, "hunt_success");
+                        npc.hostile = true;
+                        hp = std::max(0, hp - 4);
+                        hurt = .2f;
+                    }
+                    else
+                    {
+                        auto &e = enemies[npc.enemyTarget];
+                        e.hp = std::max(0, e.hp - 12);
+                        if (e.hp == 0)
+                        {
+                            e.respawn = 45;
+                            ++npc.kills;
+                            npc.Remember("hunt_success");
+                            npc.mind.Remember(
+                                NpcMemoryType::SuccessfulMission, npc.id, -1, time, .3f);
+                            LogNpc(npc, "hunt_success");
+                        }
                     }
                 }
+                break;
             }
-            break;
-        }
+            }
         }
         float previousHp = npc.hp;
         // Nearby hostile creatures retaliate; citizens inside the town remain protected.
         if (!TownNpc::InTown(npc.position.x, npc.position.z))
             for (const auto &e : enemies)
-                if (e.hp > 0 && Distance(npc.position, {e.position.x, e.position.z}) < 1.5f)
+                if (e.hp > 0 && e.action == BanditAction::Attack &&
+                    Distance(npc.position, {e.position.x, e.position.z}) < 1.5f)
                     npc.hp = std::max(0.0f, npc.hp - 5 * dt);
         if (previousHp >= 20 && npc.hp < 20)
         {
@@ -585,7 +668,24 @@ void RpgGame::InteractNpc()
         return;
     }
     firing = false;
+    talkingActor = 0;
     auto &selected = npcs[talkingNpc];
+    selected.moving = false;
+    selected.path.clear();
+    if (selected.role == NpcRole::Guard && PatrolReady() && !patrolReported)
+    {
+        patrolReported = true;
+        scrap += 5;
+        RecordEconomy("patrol_reward", -2, -1, 5);
+        Notify("첫 순찰 보고 완료 · 부품 +5 · I로 성장한 능력치를 확인하세요.");
+        return;
+    }
+    if (selected.robbedUntil > time)
+    {
+        Notify(selected.name +
+               ": 부품을 약탈당했습니다. 범죄자를 제압하면 도난 물자를 회수할 수 있습니다.");
+        return;
+    }
     bool grateful = false;
     for (const auto &event : selected.mind.memories)
         if (event.type == NpcMemoryType::CommanderSavedMe)
@@ -612,30 +712,34 @@ void RpgGame::NpcChoice(int choice)
     switch (npc.role)
     {
     case NpcRole::Merchant:
-        if (choice == 1 && scrap >= 3)
+        if (choice == 1 && npc.potionStock > 0 && TransferScrap(scrap, npc.scrap, 3))
         {
-            scrap -= 3;
+            --npc.potionStock;
+            RecordEconomy("potion_purchase", -1, npc.id, 3);
             ++potions;
             Notify("부품 3개로 회복약 1개 구매.");
         }
-        else if (choice == 2 && potions > 0)
+        else if (choice == 2 && potions > 0 && TransferScrap(npc.scrap, scrap, 2))
         {
             --potions;
-            scrap += 2;
+            ++npc.potionStock;
+            RecordEconomy("potion_sale", npc.id, -1, 2);
             Notify("회복약 1개 판매: 부품 2개 획득.");
         }
         else
-            Notify("구매에는 부품 3개, 판매에는 회복약 1개가 필요합니다.");
+            Notify("구매: 부품 3개와 상인 재고 필요 / 판매: 회복약과 상인 부품 2개 필요.");
         break;
     case NpcRole::Medic:
-        if (choice == 1 && scrap >= 2 && hp < MaxHp())
+        if (choice == 1 && hp < MaxHp() && npc.medicalSupplies > 0 &&
+            TransferScrap(scrap, npc.scrap, 2))
         {
-            scrap -= 2;
+            --npc.medicalSupplies;
+            RecordEconomy("medical_service", -1, npc.id, 2);
             hp = MaxHp();
             Notify("부품 2개로 치료 완료.");
         }
         else
-            Notify("치료 비용은 부품 2개입니다. 상처가 없으면 치료하지 않습니다.");
+            Notify("치료: 부품 2개와 의약 재고가 필요합니다. 상처가 없으면 치료하지 않습니다.");
         break;
     case NpcRole::Helper:
         if (choice == 1 && hp < MaxHp())
@@ -646,12 +750,12 @@ void RpgGame::NpcChoice(int choice)
             Notify("구호 주민의 응급 처치: 체력 +25.");
         }
         else
-            Notify("광장과 도로는 안전합니다. 사냥터에는 사냥꾼이 있습니다.");
+            Notify("광장에서도 적의 추격에 주의하세요. 사냥터에는 사냥꾼이 있습니다.");
         break;
     case NpcRole::Swindler:
-        if (choice == 1 && scrap >= 4)
+        if (choice == 1 && TransferScrap(scrap, npc.scrap, 4))
         {
-            scrap -= 4;
+            RecordEconomy("fraud", -1, npc.id, 4);
             npc.trust = std::max(0.0f, npc.trust - .1f);
             npc.serviceCooldown = 20;
             npc.Remember("fake_goods_sold");
@@ -665,9 +769,9 @@ void RpgGame::NpcChoice(int choice)
         break;
     case NpcRole::Outlaw:
     case NpcRole::Bully:
-        if (choice == 1 && scrap >= 2)
+        if (choice == 1 && TransferScrap(scrap, npc.scrap, 2))
         {
-            scrap -= 2;
+            RecordEconomy("extortion", -1, npc.id, 2);
             npc.serviceCooldown = 20;
             npc.hostile = false;
             Notify("통행료로 부품 2개를 냈습니다.");
@@ -689,15 +793,16 @@ void RpgGame::NpcChoice(int choice)
             npc.path.clear();
             npc.decisionTimer = 0;
             npc.trust = std::min(1.0f, npc.trust + .02f);
-            Notify(npc.hp < 35 ? "부상으로 안전 구역을 순찰 거점으로 변경하겠습니다."
+            Notify(npc.hp < 35 ? "부상으로 광장을 순찰 거점으로 변경하겠습니다."
                                : "현재 위치를 새 순찰 거점으로 지정했습니다.");
         }
         else
         {
             if (choice == 1)
                 npc.mind.commandStatus = "questioned";
-            Notify(choice == 1 ? "현재 신뢰로는 명령을 바로 수행하기 어렵습니다."
-                               : "마을 바깥 적은 8초 뒤 재생성됩니다.");
+            Notify(choice == 1
+                       ? "현재 신뢰로는 명령을 바로 수행하기 어렵습니다."
+                       : "야적은 무리로 순찰합니다. 관찰 중인 무리를 모두 공격할 필요는 없습니다.");
         }
         break;
     }
@@ -738,6 +843,8 @@ void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
            << ",\"time_s\":" << time << ",\"npc_id\":" << npc.id << ",\"role\":\""
            << TownNpc::RoleName(npc.role) << "\",\"action\":\"" << TownNpc::ActionName(npc.action)
            << "\",\"state\":" << int(npc.state) << ",\"hp\":" << npc.hp
+           << ",\"wallet_scrap\":" << npc.scrap << ",\"robbery_target\":" << npc.robberyTarget
+           << ",\"criminal_target\":" << npc.criminalTarget
            << ",\"enemy_target\":" << npc.enemyTarget << ",\"ally_target\":" << npc.allyTarget
            << ",\"trust\":" << npc.trust << ",\"memory_count\":" << npc.memory.size()
            << ",\"cpu_update_ms\":" << npcUpdateCpuMs << ",\"cpu_decision_ms\":" << npcDecisionCpuMs
@@ -745,7 +852,7 @@ void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
            << ",\"window_simulation_s\":" << npcMetricsTimer
            << ",\"decisions_count\":" << npcDecisions
            << ",\"path_replans_count\":" << npcPathReplans << ",\"scores\":{";
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < int(npc.scores.size()); ++i)
     {
         if (i)
             stream << ',';
@@ -775,7 +882,8 @@ void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
                << ",\"direct\":" << (fact.direct ? "true" : "false")
                << ",\"observed_at_s\":" << fact.timestamp
                << ",\"confidence\":" << fact.Confidence(time) << ",\"x\":" << fact.position.x
-               << ",\"z\":" << fact.position.z << ",\"hp\":" << fact.hp << '}';
+               << ",\"z\":" << fact.position.z << ",\"observed_scrap\":" << fact.carriedScrap
+               << ",\"hp\":" << fact.hp << '}';
     }
     stream << "],\"relationships\":[";
     first = true;

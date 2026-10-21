@@ -1,0 +1,42 @@
+{
+  "bundle": "GJ9hOSyMsi8M5vf9V6dv0SvXXBhHqi8njKGsMTJcmUmdGi4OvIHmY41AN55iarcharacterjaegerspine.ab",
+  "sha256": "b756d33dee63046d5fbf4a656ede2c04aecb35ecbeeed2d83838b7e0a3fdc725",
+  "assets": [
+    {
+      "file": "Jaeger_SWAP.atlas",
+      "type": "TextAsset",
+      "bytes": 2495,
+      "sha256": "9dc5c8f844b1a4fac0933b1b7523b0b1335f1072984f35914399077cfe8ffe55"
+    },
+    {
+      "file": "Jaeger.png",
+      "type": "Texture2D",
+      "bytes": 124390,
+      "sha256": "585372a32281cf0ddf83d5df70406bcf5073550afaf0a6d6df171ef300118ee7"
+    },
+    {
+      "file": "Jaeger.atlas",
+      "type": "TextAsset",
+      "bytes": 2582,
+      "sha256": "7cd0b0037e423a3049a9ad8b870bf9192c534842996f37b1a759edc9f1bb5b7b"
+    },
+    {
+      "file": "Jaeger.skel",
+      "type": "TextAsset",
+      "bytes": 53001,
+      "sha256": "de99f5bcc6f5f16a47a44372bf4d6e97ea8d060ef907a8d33405c16eb58ef98b"
+    },
+    {
+      "file": "Jaeger_SWAP.png",
+      "type": "Texture2D",
+      "bytes": 121464,
+      "sha256": "b23911ddc0a2c1c055c25d37060dd17c389030b81a805b77cccb1fdbeedbffa4"
+    },
+    {
+      "file": "Jaeger_SWAP.skel",
+      "type": "TextAsset",
+      "bytes": 52532,
+      "sha256": "fa70a70055110dcb36864e07a8b290720e91b3058388f79c8c3ef41961ed0bc9"
+    }
+  ]
+}

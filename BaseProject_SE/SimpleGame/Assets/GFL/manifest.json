@@ -153,5 +153,74 @@
       }
     },
     "bytes": 4563332
+  },
+  {
+    "model": "Guard",
+    "texture": "guard.png",
+    "clips": {
+      "wait": {
+        "duration": 0.6666666865348816,
+        "frames": 22
+      },
+      "move": {
+        "duration": 1.2666666507720947,
+        "frames": 39
+      },
+      "attack": {
+        "duration": 0.3333333432674408,
+        "frames": 12
+      },
+      "die": {
+        "duration": 1.2666666507720947,
+        "frames": 39
+      }
+    },
+    "bytes": 1054312
+  },
+  {
+    "model": "Ripper",
+    "texture": "ripper.png",
+    "clips": {
+      "wait": {
+        "duration": 1.0,
+        "frames": 31
+      },
+      "move": {
+        "duration": 0.6000000238418579,
+        "frames": 20
+      },
+      "attack": {
+        "duration": 0.3333333432674408,
+        "frames": 12
+      },
+      "die": {
+        "duration": 1.0666667222976685,
+        "frames": 34
+      }
+    },
+    "bytes": 2822092
+  },
+  {
+    "model": "Jaeger",
+    "texture": "jaeger.png",
+    "clips": {
+      "wait": {
+        "duration": 1.0,
+        "frames": 31
+      },
+      "move": {
+        "duration": 0.5666666626930237,
+        "frames": 18
+      },
+      "attack": {
+        "duration": 0.8333333134651184,
+        "frames": 26
+      },
+      "die": {
+        "duration": 1.2000000476837158,
+        "frames": 38
+      }
+    },
+    "bytes": 2256620
   }
 ]

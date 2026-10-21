@@ -16,6 +16,7 @@ class RenderEffects
     void Lit(const GLdouble *view, float time, int material = 0);
     void Material(int material);
     void Fire(float time);
+    bool BeginContactShadows();
     void Composite();
     void Text(float x, float y, const std::string &utf8, float size, float r, float g, float b);
     float TextWidth(const std::string &utf8, float size);
@@ -41,11 +42,14 @@ class RenderEffects
 
     std::map<std::string, Label> labels;
     std::array<std::array<GLuint, 8>, 4> sprites{};
+    std::array<GLuint, 3> terrainMaterials{};
     GLuint sceneFbo = 0, sceneColor = 0, sceneDepth = 0, shadowFbo = 0, shadowDepth = 0;
     GLuint litProgram = 0, postProgram = 0, fireProgram = 0;
+    GLuint contactProgram = 0;
     int width = 0, height = 0;
     GLdouble lightMatrix[16]{};
     Label &MakeLabel(const std::string &text, int pixels = 64);
     void CreateSprites();
+    void CreateTerrainMaterials();
     void FreeScene();
 };

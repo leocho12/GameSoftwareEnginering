@@ -6,19 +6,7 @@ void Renderer::WorldHud(const RpgGame &game)
 {
     const auto &world = game.world;
     if (!world.Ready())
-    {
-        Text(25, 130, "월드 AI 데이터 오류: " + world.error, 14, 1, .4f, .3f);
         return;
-    }
-    Text(25,
-         130,
-         "기지 시간 " + world.ClockLabel() + " · V 월드 AI · B 인물 전환 · F 대화",
-         14,
-         .55f,
-         .9f,
-         1);
-    if (world.Event().playerAccepted && world.Event().state == narrative::EventState::Active)
-        Text(25, 155, "남쪽 길의 초록색 구조 표식 · E 구조 · 동료 출발 전 도착", 14);
     for (const auto &entry : world.Actors())
     {
         const auto &a = entry.second;
@@ -68,8 +56,6 @@ void Renderer::WorldHud(const RpgGame &game)
     }
     if (!game.worldDebug)
     {
-        if (!world.PlayerLog().empty())
-            Text(25, 178, world.PlayerLog().back(), 13, .7f, .85f, .9f);
         return;
     }
     Panel(15, 180, 710, 495, .02f, .035f, .06f, .96f);
@@ -140,4 +126,38 @@ void Renderer::WorldHud(const RpgGame &game)
     if (!log.empty())
         Text(35, 580, "수신 기록: " + log.back(), 13);
     Text(35, 625, "V 닫기 · B 인물 전환 · world_ai.jsonl 상세 기록", 14);
+}
+
+void Renderer::StoryHud(const RpgGame &game)
+{
+    if (game.worldDebug && !game.storyJournalOpen)
+        return;
+    Panel(24, 240, 710, 125, .025f, .06f, .08f, .92f);
+    Text(38, 250, "이야기 | 1장 끊어진 보급선 · 지역 창작 프롤로그", 16, .6f, .9f, 1);
+    Text(38, 279, game.StoryStatus(), 13);
+    Text(38, 306, game.StoryNextStep(), 12);
+    Text(38, 337, "L: 이야기 일지 · 원작 지휘관과 별개인 그리폰 현장 지휘관", 12, .7f, .8f, .85f);
+    if (!game.storyJournalOpen)
+        return;
+    Panel(120, 110, 1040, 575, .02f, .045f, .065f, .98f);
+    Text(148, 133, "이야기 일지 | L로 닫기", 24, .65f, .9f, 1);
+    Text(148, 180, "당신은 그리폰 & 크루거의 인간 지휘관으로 변경 마을을 담당합니다.", 16);
+    Text(148, 211, "원작 주인공과 별개로 주민·현장 동료의 안전과 보급을 맡습니다.", 16);
+    Text(148, 247, "현장 임무: " + game.PatrolObjective(), 16, .95f, .84f, .55f);
+    Text(148, 280, "지역 소식: " + game.StoryStatus(), 14);
+    Text(148, 313, game.StoryNextStep(), 14);
+    Text(148, 352, "받은 무전·직접 들은 보고 (지역 사건은 기다리지 않고 진행됩니다)", 16);
+    float y = 386;
+    const auto &lines = game.world.PlayerLog();
+    if (lines.empty())
+        Text(148, y, "아직 확인한 소식이 없습니다. 기지의 미라·벨에게 F로 대화하세요.", 14);
+    for (std::size_t i = lines.size() > 5 ? lines.size() - 5 : 0; i < lines.size(); ++i)
+    {
+        Text(148, y, lines[i], 13);
+        y += 28;
+    }
+    Text(148, 557, "구현 범위: 현장 순찰과 실종 인형 구조 시뮬레이션", 15, .8f, .85f, .8f);
+    Text(148, 588, "중계소 복구·수송차 수색·회사 잔류/독립 분기는 아직 기획 단계입니다.", 14);
+    Text(
+        148, 626, "일지를 열어도 세계 시간과 전투는 계속됩니다. Esc: 일시정지", 13, .95f, .8f, .5f);
 }

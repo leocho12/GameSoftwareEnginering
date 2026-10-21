@@ -1,4 +1,4 @@
-// CPU-only checks. Compile separately with RpgGame.cpp; not part of the game executable.
+// CPU-only checks. Link the RPG sources including RpgEconomy.cpp and RpgBandits.cpp; no renderer.
 #include "../BaseProject_SE/SimpleGame/RpgGame.h"
 #include <cassert>
 #include <cmath>

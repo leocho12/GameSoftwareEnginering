@@ -10,7 +10,8 @@ enum class NpcFact
 {
     Enemy,
     Ally,
-    Commander
+    Commander,
+    Crime
 };
 enum class NpcMemoryType
 {
@@ -28,6 +29,7 @@ struct NpcBelief
     DollPoint position;
     float hp = 0, confidence = 1, timestamp = 0;
     bool direct = true, hostile = false;
+    int carriedScrap = 0;
 
     float Confidence(float now) const
     {

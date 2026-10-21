@@ -16,6 +16,44 @@ std::filesystem::path RuntimeDirectory()
 }
 }
 
+std::string RpgGame::StoryStatus() const
+{
+    std::string status =
+        patrolReported ? "현장 순찰: 복귀 보고 완료" : "현장 순찰: 성장·물자 회수 중";
+    if (world.Ready() && world.ResultReported())
+        status += " / 구조 보고: " +
+                  std::string(narrative::WorldSimulation::OutcomeLabel(world.Event().outcome));
+    else if (world.Ready() && world.PlayerAware())
+        status += " / 실종 인형의 구조 요청 확인";
+    return status;
+}
+
+std::string RpgGame::StoryNextStep() const
+{
+    if (!world.Ready())
+        return "구조 사건 자료를 불러오지 못했습니다. 현장 순찰 목표는 계속할 수 있습니다.";
+    if (world.ResultReported())
+        return patrolReported
+                   ? "현장 시험 임무 종료. 중계소·수송차 본편 퀘스트는 아직 미구현입니다."
+                   : "구조 보고는 일지에 보관됩니다. 순찰 목표를 마치고 경비에게 F로 보고하세요.";
+    bool canTalk = false;
+    for (const auto &entry : world.Actors())
+        canTalk |= world.CanTalk(entry.first);
+    if (!world.PlayerAware())
+        return canTalk
+                   ? "기지의 미라 또는 벨에게 F로 대화해 지역 소식을 확인하세요."
+                   : "동료가 현장 임무로 기지를 비웠습니다. 순찰을 진행하며 귀환 보고를 기다리세요.";
+    if (world.Event().playerAccepted && world.Event().state == narrative::EventState::Active &&
+        world.Event().participants.empty())
+        return "직접 수색 수락: 남쪽 길 초록색 구조 표식으로 이동 → E 구조.";
+    if (!world.Event().participants.empty())
+        return "동료가 수색에 출발했습니다. 기지 귀환 후 F로 보고를 확인하세요.";
+    if (world.Event().state != narrative::EventState::Active)
+        return "구조 요청의 최종 보고를 아직 듣지 못했습니다. 동료에게 F로 확인하세요.";
+    return canTalk ? "동료에게 F 대화 → 1 직접 수색 / 2 자율 판단. 귀환 후 F로 보고 확인."
+                   : "동료가 구조 임무를 진행 중입니다. 기지 귀환 후 F로 결과를 확인하세요.";
+}
+
 void RpgGame::InitializeWorld()
 {
     worldBodies.clear();
@@ -40,6 +78,7 @@ void RpgGame::UpdateWorld(float dt)
 {
     if (!world.Ready())
         return;
+    world.SetConversation(talkingActor);
     world.Advance(dt, townRadioConnected);
     for (const auto &entry : world.Actors())
     {
@@ -51,6 +90,12 @@ void RpgGame::UpdateWorld(float dt)
         body.position = {actor.position.x, actor.position.z};
         body.moving = false;
         body.pathTimer -= dt;
+        if (id == talkingActor)
+        {
+            body.path.clear();
+            world.SetPosition(id, actor.position, false);
+            continue;
+        }
         if (actor.task == narrative::Task::Departing || actor.task == narrative::Task::WalkingHome)
         {
             auto target =
@@ -117,6 +162,8 @@ bool RpgGame::InteractWorldActor()
     }
     talkingNpc = -1;
     talkingActor = selectedWorldActor = nearest;
+    world.SetConversation(nearest);
+    world.SetPosition(nearest, world.Find(nearest)->position, false);
     firing = false;
     Notify(world.Dialogue(nearest));
     return true;
@@ -156,6 +203,7 @@ void RpgGame::FastForwardWorld()
     if (paused || hp <= 0 || dollTraining.active || !worldDebug)
         return;
     // Remote clock only: local navigation still requires actual travel and arrival.
+    world.SetConversation(talkingActor);
     world.Advance(10.0 * world.Settings().minuteSeconds, townRadioConnected);
     Notify("진단: 월드 시간 +10분 (로컬 이동은 실제 도착 필요)");
     LogWorld();

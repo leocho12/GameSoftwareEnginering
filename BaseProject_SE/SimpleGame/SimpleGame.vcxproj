@@ -159,6 +159,7 @@
     <ClInclude Include="CharacterAnimation.h" />
     <ClInclude Include="DollBehavior.h" />
     <ClInclude Include="TownNpc.h" />
+    <ClInclude Include="GameMonitor.h" />
     <ClInclude Include="WorldSimulation.h" />
     <ClInclude Include="NpcMind.h" />
     <ClInclude Include="RpgGame.h" /><ClInclude Include="GridTypes.h" />
@@ -174,9 +175,12 @@
     <ClCompile Include="DollBehavior.cpp" />
     <ClCompile Include="TownNpc.cpp" />
     <ClCompile Include="WorldSimulation.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="GameMonitor.cpp" />
     <ClCompile Include="RpgWorld.cpp" />
     <ClCompile Include="RendererWorld.cpp" />
     <ClCompile Include="TownKnowledge.cpp" />
+    <ClCompile Include="RpgEconomy.cpp" />
+    <ClCompile Include="RpgBandits.cpp" />
     <ClCompile Include="RpgGame.cpp" />
     <ClCompile Include="RenderEffects.cpp" />
     <ClCompile Include="SimpleGame.cpp" />

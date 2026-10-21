@@ -1,0 +1,42 @@
+{
+  "bundle": "AutBGCZRiAb5LKs4fOUVW8RMg0yKsTMu8aNRmAPBtZcHvdvFqaBB4sLF1eoWcharacterguardspine.ab",
+  "sha256": "7952192c649a3740d776f745a0b929995c7a08dcd62ccf822b23aeb9a3758ef0",
+  "assets": [
+    {
+      "file": "Guard.png",
+      "type": "Texture2D",
+      "bytes": 78766,
+      "sha256": "5899cbe743b086d63573b1cdf4e22da963bc75f643436c47424243999170dd0d"
+    },
+    {
+      "file": "Guard_SWAP.skel",
+      "type": "TextAsset",
+      "bytes": 24737,
+      "sha256": "a6f17b5cfb569dc23704e6f3f2ec65c9a8679eebda21720cb7e8972df45b4693"
+    },
+    {
+      "file": "Guard.skel",
+      "type": "TextAsset",
+      "bytes": 24737,
+      "sha256": "ae9e9d591d6f7b13fa7778f49b7ba2c0c1ae22100ed10f293fa54b6113ff604f"
+    },
+    {
+      "file": "Guard.atlas",
+      "type": "TextAsset",
+      "bytes": 2249,
+      "sha256": "47f9d02355732e4c9d93616ceccbb382e80ebf5c596796c030b4118d7e23723e"
+    },
+    {
+      "file": "Guard_SWAP.png",
+      "type": "Texture2D",
+      "bytes": 86897,
+      "sha256": "66185be6705260c026a9b0ba2315e6a88c703125f848d0b2f160346dd0bb79cd"
+    },
+    {
+      "file": "Guard_SWAP.atlas",
+      "type": "TextAsset",
+      "bytes": 2267,
+      "sha256": "191a702edc7cd6c7f035170839c1f6193ab6962d8105b291b62a055eb56a6146"
+    }
+  ]
+}

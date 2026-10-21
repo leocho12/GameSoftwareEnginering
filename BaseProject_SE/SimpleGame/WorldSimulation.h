@@ -233,6 +233,11 @@ class WorldSimulation
         return reported;
     }
 
+    void SetConversation(ActorId id)
+    {
+        conversationActor = id;
+    }
+
     std::string error;
     std::int64_t nextRecovery = 0;
     double updateMs = 0, decisionMs = 0;
@@ -251,6 +256,7 @@ class WorldSimulation
     double targetMinute = 0;
     std::uint64_t nextOrder = 1;
     bool ready = false, playerAware = false, reported = false, radioConnected = true;
+    ActorId conversationActor = 0;
     void Schedule(std::int64_t at, Scheduled::Kind kind, ActorId actor = 0);
     void Process(const Scheduled &item);
     void Evaluate();

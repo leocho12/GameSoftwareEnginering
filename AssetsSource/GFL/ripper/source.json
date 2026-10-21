@@ -1,0 +1,24 @@
+{
+  "bundle": "vxbQeWby9E5D5yEasObGRKbxYVosRUklIqvSCG8SneSTgL6pbC3bKCiaNmOhmXjicharacterripperspine.ab",
+  "sha256": "9c919e5c6f829edda59b40ee37ca0f2cfacc0a25e2001ff7b9cd3a49c965d724",
+  "assets": [
+    {
+      "file": "Ripper.png",
+      "type": "Texture2D",
+      "bytes": 67550,
+      "sha256": "210d5183db98440dc7b6d4e6807c0bb2a1f37eb7c4e18486a0702f1b1ec5e6d3"
+    },
+    {
+      "file": "Ripper.atlas",
+      "type": "TextAsset",
+      "bytes": 1930,
+      "sha256": "5f5b13898da8c6aff687ba5fc2ea662ab6ce1130a5d98100a71ef81781114c25"
+    },
+    {
+      "file": "Ripper.skel",
+      "type": "TextAsset",
+      "bytes": 46330,
+      "sha256": "8d7d5866d01c47091a4f199eb67085344ba3ea15ba812bbeb7ec92473af85590"
+    }
+  ]
+}

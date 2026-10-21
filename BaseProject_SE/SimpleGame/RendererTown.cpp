@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include <cmath>
+#include <algorithm>
 
 void Renderer::TownBuildings(const RpgGame &game)
 {
@@ -51,6 +52,28 @@ void Renderer::TownBuildings(const RpgGame &game)
 
 void Renderer::TownHud(const RpgGame &game)
 {
+    for (const auto &enemy : game.enemies)
+    {
+        if (enemy.hp <= 0 ||
+            std::hypot(enemy.position.x - game.player.x, enemy.position.z - game.player.z) > 12)
+            continue;
+        GLdouble x, y, z;
+        if (gluProject(
+                enemy.position.x, 2.2, enemy.position.z, model, projection, viewport, &x, &y, &z) &&
+            z >= 0 && z <= 1)
+        {
+            float sx = float(x) * 1280 / width, sy = 800 - float(y) * 800 / height;
+            if (sx > 0 && sx < 1280 && sy > 235 && sy < 690)
+                Text(sx - 40,
+                     sy,
+                     "야적 " + std::to_string(enemy.band + 1) + "조 · " +
+                         RpgEnemy::ActionLabel(enemy.action),
+                     12,
+                     1,
+                     enemy.action == BanditAction::Attack ? .4f : .8f,
+                     .35f);
+        }
+    }
     // Static names reuse the existing text texture cache.
     for (const auto &npc : game.npcs)
     {
@@ -64,14 +87,33 @@ void Renderer::TownHud(const RpgGame &game)
             float sx = float(x) * 1280 / width, sy = 800 - float(y) * 800 / height;
             if (sx < 0 || sx > 1280 || sy < 105 || sy > 690)
                 continue;
-            Text(sx - 38, sy, npc.name + " · " + TownNpc::RoleLabel(npc.role), 12, .9f, .85f, .65f);
+            Text(sx - 38,
+                 sy,
+                 npc.name + " · " + TownNpc::RoleLabel(npc.role) +
+                     (npc.action == NpcAction::Rob    ? " · 약탈 중"
+                      : npc.criminalUntil > game.time ? " · 범죄"
+                                                      : ""),
+                 12,
+                 .9f,
+                 .85f,
+                 .65f);
         }
     }
-    Text(850, 80, "주민 20명 / 몹 32마리 / 부품 " + std::to_string(game.scrap), 12);
+    int alive = int(std::count_if(game.enemies.begin(),
+                                  game.enemies.end(),
+                                  [](const RpgEnemy &enemy)
+                                  {
+                                      return enemy.hp > 0;
+                                  }));
+    Text(850,
+         80,
+         "주민 " + std::to_string(game.npcs.size()) + "명 / 야적 " + std::to_string(alive) +
+             "명 / " + std::to_string(game.banditGroups.size()) + "무리",
+         12);
     Text(850,
          103,
-         game.townRadioConnected ? "K: 무전 끊기 · J: AI 정보"
-                                 : "K: 무전 복구 · 근거리 대화만 가능",
+         "내 부품 " + std::to_string(game.scrap) +
+             (game.townRadioConnected ? " · K: 무전 끊기 · J: AI" : " · K: 무전 복구"),
          12);
     int near = game.NearestNpc();
     if (near >= 0 && game.talkingNpc < 0)
@@ -81,7 +123,13 @@ void Renderer::TownHud(const RpgGame &game)
     const auto &npc = game.npcs[game.talkingNpc];
     Panel(750, 185, 510, 470, .025f, .055f, .07f, .96f);
     Text(773, 207, npc.name + " / " + TownNpc::RoleLabel(npc.role), 23);
-    Text(773, 245, "현재 행동: " + std::string(TownNpc::ActionLabel(npc.action)), 16);
+    Text(773, 245, "대화 중 · 이동 정지", 16);
+    Text(773,
+         266,
+         "내 부품 " + std::to_string(game.scrap) + " / 상대 부품 " + std::to_string(npc.scrap) +
+             " / 상품 " + std::to_string(npc.potionStock) + " / 의약 " +
+             std::to_string(npc.medicalSupplies),
+         12);
     if (game.npcDebug)
     {
         const auto &mind = npc.mind;
@@ -151,6 +199,13 @@ void Renderer::TownHud(const RpgGame &game)
     default:
         break;
     }
+    if (npc.role == NpcRole::Guard)
+        Text(773,
+             555,
+             game.patrolReported  ? "첫 순찰: 보고 완료 (보상 수령)"
+             : game.PatrolReady() ? "첫 순찰: F 대화로 보고 완료"
+                                  : "첫 순찰: 레벨 3 · 전리품 2개 후 복귀",
+             13);
     Text(773, 291, primary, 17, .95f, .8f, .4f);
     Text(773, 326, secondary, 16);
     Text(773,
@@ -174,6 +229,6 @@ void Renderer::TownHud(const RpgGame &game)
              ? "응대 대기: " + std::to_string(int(npc.serviceCooldown) + 1) + "초"
              : "선택 시 거래/상호작용이 실행됩니다.",
          14);
-    Text(773, 532, "원작과 별개인 창작 주민 · 임시 공용 외형", 13);
+    Text(773, 532, "창작 주민 · 원작 SD 시험 외형 · 원작 인물과 별개", 13);
     Text(773, 585, "F 닫기 · H 회복약 지원 · J AI 정보", 16);
 }

@@ -33,6 +33,7 @@
     <ClInclude Include="CharacterAnimation.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="DollBehavior.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="TownNpc.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="GameMonitor.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="WorldSimulation.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="NpcMind.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="RpgGame.h"><Filter>헤더 파일</Filter></ClInclude>
@@ -58,9 +59,12 @@
     <ClCompile Include="DollBehavior.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="TownNpc.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="WorldSimulation.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="GameMonitor.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RpgWorld.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RendererWorld.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="TownKnowledge.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RpgEconomy.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RpgBandits.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RpgGame.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RenderEffects.cpp"><Filter>소스 파일</Filter></ClCompile>
   </ItemGroup>

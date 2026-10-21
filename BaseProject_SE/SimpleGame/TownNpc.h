@@ -38,7 +38,8 @@ enum class NpcAction
     Attack,
     Retreat,
     Help,
-    Rest
+    Rest,
+    Rob
 };
 
 struct NpcBuilding
@@ -62,9 +63,15 @@ struct TownNpc
     float hp = 100, cooldown = 0, decisionTimer = 0, recovery = 0, serviceCooldown = 0;
     int ammo = 8, enemyTarget = -1, allyTarget = -1, patrol = 0;
     bool hostile = false, moving = false, playerTarget = false;
+    bool mirror = false;
+    float attackStarted = -100;
     NpcState state = NpcState::Idle;
     NpcAction action = NpcAction::Work;
-    std::array<float, 6> scores{};
+    std::array<float, 7> scores{};
+    int scrap = 0, potionStock = 0, medicalSupplies = 0;
+    int robberyTarget = -1, criminalTarget = -1;
+    float robberyCooldown = 0, robberyProgress = 0, robbedUntil = 0, criminalUntil = 0;
+    std::map<int, int> stolenGoods;
     std::deque<std::string> memory;
     std::vector<DollPoint> path;
     float pathTimer = 0;

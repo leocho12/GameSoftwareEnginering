@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include "RpgGame.h"
+#include "GameMonitor.h"
 #include "Dependencies/freeglut.h"
 #include <Windows.h>
 #include <algorithm>
@@ -13,6 +14,7 @@ namespace
 {
 std::unique_ptr<Renderer> renderer;
 RpgGame game;
+std::unique_ptr<GameMonitor> monitor;
 int mouseX = 0, mouseY = 0, lastTick = 0;
 
 void Display()
@@ -171,6 +173,11 @@ void Key(unsigned char key, int, int)
         game.npcDebug = !game.npcDebug;
         return;
     }
+    if (key == 'l')
+    {
+        game.storyJournalOpen = !game.storyJournalOpen;
+        return;
+    }
     if (key == 'k')
     {
         game.townRadioConnected = !game.townRadioConnected;
@@ -250,6 +257,8 @@ void Tick(int)
     else
         game.firing = false;
     game.Update(dt);
+    if (monitor)
+        monitor->Publish(game);
     glutPostRedisplay();
     glutTimerFunc(16, Tick, 0);
 }
@@ -290,6 +299,8 @@ int main(int argc, char **argv)
     wchar_t executable[MAX_PATH]{};
     GetModuleFileNameW(nullptr, executable, MAX_PATH);
     game.dollTraining.SetLogDirectory(std::filesystem::path(executable).parent_path() / "Profiles");
+    monitor = std::make_unique<GameMonitor>(std::filesystem::path(executable).parent_path() /
+                                            "Profiles" / "monitor.json");
     renderer = std::make_unique<Renderer>(initialW, initialH);
     glutDisplayFunc(Display);
     glutReshapeFunc(Resize);

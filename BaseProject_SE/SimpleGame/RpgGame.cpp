@@ -130,7 +130,10 @@ void RpgGame::Reset(uint32_t newSeed)
     hp = 100;
     potions = 3;
     scrap = 10;
-    kills = 0;
+    kills = itemsCollected = 0;
+    patrolReported = false;
+    storyJournalOpen = false;
+    economyEvents.clear();
     time = attackCooldown = hurt = 0;
     attackStarted = -100;
     paused = inventory = moving = false;
@@ -141,15 +144,10 @@ void RpgGame::Reset(uint32_t newSeed)
     fires.clear();
     InitializeTown();
     InitializeWorld();
-    for (int i = 0; i < 32; ++i)
-    {
-        RpgEnemy e;
-        e.position = Spawn();
-        enemies.push_back(e);
-    }
+    InitializeBandits();
     fires = {{2, 5}, {5, 2}};
     drops.push_back({{4, 3}, true});
-    Notify("변경 마을: F로 주민과 대화 · 부품 10개 지급 · 마을 밖 사냥터에서 성장하세요.");
+    Notify("첫 순찰: 레벨 3 달성 → 전리품 2개 회수 → 경비에게 F로 보고하세요.");
 }
 
 void RpgGame::ClearInput()
@@ -157,27 +155,6 @@ void RpgGame::ClearInput()
     keys.fill(false);
     firing = false;
     moving = false;
-}
-
-WorldPoint RpgGame::Spawn()
-{
-    std::vector<WorldPoint> candidates;
-    int centerX = int(std::floor(player.x)), centerZ = int(std::floor(player.z));
-    for (int z = centerZ - 22; z <= centerZ + 22; ++z)
-        for (int x = centerX - 22; x <= centerX + 22; ++x)
-        {
-            WorldPoint p{float(x), float(z)};
-            if (TownNpc::InTown(p.x, p.z) || !Fits(p) || Distance(p, player) < 7 ||
-                Distance(p, player) > 22)
-                continue;
-            bool occupied = false;
-            for (const auto &e : enemies)
-                if (e.hp > 0 && Distance(e.position, p) < 1)
-                    occupied = true;
-            if (!occupied)
-                candidates.push_back(p);
-        }
-    return candidates.empty() ? player : candidates[random() % candidates.size()];
 }
 
 void RpgGame::Move(WorldPoint &p, float x, float z)
@@ -264,7 +241,8 @@ void RpgGame::Attack()
     for (int i = 0; i < int(npcs.size()); ++i)
     {
         const auto &npc = npcs[i];
-        if (!npc.hostile || npc.hp <= 0 || TownNpc::InTown(npc.position.x, npc.position.z))
+        if ((!npc.hostile && npc.criminalUntil <= time) || npc.hp <= 0 ||
+            (TownNpc::InTown(npc.position.x, npc.position.z) && npc.criminalUntil <= time))
             continue;
         float ex = npc.position.x - player.x, ez = npc.position.z - player.z;
         float forward = ex * dx + ez * dz, side = std::abs(ex * dz - ez * dx);
@@ -284,17 +262,21 @@ void RpgGame::Attack()
         npc.recovery = 0;
         npc.Remember("player_retaliated");
         if (npc.hp == 0)
-            Notify("적대 NPC를 제압했습니다. 이후 마을로 복귀합니다.");
+        {
+            RecoverStolenGoods(npc);
+            Notify("적대 NPC를 제압했습니다. 도난 부품은 피해자에게 반환됩니다.");
+        }
     }
     else if (target >= 0)
     {
         auto &e = enemies[target];
         end = e.position;
+        ProvokeBand(e);
         e.hp = std::max(0, e.hp - AttackPower());
         if (e.hp == 0)
         {
             ++kills;
-            e.respawn = 8;
+            e.respawn = 45;
             drops.push_back({e.position, random() % 3 == 0});
             // Keep the floor bounded during prolonged grinding.
             if (drops.size() > 128)
@@ -332,8 +314,12 @@ void RpgGame::Pickup()
                                    if (d.potion)
                                        ++potions;
                                    else
+                                   {
                                        ++scrap;
+                                       RecordEconomy("salvage", -2, -1, 1);
+                                   }
                                    ++count;
+                                   ++itemsCollected;
                                    return true;
                                }),
                 drops.end());
@@ -411,127 +397,5 @@ void RpgGame::Step(float dt)
     UpdateWorld(dt);
     if (hp <= 0)
         return;
-    // A bounded local navigation window follows the player through the infinite world.
-    int originX = int(std::floor(player.x + .5f)) - Size / 2;
-    int originZ = int(std::floor(player.z + .5f)) - Size / 2;
-    auto indexOf = [&](WorldPoint p)
-    {
-        int x = int(std::floor(p.x + .5f)) - originX, z = int(std::floor(p.z + .5f)) - originZ;
-        return x < 0 || z < 0 || x >= Size || z >= Size ? -1 : z * Size + x;
-    };
-    auto pointOf = [&](int i)
-    {
-        return WorldPoint{float(originX + i % Size), float(originZ + i / Size)};
-    };
-    auto adjacent = [](int i, int j)
-    {
-        return j >= 0 && j < Size * Size &&
-               std::abs(i % Size - j % Size) + std::abs(i / Size - j / Size) == 1;
-    };
-    std::array<int, Size * Size> distance;
-    distance.fill(-1);
-    std::queue<int> pending;
-    int start = indexOf(player);
-    distance[start] = 0;
-    pending.push(start);
-    while (!pending.empty())
-    {
-        int i = pending.front();
-        pending.pop();
-        for (int offset : {1, -1, Size, -Size})
-        {
-            int j = i + offset;
-            if (!adjacent(i, j) || distance[j] >= 0 ||
-                !Walkable(originX + j % Size, originZ + j / Size))
-                continue;
-            distance[j] = distance[i] + 1;
-            pending.push(j);
-        }
-    }
-    for (auto &e : enemies)
-    {
-        // Recycle off-screen population so exploration stays populated and memory stays bounded.
-        if (e.hp > 0 && Distance(e.position, player) > 24)
-        {
-            e.position = Spawn();
-            e.maxHp = 40 + std::min(level - 1, 10) * 5;
-            e.hp = e.maxHp;
-            e.cooldown = 1;
-        }
-        if (e.hp <= 0)
-        {
-            e.respawn -= dt;
-            if (e.respawn <= 0)
-            {
-                e.position = Spawn();
-                e.maxHp = 40 + std::min(level - 1, 10) * 5;
-                e.hp = e.maxHp;
-                e.cooldown = 1;
-            }
-            continue;
-        }
-        e.cooldown = std::max(0.0f, e.cooldown - dt);
-        if (TownNpc::InTown(e.position.x, e.position.z))
-        {
-            e.position = Spawn();
-        }
-        if (TownNpc::InTown(player.x, player.z))
-            continue;
-        float range = Distance(player, e.position);
-        if (range > 10)
-            continue;
-        if (range > .85f)
-        {
-            WorldPoint goal = player;
-            auto clearRoute = [&](WorldPoint target)
-            {
-                int samples = std::max(1, int(std::ceil(Distance(e.position, target) / .1f)));
-                for (int n = 1; n <= samples; ++n)
-                {
-                    float t = float(n) / samples;
-                    if (!Fits({e.position.x + (target.x - e.position.x) * t,
-                               e.position.z + (target.z - e.position.z) * t}))
-                        return false;
-                }
-                return true;
-            };
-            if (!clearRoute(player))
-            {
-                int here = indexOf(e.position);
-                if (here < 0)
-                    continue;
-                int best = here;
-                for (int offset : {1, -1, Size, -Size})
-                {
-                    int j = here + offset;
-                    if (adjacent(here, j) && distance[j] >= 0 &&
-                        (distance[best] < 0 || distance[j] < distance[best]))
-                        best = j;
-                }
-                goal = pointOf(best);
-                if (!clearRoute(goal))
-                    goal = pointOf(here);
-            }
-            float dx = goal.x - e.position.x, dz = goal.z - e.position.z, len = std::hypot(dx, dz);
-            auto beforeEnemy = e.position;
-            if (len > .01f)
-                Move(e.position,
-                     dx / len * std::min(len, 1.45f * dt),
-                     dz / len * std::min(len, 1.45f * dt));
-            if (TownNpc::InTown(e.position.x, e.position.z))
-                e.position = beforeEnemy;
-        }
-        else if (e.cooldown == 0 && LineOfSight(player, e.position))
-        {
-            hp = std::max(0, hp - std::max(1, 10 - Defense()));
-            e.cooldown = 1;
-            hurt = .2f;
-            if (hp == 0)
-            {
-                ClearInput();
-                Notify("전투 불능 · Enter로 같은 맵에서 다시 시작");
-                break;
-            }
-        }
-    }
+    UpdateBandits(dt);
 }

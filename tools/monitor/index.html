@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>그리폰 · 월드 모니터</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Malgun Gothic",sans-serif;background:#0c111a;color:#e6edf5}
+*{box-sizing:border-box}body{margin:0}main{max-width:1500px;margin:auto;padding:32px}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:28px}
+h1{font-size:28px;margin:4px 0}h2{font-size:18px;margin:0 0 16px}p{color:#94a5bd;margin:7px 0;font-size:14px}
+.brand{font-size:12px;letter-spacing:3px;color:#60ddd1}.badge{padding:9px 14px;border-radius:20px;background:#19352f;color:#76ebc9;font-size:13px}.bad{background:#472a23;color:#ffc38f}
+#cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+.card,.panel{border:1px solid #293346;background:#141c29;border-radius:12px;padding:20px}
+.card strong{display:block;font-size:32px;margin:8px 0}.card span{color:#a6b4c8;font-size:13px}
+#villages{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:22px}
+.window-tools{display:flex;gap:12px;align-items:center}.rumors{padding-left:20px;margin-bottom:0;color:#bccbe0;font-size:14px;line-height:1.7}.tendencies{margin-top:18px;padding-top:15px;border-top:1px solid #293346}.tendency{display:grid;grid-template-columns:90px 1fr 45px;gap:10px;align-items:center;margin:9px 0;font-size:13px}.track{height:6px;background:#273448;border-radius:3px;overflow:hidden}.track i{display:block;height:100%;background:#60c9c2}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:14px}.metrics span{color:#9cacbf}
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+input,select,button{font:inherit;font-size:14px;background:#0d1420;color:#e6edf5;border:1px solid #3a4960;border-radius:7px;padding:10px}
+input{min-width:230px}button{cursor:pointer}button:hover{border-color:#60ddd1}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:14px}
+th{text-align:left;color:#8e9db3;font-size:12px;font-weight:500;padding:12px;border-bottom:1px solid #334053}
+td{padding:13px 12px;border-bottom:1px solid #233043}tbody tr:hover{background:#1b2a3d;cursor:pointer}
+small{display:block;color:#8798b0;font-size:11px;margin-top:3px}.hp{width:80px;height:4px;background:#394051;border-radius:4px;margin-top:5px}.hp i{display:block;height:4px;background:#68d5b3}
+#detail{margin-top:20px;display:none}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.7;color:#b2c6dd}
+#notice{padding:12px 16px;border-left:3px solid #efb96f;background:#272315;display:none;margin:14px 0;font-size:14px}
+footer{margin:20px 0;font-size:12px;color:#7d8da5;overflow-wrap:anywhere}
+@media(max-width:760px){main{padding:18px}#cards{grid-template-columns:1fr 1fr}header{align-items:flex-start;flex-direction:column}}
+</style></head>
+<body><main>
+<header><div><div class="brand">GRIFFIN / OBSERVATORY</div><h1>월드 모니터</h1><p>마을과 NPC의 현재 상태를 한눈에 확인합니다.</p></div><div class="window-tools"><button id="open-window">별도 창으로 열기</button><div id="connection" class="badge bad" role="status">연결 대기</div></div></header>
+<div id="notice" role="status"></div><div id="cards"></div>
+<section class="panel" style="margin-bottom:22px"><h2>첫 레벨 목표</h2><p id="story-status"></p><p id="patrol-objective">게임 상태를 기다리는 중입니다.</p></section>
+<h2>마을 현황</h2><div id="villages"><p>게임 상태를 기다리는 중입니다.</p></div>
+<section class="panel"><div class="toolbar"><h2 style="margin:0;margin-right:auto">NPC 현황</h2>
+<input id="search" aria-label="NPC 검색" placeholder="이름·직업·행동 검색">
+<select id="village" aria-label="마을 필터"><option value="">모든 마을</option></select>
+<select id="filter" aria-label="상태 필터"><option value="">전체 상태</option><option value="injured">부상 / 전투 불능</option><option value="remote">원격 임무</option><option value="hostile">적대</option></select>
+<button id="download">JSON 내려받기</button></div>
+<div class="table-wrap"><table><thead><tr><th>NPC</th><th>소속 마을</th><th>상태</th><th>행동 / 목표</th><th>체력</th><th>부품 / 재고</th><th>위치</th><th>탄약</th><th>기억 / 지식</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p id="empty">상태 수신 전입니다.</p></section>
+<section class="panel" style="margin-top:22px"><h2>야적 무리 · 판단 상태</h2>
+<p>같은 조가 함께 순찰하며, 성향과 위험에 따라 경계·공격·후퇴를 선택합니다.</p>
+<div class="table-wrap"><table><thead><tr><th>무리 / 개체</th><th>행동</th><th>체력</th><th>공격성</th><th>위험 감수</th><th>피격 대응</th><th>판단 근거</th><th>행동 점수</th></tr></thead><tbody id="bandit-rows"></tbody></table></div></section>
+<section class="panel" style="margin-top:22px"><h2>재화 이동 · 거래와 약탈</h2><p id="economy-status"></p><pre id="economy-events"></pre></section>
+<section class="panel" id="detail"><h2 id="detail-title"></h2><p>선택한 NPC의 판단 근거와 목표 점수 · 수신 JSON</p><pre id="detail-json"></pre></section>
+<footer id="meta">로컬 JSON 수신 · 1초마다 갱신 · 읽기 전용</footer>
+</main>
+<script>
+"use strict";
+let snapshot=null, selected=null, villageSignature="";
+const $=id=>document.getElementById(id);
+function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+function value(x){return x===null||x===undefined?"—":String(x);}
+function card(title,count,note){const n=node("div",undefined,"card");n.append(node("span",title),node("strong",value(count)),node("span",note));return n;}
+function render(data){
+ snapshot=data;
+ $("story-status").textContent=data.story?data.story.status+" · "+data.story.next_step:"";
+ const c=data.counts,g=data.game;
+ $("economy-status").textContent="플레이어 부품: "+value(data.economy?.player_scrap);
+ const eventNames={robbery:"약탈",stolen_goods_returned:"도난 부품 반환",potion_purchase:"회복약 구매",potion_sale:"회복약 판매",medical_service:"치료",fraud:"사기",extortion:"통행료",patrol_reward:"순찰 보상"};
+ $("economy-events").textContent=(data.economy?.recent_events||[]).slice(-12).map(e=>
+  Math.floor(e.time_s)+"초 · "+(eventNames[e.kind]||e.kind)+" · "+e.from+" → "+e.to+" · 부품 "+e.amount).join("\n")||"아직 거래·약탈 기록이 없습니다. (-1: 플레이어, -2: 임무 지급)";
+ $("patrol-objective").textContent=data.objective?.title||"목표 정보가 아직 수신되지 않았습니다.";
+ $("bandit-rows").replaceChildren(...(data.bandits||[]).map(b=>{
+  const row=node("tr");
+  for(const text of [String(b.band_id+1)+"조 / #"+b.id,b.hp>0?b.action_label:"제압됨",
+    b.hp+" / "+b.max_hp,Math.round(b.aggression*100)+"%",Math.round(b.risk_tolerance*100)+"%",
+    b.provoked?"주변 동료와 경계 공유":"없음",
+    ({highest_utility:"행동 점수 우선",hysteresis:"이전 행동 유지",critical_health:"생존 우선",routine_patrol:"정기 순찰"})[b.reason]||b.reason,
+    (b.scores||[]).map((score,i)=>["순찰","경계","교전","후퇴","복귀"][i]+" "+score.toFixed(2)).join(" / ")])
+      row.append(node("td",text));
+  return row;
+ }));
+ $("cards").replaceChildren(card("전체 NPC",c.npcs_total,"주민 + 서사 동료 / 플레이어·훈련 인형 제외"),
+ card("활동 가능 NPC",c.npcs_active,"전투 불능 "+c.npcs_incapacitated+" · 원격 "+c.npcs_remote),
+ card("활동 중 야적",c.mobs_alive,"무리 "+value(c.bandit_groups)+" · 제압됨 "+c.mobs_respawning),
+ card("마을",data.villages.length,g.world_ready?g.world_clock:"월드 AI 미준비"));
+ const signature=JSON.stringify(data.villages.map(v=>[v.id,v.name]));
+ if(signature!==villageSignature){
+  const old=$("village").value;
+  $("village").replaceChildren(new Option("모든 마을",""),...data.villages.map(v=>new Option(v.name,v.id)));
+  $("village").value=data.villages.some(v=>v.id===old)?old:"";villageSignature=signature;
+ }
+ $("villages").replaceChildren(...data.villages.map(v=>{
+  const panel=node("section",undefined,"panel");panel.append(node("h2",v.name));
+  const status=v.mobs_inside>0||v.npcs_hostile>0?"경계 필요":v.npcs_incapacitated>0||v.npcs_injured>0?"치료 필요":"안정";
+  panel.append(node("p","상태: "+status+" · 적대/몹 진입 → 경계, 부상/전투 불능 → 치료 기준"));
+  const metrics=node("div",undefined,"metrics");
+  for(const [name,key] of [["인구 (생존 NPC)","population"],["등록 NPC","npcs_registered"],["마을 안","npcs_present"],["마을 밖","npcs_outside"],["원격 임무","npcs_remote"],["부상 NPC","npcs_injured"],["전투 불능","npcs_incapacitated"],["적대 NPC","npcs_hostile"],["마을 내 몹","mobs_inside"],["건물","buildings"],["기지 물자","supplies"],["구조 인원","rescued"]]){
+   const row=node("div");row.append(node("span",name+"  "),node("b",value(v[key])));metrics.append(row);
+  }
+  panel.append(metrics);
+  const mood=v.atmosphere;
+  panel.append(node("h3","분위기 · "+(mood?.label||"미수신")));
+  panel.append(node("p",mood?.reason||"업데이트된 게임에서 분위기 정보가 전송됩니다."));
+  const tendency=node("div",undefined,"tendencies");
+  tendency.append(node("h3","마을 성향"),node("p","생존 등록 NPC의 평균 성향"));
+  if(v.tendencies){
+   for(const [label,key] of [["구조 우선","rescue_priority"],["명령 준수","command_obedience"],["자율 판단","autonomy"]]){
+    const score=Math.max(0,Math.min(100,Math.round(v.tendencies[key]*100)));
+    const row=node("div",undefined,"tendency"),track=node("div",undefined,"track"),fill=node("i");
+    fill.style.width=score+"%";track.append(fill);row.append(node("span",label),track,node("span",score+"%"));tendency.append(row);
+   }
+  }else tendency.append(node("p","성향 정보 없음"));
+  panel.append(tendency,node("h3","소문 · 알려진 소식"));
+  if(v.rumors?.length){
+   const list=node("ul",undefined,"rumors");
+   for(const rumor of v.rumors){
+    const item=node("li",rumor.text);
+    item.append(node("small","알고 있는 인원 "+rumor.holders+"명 · 평균 확신 "+Math.round(rumor.confidence*100)+"% · "+rumor.sources.join(", ")));
+    list.append(item);
+   }
+   panel.append(list,node("p","기지에 있는 NPC의 믿음 요약이며, 세계의 확정 사실과 다를 수 있습니다."));
+  }else panel.append(node("p","현재 기지 인원이 알고 있는 소식이 없습니다."));
+  return panel;
+ }));
+ const notices=[];
+ if(data.transport.stale)notices.push("게임 상태 갱신이 중단되었습니다. 마지막 수신값을 표시합니다.");
+ if(g.paused)notices.push("게임 일시정지 중입니다. 브라우저로 창을 전환하면 기존 게임 규칙에 따라 정지합니다.");
+ if(g.player_down)notices.push("플레이어 전투 불능: 월드 진행 중단.");
+ if(g.training)notices.push("F6 훈련 중: 표의 본 월드는 정지합니다. 훈련 인형 2명은 집계에서 제외합니다.");
+ if(!g.world_ready)notices.push("월드 AI 오류: "+g.world_error);
+ $("notice").textContent=notices.join(" ");$("notice").style.display=notices.length?"block":"none";
+ $("connection").textContent=data.transport.stale?"수신 중단":g.paused?"연결됨 · 게임 정지":"연결됨 · 실시간";
+ $("connection").className="badge"+(data.transport.stale?" bad":"");
+ $("meta").textContent="JSON #"+data.sequence+" · 수신 지연 "+(data.transport.age_ms/1000).toFixed(1)+"초 · "+data.transport.source;
+ renderRows();
+}
+function renderRows(){
+ if(!snapshot)return;
+ const q=$("search").value.trim().toLowerCase(),v=$("village").value,f=$("filter").value;
+ const list=snapshot.npcs.filter(n=>(!v||n.village_id===v)&&(!q||[n.name,n.role,n.action,n.id].join(" ").toLowerCase().includes(q))
+ &&(!f||(f==="injured"&&n.hp<n.max_hp)||(f==="remote"&&!n.available)||(f==="hostile"&&n.hostile)));
+ $("empty").textContent=list.length?list.length+"명 표시 · 행을 선택하면 상세 상태가 표시됩니다.":"조건에 맞는 NPC가 없습니다.";
+ $("rows").replaceChildren(...list.map(n=>{
+  const row=node("tr");row.tabIndex=0;row.setAttribute("aria-label",n.name+" 상세 보기");
+  const name=node("td",n.name);name.append(node("small",n.role+" · "+n.id));row.append(name);
+  row.append(node("td",snapshot.villages.find(v=>v.id===n.village_id)?.name||n.village_id));
+  row.append(node("td",n.state+(n.hostile?" · 적대":"")),node("td",n.action));
+  const hp=node("td",Math.round(n.hp)+" / "+n.max_hp),bar=node("div",undefined,"hp"),fill=node("i");
+  fill.style.width=Math.max(0,Math.min(100,n.hp/n.max_hp*100))+"%";bar.append(fill);hp.append(bar);row.append(hp);
+  row.append(node("td",value(n.wallet_scrap)+" / 회복약 "+value(n.potion_stock)+" / 의약 "+value(n.medical_supplies)));
+  const pos=node("td",n.location);if(n.position)pos.append(node("small",n.position.x.toFixed(1)+", "+n.position.z.toFixed(1)));row.append(pos,node("td",value(n.ammo)),node("td",n.memories+" / "+n.beliefs));
+  function choose(){selected=n.id;showDetail();}
+  row.onclick=choose;row.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose();}};
+  return row;
+ }));showDetail();
+}
+function showDetail(){
+ const n=snapshot?.npcs.find(n=>n.id===selected);$("detail").style.display=n?"block":"none";
+ if(n){$("detail-title").textContent=n.name+" · 상세 상태";$("detail-json").textContent=JSON.stringify(n,null,2);}
+}
+$("open-window").onclick=()=>{
+ const opened=window.open(window.location.href,"griffin-world-monitor","popup,width=1480,height=960,resizable=yes,scrollbars=yes");
+ if(opened)opened.focus();
+ else{$("notice").textContent="브라우저에서 이 사이트의 팝업을 허용하거나 새 창에서 주소를 여세요.";$("notice").style.display="block";}
+};
+for(const id of ["search","village","filter"])$(id).addEventListener("input",renderRows);
+$("download").onclick=()=>{
+ if(!snapshot)return;
+ const url=URL.createObjectURL(new Blob([JSON.stringify(snapshot,null,2)],{type:"application/json"}));
+ const link=node("a");link.href=url;link.download="world-snapshot.json";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+async function poll(){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),4000);
+ try{
+  const response=await fetch("/api/snapshot",{cache:"no-store",signal:controller.signal});
+  const data=await response.json();if(!response.ok)throw new Error(data.error||"수신 실패");
+  render(data);
+ }catch(error){
+  $("connection").textContent="연결 대기 / 수신 실패";$("connection").className="badge bad";
+  $("notice").textContent=(snapshot?"마지막 수신값을 유지합니다. ":"")+error.message;
+  $("notice").style.display="block";
+ }finally{clearTimeout(timer);setTimeout(poll,1000);}
+}
+poll();
+</script></body></html>
