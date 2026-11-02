@@ -1,0 +1,162 @@
+{
+  "skin": {
+    "hex_srgb": "#b38771",
+    "roughness": 0.84
+  },
+  "skin_warm": {
+    "hex_srgb": "#956b55",
+    "roughness": 0.84
+  },
+  "skin_light": {
+    "hex_srgb": "#c5a58b",
+    "roughness": 0.84
+  },
+  "olive": {
+    "hex_srgb": "#59604b",
+    "roughness": 0.92
+  },
+  "olive_dark": {
+    "hex_srgb": "#373e34",
+    "roughness": 0.92
+  },
+  "canvas": {
+    "hex_srgb": "#8c8970",
+    "roughness": 0.95
+  },
+  "charcoal": {
+    "hex_srgb": "#313a3e",
+    "roughness": 0.88
+  },
+  "cloth_gray": {
+    "hex_srgb": "#707875",
+    "roughness": 0.95
+  },
+  "leather": {
+    "hex_srgb": "#5e4839",
+    "roughness": 0.79
+  },
+  "leather_dark": {
+    "hex_srgb": "#332d28",
+    "roughness": 0.84
+  },
+  "rubber": {
+    "hex_srgb": "#232b2e",
+    "roughness": 0.95
+  },
+  "steel": {
+    "hex_srgb": "#667779",
+    "roughness": 0.51
+  },
+  "rust": {
+    "hex_srgb": "#805447",
+    "roughness": 0.91
+  },
+  "wood": {
+    "hex_srgb": "#80705a",
+    "roughness": 0.9
+  },
+  "wood_light": {
+    "hex_srgb": "#a08e6b",
+    "roughness": 0.91
+  },
+  "concrete": {
+    "hex_srgb": "#8e9288",
+    "roughness": 0.94
+  },
+  "glass": {
+    "hex_srgb": "#689295",
+    "roughness": 0.31
+  },
+  "ivory": {
+    "hex_srgb": "#d5ccb2",
+    "roughness": 0.8
+  },
+  "eye": {
+    "hex_srgb": "#17292e",
+    "roughness": 0.3
+  },
+  "white": {
+    "hex_srgb": "#c5c9b9",
+    "roughness": 0.84
+  },
+  "hair_black": {
+    "hex_srgb": "#303432",
+    "roughness": 0.94
+  },
+  "hair_brown": {
+    "hex_srgb": "#55443b",
+    "roughness": 0.94
+  },
+  "hair_ash": {
+    "hex_srgb": "#9a978a",
+    "roughness": 0.94
+  },
+  "accent": {
+    "hex_srgb": "#af674d",
+    "roughness": 0.8
+  },
+  "grass": {
+    "hex_srgb": "#667148",
+    "roughness": 1
+  },
+  "grass_dark": {
+    "hex_srgb": "#414f39",
+    "roughness": 1
+  },
+  "leaf": {
+    "hex_srgb": "#62714d",
+    "roughness": 1
+  },
+  "pine": {
+    "hex_srgb": "#3e5b4c",
+    "roughness": 1
+  },
+  "bark": {
+    "hex_srgb": "#675343",
+    "roughness": 1
+  },
+  "soil": {
+    "hex_srgb": "#70624d",
+    "roughness": 1
+  },
+  "rock": {
+    "hex_srgb": "#787f78",
+    "roughness": 0.96
+  },
+  "sand": {
+    "hex_srgb": "#a59c7c",
+    "roughness": 1
+  },
+  "tiger": {
+    "hex_srgb": "#b1854e",
+    "roughness": 0.93
+  },
+  "fur_light": {
+    "hex_srgb": "#c7baa0",
+    "roughness": 0.98
+  },
+  "stripe": {
+    "hex_srgb": "#38382e",
+    "roughness": 0.98
+  },
+  "wolf": {
+    "hex_srgb": "#6d746c",
+    "roughness": 0.97
+  },
+  "wolf_dark": {
+    "hex_srgb": "#46524d",
+    "roughness": 0.98
+  },
+  "fox": {
+    "hex_srgb": "#a5724a",
+    "roughness": 0.97
+  },
+  "deer": {
+    "hex_srgb": "#9a8464",
+    "roughness": 0.98
+  },
+  "water": {
+    "hex_srgb": "#4e7276",
+    "roughness": 0.23
+  }
+}

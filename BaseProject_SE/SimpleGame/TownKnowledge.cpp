@@ -12,7 +12,8 @@ float Distance(DollPoint a, DollPoint b)
 
 bool CanCommunicate(const TownNpc &a, const TownNpc &b, bool radio)
 {
-    return (radio && a.radio && b.radio) || Distance(a.position, b.position) <= 6;
+    (void)radio;
+    return Distance(a.position, b.position) <= 6;
 }
 }
 
@@ -47,7 +48,7 @@ void RpgGame::PerceiveNpc(TownNpc &npc)
                               time,
                               true,
                               other.hostile,
-                              other.scrap});
+                              other.silver});
     for (const auto &other : npcs)
         if (other.criminalUntil > time && npc.mind.Find(NpcFact::Crime, other.id, time) &&
             Distance(npc.position, other.position) < 8 &&

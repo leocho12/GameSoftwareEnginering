@@ -23,100 +23,104 @@ const char *RpgEnemy::ActionName(BanditAction value)
 
 const char *RpgEnemy::ActionLabel(BanditAction value)
 {
-    const char *names[] = {"순찰", "경계", "교전", "후퇴", "야영지 복귀"};
+    const char *names[] = {"순찰", "경계", "교전", "후퇴", "서식지 복귀"};
     return names[int(value)];
 }
 
 void RpgGame::InitializeBandits()
 {
-    banditGroups.assign(3, {});
-    enemies.resize(9);
+    constexpr int groupsPerCorridor = 10;
+    banditGroups.assign(novel::CorridorCount * groupsPerCorridor, {});
+    enemies.assign(novel::CorridorCount * novel::MonstersPerCorridor, {});
     banditLogTimer = banditUpdateCpuMs = banditPathCpuMs = 0;
     banditDecisions = banditPathReplans = 0;
-    for (int band = 0; band < 3; ++band)
+    for (int route = 0; route < novel::CorridorCount; ++route)
     {
-        for (int member = 0; member < 3; ++member)
+        float left = novel::Villages()[route].x + 14;
+        for (int group = 0; group < groupsPerCorridor; ++group)
         {
-            auto &enemy = enemies[band * 3 + member];
-            enemy.hp = 0;
-            enemy.band = band;
-            enemy.appearance = 5 + member;
-            enemy.traits.aggression = .20f + band * .28f + member * .035f;
-            enemy.traits.riskTolerance = .25f + band * .25f;
-            enemy.traits.selfPreservation = .85f - band * .15f;
-            enemy.traits.teamSupport = .8f;
+            auto &g = banditGroups[route * groupsPerCorridor + group];
+            g.camp = {left + 5 + (group % 5) * 8.0f, 3 + (group < 5 ? -12.0f : 12.0f)};
+            g.waypoint = g.camp;
         }
-        PlaceBand(band);
+        for (int member = 0; member < novel::MonstersPerCorridor; ++member)
+        {
+            auto &enemy = enemies[route * novel::MonstersPerCorridor + member];
+            enemy.band = route * groupsPerCorridor + member / 5;
+            enemy.hp = 0;
+            enemy.appearance = member % 4;
+            enemy.traits.aggression = member % 4 == 0 ? .85f : member % 4 == 1 ? .65f : .05f;
+            enemy.traits.riskTolerance = .4f;
+            enemy.traits.selfPreservation = .8f;
+            enemy.traits.teamSupport = .5f;
+            RespawnMonster(enemy, true);
+        }
     }
+}
+
+bool RpgGame::RespawnMonster(RpgEnemy &enemy, bool initial)
+{
+    if (enemy.band < 0 || enemy.band / 10 >= novel::CorridorCount ||
+        banditGroups.size() != novel::CorridorCount * 10)
+    {
+        enemy.respawn = .25f;
+        return false;
+    }
+    const int route = enemy.band / 10;
+    const float left = novel::Villages()[route].x + 13;
+    const float right = novel::Villages()[route + 1].x - 13;
+    const WorldPoint death = enemy.position;
+    for (int attempt = 0; attempt < 256; ++attempt)
+    {
+        WorldPoint point{left + float(random() % 10001) / 10000 * (right - left),
+                         3 + float(int(random() % 4301) - 2150) / 100};
+        // Keep the main road usable and avoid visible pop-in after a kill.
+        if (std::abs(point.z - 3) < 4 || !Fits(point) || TownNpc::InTown(point.x, point.z) ||
+            (!initial && (Distance(point, death) < 8 || Distance(point, player) < 10)))
+            continue;
+        bool occupied = false;
+        for (const auto &other : enemies)
+            if (&other != &enemy && other.hp > 0 && Distance(point, other.position) < 1)
+                occupied = true;
+        if (occupied)
+            continue;
+        int nearest = route * 10;
+        for (int g = route * 10; g < (route + 1) * 10; ++g)
+            if (Distance(point, banditGroups[g].camp) < Distance(point, banditGroups[nearest].camp))
+                nearest = g;
+        auto traits = enemy.traits;
+        int appearance = enemy.appearance;
+        enemy = RpgEnemy{};
+        enemy.traits = traits;
+        enemy.band = nearest;
+        enemy.appearance = appearance;
+        enemy.position = point;
+        enemy.maxHp = enemy.hp = 40;
+        enemy.decisionTimer = float(random() % 50) * .01f;
+        if (!initial)
+            ++monsterRespawns;
+        return true;
+    }
+    enemy.respawn = .25f; // Retry later, never force a blocked or occupied spawn.
+    return false;
 }
 
 bool RpgGame::PlaceBand(int band)
 {
-    std::vector<WorldPoint> candidates;
-    int cx = int(std::floor(player.x)), cz = int(std::floor(player.z));
-    for (int z = cz - 32; z <= cz + 32; ++z)
-        for (int x = cx - 32; x <= cx + 32; ++x)
-        {
-            WorldPoint p{float(x), float(z)};
-            if (Distance(p, player) < 18 || Distance(p, player) > 32 || TownNpc::InTown(p.x, p.z) ||
-                !Fits(p))
-                continue;
-            bool clear = true;
-            // A compact formation needs room; keep camps away from village exits.
-            for (int dz = -2; dz <= 2; ++dz)
-                for (int dx = -2; dx <= 2; ++dx)
-                    if (TownNpc::InTown(p.x + dx, p.z + dz))
-                        clear = false;
-            for (int other = 0; other < int(banditGroups.size()); ++other)
-                if (other != band && Distance(p, banditGroups[other].camp) < 13)
-                    clear = false;
-            if (clear)
-                candidates.push_back(p);
-        }
-    if (candidates.empty())
-        return false;
-    auto &group = banditGroups[band];
-    group.camp = group.waypoint = candidates[random() % candidates.size()];
-    group.patrolTimer = 0;
-    group.respawnTimer = 45;
-    int member = 0;
+    bool placed = false;
     for (auto &enemy : enemies)
-    {
-        if (enemy.band != band)
-            continue;
-        auto traits = enemy.traits;
-        int appearance = enemy.appearance;
-        enemy = RpgEnemy{};
-        enemy.band = band;
-        enemy.traits = traits;
-        enemy.appearance = appearance;
-        enemy.maxHp = enemy.hp = 40 + std::min(level - 1, 4) * 3;
-        enemy.position = group.camp;
-        for (int dz = -2; dz <= 2; ++dz)
-            for (int dx = -2; dx <= 2; ++dx)
-            {
-                WorldPoint p{group.camp.x + dx, group.camp.z + dz};
-                if (!Fits(p) || TownNpc::InTown(p.x, p.z))
-                    continue;
-                bool occupied = false;
-                for (const auto &other : enemies)
-                    if (&other != &enemy && other.band == band && other.hp > 0 &&
-                        Distance(other.position, p) < .75f)
-                        occupied = true;
-                if (!occupied)
-                    enemy.position = p;
-            }
-        enemy.decisionTimer = .08f * member++;
-    }
-    return true;
+        if (enemy.band == band && enemy.hp <= 0)
+            placed |= RespawnMonster(enemy);
+    return placed;
 }
 
 void RpgGame::ProvokeBand(RpgEnemy &victim)
 {
     // Only witnesses in the same nearby group share the provocation.
     for (auto &enemy : enemies)
-        if (&enemy == &victim || (victim.band >= 0 && enemy.band == victim.band &&
-                                  Distance(enemy.position, victim.position) <= 8))
+        if (&enemy == &victim ||
+            (victim.band >= 0 && enemy.band == victim.band &&
+             Distance(enemy.position, victim.position) <= 8 && LineOfSight(enemy.position, player)))
         {
             enemy.provokedUntil = time + 12;
             enemy.lastSeen = player;
@@ -125,28 +129,33 @@ void RpgGame::ProvokeBand(RpgEnemy &victim)
         }
 }
 
+bool RpgGame::DamageMonster(RpgEnemy &enemy, int damage, bool playerCredit)
+{
+    if (enemy.hp <= 0 || damage <= 0)
+        return false;
+    enemy.hp = std::max(0, enemy.hp - damage);
+    if (enemy.hp > 0)
+        return false;
+    enemy.respawn = expeditionState.clock.SecondsToDawn();
+    enemy.moving = false;
+    if (playerCredit)
+    {
+        ++kills;
+        ++expeditionState.progress.combatWins;
+        AddLocalRumor(enemy.position, "교역로의 마수가 모험가에게 토벌되었다고 한다.", 1);
+        drops.push_back({enemy.position, random() % 3 == 0});
+        if (drops.size() > 128)
+            drops.erase(drops.begin());
+    }
+    return true;
+}
+
 void RpgGame::UpdateBandits(float dt)
 {
     auto started = std::chrono::steady_clock::now();
     for (int band = 0; band < int(banditGroups.size()); ++band)
     {
         auto &group = banditGroups[band];
-        bool any = false, allFar = true;
-        for (const auto &enemy : enemies)
-            if (enemy.band == band)
-            {
-                any |= enemy.hp > 0;
-                allFar &= Distance(enemy.position, player) > 42;
-            }
-        // Never refill individual members next to a fight or recycle visible pursuers.
-        if (!any)
-            group.respawnTimer -= dt;
-        if (((any && allFar) || (!any && group.respawnTimer <= 0)) &&
-            Distance(group.camp, player) > 36)
-        {
-            PlaceBand(band);
-            continue;
-        }
         group.patrolTimer -= dt;
         if (group.patrolTimer <= 0)
         {
@@ -167,7 +176,25 @@ void RpgGame::UpdateBandits(float dt)
     {
         enemy.moving = false;
         if (enemy.hp <= 0)
+        {
+            enemy.respawn -= dt;
+            if (enemy.respawn <= 0)
+                RespawnMonster(enemy);
             continue;
+        }
+        bool nearby = Distance(enemy.position, player) <= 38;
+        if (!nearby)
+            for (const auto &npc : npcs)
+                if (npc.hp > 0 && Distance(enemy.position, {npc.position.x, npc.position.z}) < 12)
+                {
+                    nearby = true;
+                    break;
+                }
+        if (!nearby)
+        {
+            enemy.seesPlayer = false;
+            continue;
+        }
         enemy.cooldown = std::max(0.0f, enemy.cooldown - dt);
         enemy.decisionTimer -= dt;
         enemy.locomotion.pathTimer -= dt;
@@ -179,7 +206,27 @@ void RpgGame::UpdateBandits(float dt)
         {
             ++banditDecisions;
             enemy.decisionTimer = .5f;
-            bool seesPlayer = range <= 7 && LineOfSight(enemy.position, player);
+            auto &alert = expeditionState.alerts[RegionAt(enemy.position)];
+            auto phase = expeditionState.clock.CurrentPhase();
+            bool night =
+                phase == expedition::Phase::DeepNight || phase == expedition::Phase::Evening;
+            float sightRange = (night ? 5.0f : 7.0f) + alert.Level() * .5f;
+            if (keys['c'])
+                sightRange *= .55f;
+            bool seesPlayer = range <= sightRange && LineOfSight(enemy.position, player);
+            WorldPoint heard;
+            bool hearsNoise = HeardNoise(enemy.position, heard);
+            if (hearsNoise && !seesPlayer)
+            {
+                enemy.lastSeen = heard;
+                enemy.memoryUntil = time + 8;
+            }
+            if ((seesPlayer || hearsNoise) && time - enemy.alertReportedAt >= 8)
+            {
+                // Only a local observer raises this route's alert; no remote broadcast.
+                alert.Raise(seesPlayer && enemy.traits.aggression > .5f ? 8.0f : 3.0f);
+                enemy.alertReportedAt = time;
+            }
             enemy.seesPlayer = seesPlayer;
             if (seesPlayer)
             {
@@ -204,11 +251,11 @@ void RpgGame::UpdateBandits(float dt)
             enemy.perceivedDanger = danger;
             bool provoked = enemy.provokedUntil > time;
             bool remembers = enemy.memoryUntil > time;
-            bool leash = Distance(enemy.position, camp) > 14;
+            bool leash = Distance(enemy.position, camp) > 14 + alert.Level() * 3;
             auto &scores = enemy.scores;
             scores.fill(-1);
             scores[0] = .35f;
-            if (seesPlayer)
+            if (seesPlayer || hearsNoise)
                 scores[1] = .65f - enemy.traits.aggression * .20f;
             if (remembers && !leash)
                 scores[2] = enemy.traits.aggression * .65f + enemy.traits.riskTolerance * .20f +
@@ -242,7 +289,7 @@ void RpgGame::UpdateBandits(float dt)
             {
                 goal = banditGroups[enemy.band].waypoint;
                 // Loose formation around a shared route, with collision-checked offsets.
-                int slot = int(&enemy - enemies.data()) % 3;
+                int slot = int(&enemy - enemies.data()) % 5;
                 WorldPoint offset{goal.x + slot - 1, goal.z + (slot == 1 ? 1 : 0)};
                 if (Fits(offset))
                     goal = offset;
@@ -250,12 +297,13 @@ void RpgGame::UpdateBandits(float dt)
             break;
         case BanditAction::Observe:
             enemy.mirror = enemy.lastSeen.x < enemy.position.x;
-            continue;
+            goal = enemy.memoryUntil > time ? enemy.lastSeen : camp;
+            break;
         case BanditAction::Attack:
             if (!knowsPlayer)
                 continue;
             goal = enemy.lastSeen;
-            if (range <= .85f && LineOfSight(enemy.position, player))
+            if (enemy.seesPlayer && range <= .85f && LineOfSight(enemy.position, player))
             {
                 if (enemy.cooldown == 0)
                 {
@@ -321,11 +369,11 @@ void RpgGame::LogBandits()
     auto directory = std::filesystem::path(executable).parent_path() / "Profiles";
     std::error_code error;
     std::filesystem::create_directories(directory, error);
-    auto path = directory / "bandit_ai.jsonl";
+    auto path = directory / "monster_ai.jsonl";
     if (std::filesystem::exists(path, error) &&
         std::filesystem::file_size(path, error) > 5 * 1024 * 1024)
     {
-        auto previous = directory / "bandit_ai.previous.jsonl";
+        auto previous = directory / "monster_ai.previous.jsonl";
         std::filesystem::remove(previous, error);
         error.clear();
         std::filesystem::rename(path, previous, error);
@@ -334,7 +382,7 @@ void RpgGame::LogBandits()
     }
     std::ofstream out(path, std::ios::app);
     out.imbue(std::locale::classic());
-    out << "{\"event\":\"bandit_performance_window\",\"game_seconds\":" << time
+    out << "{\"event\":\"monster_performance_window\",\"game_seconds\":" << time
         << ",\"window_seconds\":" << banditLogTimer << ",\"cpu_update_ms\":" << banditUpdateCpuMs
         << ",\"cpu_path_ms\":" << banditPathCpuMs << ",\"decisions\":" << banditDecisions
         << ",\"path_replans\":" << banditPathReplans << ",\"enemy_slots\":" << enemies.size()
@@ -342,10 +390,13 @@ void RpgGame::LogBandits()
     for (std::size_t i = 0; i < enemies.size(); ++i)
     {
         const auto &enemy = enemies[i];
-        out << "{\"event\":\"bandit_ai_snapshot\",\"seed\":" << seed << ",\"game_seconds\":" << time
-            << ",\"enemy_id\":" << i << ",\"band_id\":" << enemy.band << ",\"hp\":" << enemy.hp
-            << ",\"action\":\"" << RpgEnemy::ActionName(enemy.action) << "\",\"reason\":\""
-            << enemy.reason << "\",\"aggression\":" << enemy.traits.aggression
+        if (Distance(enemy.position, player) > 38 && enemy.hp > 0)
+            continue;
+        out << "{\"event\":\"monster_ai_snapshot\",\"seed\":" << seed
+            << ",\"game_seconds\":" << time << ",\"enemy_id\":" << i
+            << ",\"band_id\":" << enemy.band << ",\"hp\":" << enemy.hp << ",\"action\":\""
+            << RpgEnemy::ActionName(enemy.action) << "\",\"reason\":\"" << enemy.reason
+            << "\",\"aggression\":" << enemy.traits.aggression
             << ",\"risk_tolerance\":" << enemy.traits.riskTolerance
             << ",\"self_preservation\":" << enemy.traits.selfPreservation
             << ",\"sees_player\":" << (enemy.seesPlayer ? "true" : "false")
@@ -359,43 +410,4 @@ void RpgGame::LogBandits()
             out << (score ? "," : "") << enemy.scores[score];
         out << "]}\n";
     }
-}
-
-bool RpgGame::PatrolReady() const
-{
-    return level >= 3 && itemsCollected >= 2;
-}
-
-std::string RpgGame::PatrolObjective() const
-{
-    if (patrolReported)
-        return "첫 순찰 완료! 자유 탐험을 계속할 수 있습니다.";
-    if (level < 3)
-        return "1/3 야적과 교전해 레벨 3 달성 (현재 " + std::to_string(level) + ")";
-    if (itemsCollected < 2)
-        return "2/3 전리품 2개 회수 (현재 " + std::to_string(itemsCollected) + ")";
-    return "3/3 마을 경비에게 F로 복귀 보고 · 보상 부품 5개";
-}
-
-std::string RpgGame::PatrolHint() const
-{
-    if (patrolReported)
-        return "무리를 우회하거나 교전하세요. I: 성장 능력치 확인";
-    if (level >= 3)
-        return itemsCollected < 2 ? "적을 제압한 자리에서 E로 전리품을 회수하세요."
-                                  : "마을 초소나 출입로의 경비에게 다가가 F를 누르세요.";
-    const RpgEnemy *nearest = nullptr;
-    for (const auto &enemy : enemies)
-        if (enemy.hp > 0 &&
-            (!nearest || Distance(enemy.position, player) < Distance(nearest->position, player)))
-            nearest = &enemy;
-    if (!nearest)
-        return "지역 무리를 모두 제압했습니다. 다른 구역을 탐험하세요.";
-    float dx = nearest->position.x - player.x, dz = nearest->position.z - player.z;
-    float right = .745f * dx - .667f * dz, up = -.667f * dx - .745f * dz;
-    const char *direction = std::abs(right) > std::abs(up) ? (right > 0 ? "오른쪽" : "왼쪽")
-                                                           : (up > 0 ? "위쪽" : "아래쪽");
-    return "야적 무리: 화면 " + std::string(direction) + " 약 " +
-           std::to_string(int(std::round(Distance(nearest->position, player)))) +
-           " 거리 · 먼저 공격하면 주변 동료가 반응합니다.";
 }

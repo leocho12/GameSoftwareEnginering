@@ -1,4 +1,4 @@
-// CPU-only checks. Link the RPG sources including RpgEconomy.cpp and RpgBandits.cpp; no renderer.
+// CPU-only checks. Link the RPG sources including RpgEconomy.cpp, RpgBandits.cpp and RpgExpedition.cpp; no renderer.
 #include "../BaseProject_SE/SimpleGame/RpgGame.h"
 #include <cassert>
 #include <cmath>
@@ -31,22 +31,19 @@ int main()
     auto sample = game.Terrain(15, 15);
     game.Reset(42);
     assert(sample == game.Terrain(15, 15));
-    game.AddExperience(39);
-    assert(game.level == 1 && game.experience == 39);
-    game.AddExperience(1);
-    assert(game.level == 2 && game.experience == 0);
-    assert(game.MaxHp() == 120 && game.AttackPower() == 17 && game.Defense() == 3);
-    game.AddExperience(140);
-    assert(game.level == 4 && game.experience == 0);
-    assert(game.totalExperience == 180);
+    game.expeditionState.progress.combatWins = 3;
+    assert(game.MaxHp() == 100 && game.Defense() == 3);
+    game.expeditionState.progress.combatWins = 10;
+    assert(game.expeditionState.progress.WeaponSkill() == 30 && game.AttackPower() == 17);
     game.Reset(42);
     game.enemies.clear();
     game.enemies.push_back({{4, 3}, 14, 14});
     game.aim = {4, 3};
     game.Attack();
-    assert(game.kills == 1 && game.experience == 20 && game.enemies[0].hp == 0);
+    assert(game.kills == 1 && game.expeditionState.progress.combatWins == 1 &&
+           game.enemies[0].hp == 0);
     game.Attack();
-    assert(game.kills == 1 && game.experience == 20);
+    assert(game.kills == 1 && game.expeditionState.progress.combatWins == 1);
     game.Pickup();
     assert(game.drops.empty());
     game.hp = 30;
@@ -65,10 +62,10 @@ int main()
         game.Update(1.0f / 60);
     assert(game.Fits(game.player));
     game.hp = 0;
-    int experience = game.experience;
+    int victories = game.expeditionState.progress.combatWins;
     game.Attack();
     game.Update(.1f);
-    assert(game.experience == experience);
+    assert(game.expeditionState.progress.combatWins == victories);
     game.ClearInput();
     assert(!game.keys['d'] && !game.firing);
 }

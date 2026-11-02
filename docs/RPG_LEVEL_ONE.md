@@ -1,3 +1,5 @@
+> **이전 버전 자료** — 2026-10-22 세계관·레벨·외형 기준은 [NOVEL_WORLD_PROTOTYPE.md](NOVEL_WORLD_PROTOTYPE.md), 원문 근거는 [NOVEL_WORLD_REFERENCE.md](NOVEL_WORLD_REFERENCE.md), 메시 연결은 [RESOURCE_WORLD_INTEGRATION.md](RESOURCE_WORLD_INTEGRATION.md)를 우선한다. 아래의 옛 세계관·수치·리소스는 현재 확정 기준이 아니다.
+
 # 첫 RPG 레벨 — 외곽 사냥터
 
 > 접지 그림자, 부품 지갑·재고·약탈, 대화 중 이동 정지, L 이야기 일지는 [ECONOMY_AND_STORY_STATUS.md](ECONOMY_AND_STORY_STATUS.md)를 따른다. 현재 실행은 순찰·지역 구조 사건까지이며 본편 중계소·수송차 퀘스트는 미구현이다.

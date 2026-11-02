@@ -1,3 +1,5 @@
+> **이전 버전 자료** — 2026-10-22 세계관·레벨·외형 기준은 [NOVEL_WORLD_PROTOTYPE.md](NOVEL_WORLD_PROTOTYPE.md), 원문 근거는 [NOVEL_WORLD_REFERENCE.md](NOVEL_WORLD_REFERENCE.md), 메시 연결은 [RESOURCE_WORLD_INTEGRATION.md](RESOURCE_WORLD_INTEGRATION.md)를 우선한다. 아래의 옛 세계관·수치·리소스는 현재 확정 기준이 아니다.
+
 # 변경 마을과 주민 AI
 
 > 2026-10-14: 적은 3명씩 3개 무리로 전환했다. NPC·동료의 임시 도형 스프라이트를 원작 SD 시험 외형으로 교체했다. 최신 배치·행동·레벨 목표·로그는 [BANDIT_PATROLS.md](BANDIT_PATROLS.md)를 우선한다.

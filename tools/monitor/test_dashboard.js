@@ -62,11 +62,15 @@ data.bandits = [{ id: 0, band_id: 1, hp: 26, max_hp: 40, action_label: "관찰",
     aggression: .2, risk_tolerance: .3, provoked: false, reason: "highest_utility",
     scores: [.35, .6, .3, -1, -1] }];
 data.story = { status: "현장 순찰 진행", next_step: "미라에게 F 대화" };
-data.economy = { player_scrap: 10, recent_events: [{kind:"robbery",time_s:12,from:1,to:11,amount:3}] };
-data.npcs[0].wallet_scrap = 20;
+data.economy = { player_silver: 10, recent_events: [{kind:"robbery",time_s:12,from:1,to:11,amount:3}] };
+data.npcs[0].wallet_silver = 20;
 data.npcs[0].potion_stock = 5;
 data.npcs[0].medical_supplies = 0;
+data.survival = { hunger:12, thirst:14, fatigue:8, stamina:85, alert_level:2, resting:true };
 context.render(data);
+assert.match(elements.get("survival-status").textContent, /허기 12/);
+assert.match(elements.get("survival-status").textContent, /지역 경보 2/);
+assert.match(elements.get("survival-status").textContent, /휴식 중/);
 assert.match(elements.get("story-status").textContent, /미라에게 F/);
 assert.match(elements.get("economy-events").textContent, /약탈/);
 assert.match(text(elements.get("rows")), /회복약 5/);
@@ -88,3 +92,17 @@ data.transport.stale = true;
 context.render(data);
 assert.match(elements.get("connection").textContent, /수신 중단/);
 console.log("Dashboard: village summaries, compatibility, filters, remote detail, popup, stale state passed.");
+
+data.villages=Array.from({length:5},(_,i)=>({...village,id:"v"+i,name:"마을"+i,npcs_registered:20,population:20,
+ atmosphere:{label:"평온",morale:75,safety:100,prosperity:60,trust:50,calm:12,anxious:4,frightened:0,hopeful:4},
+ mood_history:[{time_s:1,morale:75,safety:100,population:20}]}));
+data.corridors=Array.from({length:4},(_,i)=>({from:"마을"+i,to:"마을"+(i+1),mobs_alive:50,mob_slots:50,nominal_player_seconds:20}));
+data.profiling={rumor_contact_transfers_total:12,courier_physical_arrivals_total:3,monster_respawns_total:5};
+data.counts={...data.counts,npcs_total:100,mobs_alive:200,mob_slots:200};
+context.render(data);
+assert.equal(elements.get("villages").children.length,5);
+assert.match(text(elements.get("villages")),/경제 60/);
+assert.match(text(elements.get("villages")),/최근 사기 추이/);
+assert.match(elements.get("patrol-objective").textContent,/50\/50마리/);
+assert.match(elements.get("meta").textContent,/전령 도착 3회/);
+console.log("Novel world dashboard: 5 villages, mood metrics/history, 4 corridors and transport counters passed.");

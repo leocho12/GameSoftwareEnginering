@@ -20,27 +20,22 @@ RpgGame::RpgGame()
 
 int RpgGame::MaxHp() const
 {
-    return 100 + 20 * (level - 1);
+    return 100;
 }
 
 int RpgGame::AttackPower() const
 {
-    return 14 + 3 * (level - 1);
+    return 14 + expeditionState.progress.WeaponSkill() / 10;
 }
 
 int RpgGame::Defense() const
 {
-    return 2 + (level - 1);
-}
-
-int RpgGame::NextExperience() const
-{
-    return 40 + 20 * (level - 1);
+    return expeditionState.progress.Veteran() ? 3 : 2;
 }
 
 RpgGame::Ground RpgGame::Terrain(int x, int z) const
 {
-    if (TownNpc::InTown(float(x), float(z)))
+    if (TownNpc::InTown(float(x), float(z)) || novel::OnRoad(float(x), float(z)))
         return Ground::Dirt;
     // Coordinate hashing generates the same world without storing visited ground.
     // Isolated obstacle cells leave two-cell-wide connected corridors everywhere.
@@ -64,6 +59,8 @@ RpgGame::Ground RpgGame::Terrain(int x, int z) const
 
 bool RpgGame::Walkable(int x, int z) const
 {
+    if (novel::PropBlocked(float(x), float(z)))
+        return false;
     for (const auto &building : TownNpc::Buildings())
         if (std::abs(float(x) - building.x) <= building.width * .5f &&
             std::abs(float(z) - building.z) <= building.depth * .5f)
@@ -125,13 +122,11 @@ void RpgGame::Reset(uint32_t newSeed)
     random.seed(seed);
     player = {3, 3};
     aim = {4, 3};
-    level = 1;
-    experience = totalExperience = 0;
     hp = 100;
+    playerMoveSpeed = novel::PlayerSpeed;
     potions = 3;
-    scrap = 10;
+    silver = 10;
     kills = itemsCollected = 0;
-    patrolReported = false;
     storyJournalOpen = false;
     economyEvents.clear();
     time = attackCooldown = hurt = 0;
@@ -145,9 +140,9 @@ void RpgGame::Reset(uint32_t newSeed)
     InitializeTown();
     InitializeWorld();
     InitializeBandits();
-    fires = {{2, 5}, {5, 2}};
+    InitializeExpedition();
     drops.push_back({{4, 3}, true});
-    Notify("첫 순찰: 레벨 3 달성 → 전리품 2개 회수 → 경비에게 F로 보고하세요.");
+    Notify("실종 사냥꾼: 출발지 경비에게 F → 3으로 단서를 문의하세요. L: 일지");
 }
 
 void RpgGame::ClearInput()
@@ -186,32 +181,19 @@ void RpgGame::Notify(const std::string &text)
     messageTime = 4;
 }
 
-void RpgGame::AddExperience(int amount)
-{
-    if (amount <= 0)
-        return;
-    totalExperience += amount;
-    if (level >= 100)
-        return;
-    experience += amount;
-    bool gained = false;
-    while (level < 100 && experience >= NextExperience())
-    {
-        experience -= NextExperience();
-        ++level;
-        hp = std::min(MaxHp(), hp + 20);
-        gained = true;
-    }
-    if (level == 100)
-        experience = 0;
-    if (gained)
-        Notify("레벨 " + std::to_string(level) + "! 최대 체력 +20 / 공격력 +3 / 방어력 +1");
-}
-
 void RpgGame::Attack()
 {
-    if (paused || hp <= 0 || attackCooldown > 0)
+    if (paused || hp <= 0 || attackCooldown > 0 || talkingNpc >= 0 || inventory || storyJournalOpen)
         return;
+    if (!expeditionState.needs.SpendStamina(10))
+    {
+        attackCooldown = .25f;
+        Notify("기력이 부족합니다. 공격을 멈추고 회복하거나 마을에서 쉬세요.");
+        return;
+    }
+    expeditionState.resting = false;
+    expeditionState.needs.fatigue = std::min(100.0f, expeditionState.needs.fatigue + .25f);
+    EmitNoise(player, keys['c'] ? 4.0f : 10.0f);
     attackCooldown = .4f;
     attackStarted = time;
     float dx = aim.x - player.x, dz = aim.z - player.z, length = std::hypot(dx, dz);
@@ -264,7 +246,7 @@ void RpgGame::Attack()
         if (npc.hp == 0)
         {
             RecoverStolenGoods(npc);
-            Notify("적대 NPC를 제압했습니다. 도난 부품은 피해자에게 반환됩니다.");
+            Notify("적대 NPC를 제압했습니다. 도난 은화은 피해자에게 반환됩니다.");
         }
     }
     else if (target >= 0)
@@ -272,17 +254,7 @@ void RpgGame::Attack()
         auto &e = enemies[target];
         end = e.position;
         ProvokeBand(e);
-        e.hp = std::max(0, e.hp - AttackPower());
-        if (e.hp == 0)
-        {
-            ++kills;
-            e.respawn = 45;
-            drops.push_back({e.position, random() % 3 == 0});
-            // Keep the floor bounded during prolonged grinding.
-            if (drops.size() > 128)
-                drops.erase(drops.begin());
-            AddExperience(20);
-        }
+        DamageMonster(e, AttackPower(), true);
     }
     else
     {
@@ -301,7 +273,7 @@ void RpgGame::Attack()
 
 void RpgGame::Pickup()
 {
-    if (paused || hp <= 0)
+    if (paused || hp <= 0 || talkingNpc >= 0 || inventory || storyJournalOpen)
         return;
     int count = 0;
     drops.erase(std::remove_if(drops.begin(),
@@ -315,7 +287,7 @@ void RpgGame::Pickup()
                                        ++potions;
                                    else
                                    {
-                                       ++scrap;
+                                       ++silver;
                                        RecordEconomy("salvage", -2, -1, 1);
                                    }
                                    ++count;
@@ -329,7 +301,7 @@ void RpgGame::Pickup()
 
 void RpgGame::Heal()
 {
-    if (paused || hp <= 0)
+    if (paused || hp <= 0 || talkingNpc >= 0 || storyJournalOpen)
         return;
     if (potions <= 0)
     {
@@ -386,16 +358,31 @@ void RpgGame::Step(float dt)
     float right = float(keys['d']) - float(keys['a']), up = float(keys['w']) - float(keys['s']);
     float length = std::hypot(right, up);
     WorldPoint before = player;
-    if (length > 0)
+    bool inputBlocked = talkingNpc >= 0 || inventory || storyJournalOpen;
+    float speed = novel::PlayerSpeed;
+    bool sprinting = keys['g'] && !keys['c'] && expeditionState.needs.CanSprint();
+    if (keys['c'])
+        speed *= .55f;
+    else if (sprinting)
+        speed *= 1.5f;
+    playerMoveSpeed = speed;
+    if (length > 0 && !inputBlocked)
         Move(player,
-             (.745f * right - .667f * up) / length * 3.6f * dt,
-             (-.667f * right - .745f * up) / length * 3.6f * dt);
+             (.745f * right - .667f * up) / length * speed * dt,
+             (-.667f * right - .745f * up) / length * speed * dt);
     moving = Distance(before, player) > .00001f;
-    if (talkingNpc < 0 && talkingActor == 0 && (firing || keys[' ']))
+    if (!inputBlocked && talkingActor == 0 && (firing || keys[' ']))
         Attack();
-    UpdateTown(dt);
-    UpdateWorld(dt);
+    UpdateExpedition(dt, Distance(before, player), sprinting);
     if (hp <= 0)
         return;
+    UpdateWorld(dt);
+    UpdateTown(dt);
+    if (hp <= 0)
+    {
+        expeditionState.rescue.stage = expedition::RescueStage::Failed;
+        return;
+    }
     UpdateBandits(dt);
+    UpdateRescue(dt);
 }

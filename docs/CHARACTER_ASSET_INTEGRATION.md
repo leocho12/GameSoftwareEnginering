@@ -1,3 +1,5 @@
+> **이전 버전 자료** — 2026-10-22 세계관·레벨·외형 기준은 [NOVEL_WORLD_PROTOTYPE.md](NOVEL_WORLD_PROTOTYPE.md), 원문 근거는 [NOVEL_WORLD_REFERENCE.md](NOVEL_WORLD_REFERENCE.md), 메시 연결은 [RESOURCE_WORLD_INTEGRATION.md](RESOURCE_WORLD_INTEGRATION.md)를 우선한다. 아래의 옛 세계관·수치·리소스는 현재 확정 기준이 아니다.
+
 > **RPG 전환 안내:** 아래는 이전 개발 이력입니다. 명일방주식 전투·타일 이동은 폐기되었으며, 현재 실행·조작·첫 레벨의 기준은 [RPG_LEVEL_ONE.md](RPG_LEVEL_ONE.md)입니다. 원작 리소스 추출·비픽셀 아트 기준은 유지합니다.
 
 # 원작 SD 리소스 적용

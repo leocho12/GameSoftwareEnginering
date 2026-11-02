@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "fps": 30,
+  "applies_to": [
+    "HUM_7H_v1",
+    "FELINE_TIGER_v1",
+    "CANINE_WOLF_v1",
+    "CANINE_FOX_v1",
+    "CERVID_DEER_v1"
+  ],
+  "locomotion": {
+    "clip_type": "in_place",
+    "speed_mps_suggested": {
+      "human_walk": 0.968,
+      "human_run": 2.303,
+      "human_crouch_walk": 0.194,
+      "tiger_walk": 0.738,
+      "tiger_run": 2.786,
+      "wolf_walk": 0.601,
+      "wolf_run": 2.266,
+      "fox_walk": 0.389,
+      "fox_run": 1.467,
+      "deer_walk": 0.581,
+      "deer_run": 2.191
+    },
+    "synchronize": "Match cyclic normalized phase on gait changes; adjust speed or stride to limit foot sliding.",
+    "playback_speed_rule": "Start at the listed speed for playback_rate=1. For another planar speed, playback_rate = desired_speed / listed_speed. Fine-tune foot placement for terrain and blend changes."
+  },
+  "rules": [
+    {
+      "from": "Idle",
+      "to": "Walk",
+      "sequence": [
+        "Walk_Start",
+        "Walk"
+      ],
+      "crossfade_seconds": 0.14,
+      "exit_normalized": 1,
+      "note": "Walk_Start ends at Walk phase 0."
+    },
+    {
+      "from": "Walk",
+      "to": "Idle",
+      "sequence": [
+        "Walk_Stop",
+        "Idle"
+      ],
+      "crossfade_seconds": 0.16,
+      "entry_phase": 0,
+      "note": "Trigger stop near Walk phase 0; otherwise blend to stop with matching foot support."
+    },
+    {
+      "from": "Walk",
+      "to": "Run",
+      "sequence": [
+        "Run"
+      ],
+      "crossfade_seconds": 0.18,
+      "phase_sync": true
+    },
+    {
+      "from": "Run",
+      "to": "Walk",
+      "sequence": [
+        "Walk"
+      ],
+      "crossfade_seconds": 0.18,
+      "phase_sync": true
+    },
+    {
+      "from": "Idle",
+      "to": "Crouch",
+      "sequence": [
+        "Stand_To_Crouch",
+        "Crouch"
+      ],
+      "crossfade_seconds": 0.1,
+      "exit_normalized": 1
+    },
+    {
+      "from": "Crouch",
+      "to": "Idle",
+      "sequence": [
+        "Crouch_To_Stand",
+        "Idle"
+      ],
+      "crossfade_seconds": 0.1,
+      "exit_normalized": 1
+    },
+    {
+      "from": "Crouch",
+      "to": "Crouch_Walk",
+      "sequence": [
+        "Crouch_Walk"
+      ],
+      "crossfade_seconds": 0.15
+    },
+    {
+      "from": "Crouch_Walk",
+      "to": "Run",
+      "sequence": [
+        "Crouch_To_Stand",
+        "Run"
+      ],
+      "crossfade_seconds": 0.18
+    },
+    {
+      "from": "grounded",
+      "to": "Jump",
+      "sequence": [
+        "Jump"
+      ],
+      "crossfade_seconds": 0.08,
+      "exit_normalized": 1,
+      "note": "Full Jump includes authored vertical root displacement. Collision/physics is external."
+    },
+    {
+      "from": "grounded",
+      "to": "physics_jump",
+      "sequence": [
+        "Jump_Start",
+        "Jump_Air",
+        "Jump_Land"
+      ],
+      "crossfade_seconds": 0.1,
+      "note": "Alternative to full Jump. Jump_Air loops in place; enter Jump_Land on ground contact. Use game physics for vertical trajectory; suppress/extract authored root Z in Start/Land."
+    },
+    {
+      "from": "grounded",
+      "to": "Attack",
+      "sequence": [
+        "Attack",
+        "previous_grounded_state"
+      ],
+      "crossfade_seconds": 0.08,
+      "exit_normalized": 0.93,
+      "note": "Human right-hand strike; tiger forepaw swipe/bite; wolf/fox bite; deer antler/head strike."
+    },
+    {
+      "from": "Idle",
+      "to": "turn_left",
+      "sequence": [
+        "Turn_L90",
+        "Idle"
+      ],
+      "crossfade_seconds": 0.12,
+      "root_yaw_degrees": 90
+    },
+    {
+      "from": "Idle",
+      "to": "turn_right",
+      "sequence": [
+        "Turn_R90",
+        "Idle"
+      ],
+      "crossfade_seconds": 0.12,
+      "root_yaw_degrees": -90
+    }
+  ],
+  "turn_blend": {
+    "reference": "Pose_Neutral",
+    "left": "Pose_Turn_L45",
+    "right": "Pose_Turn_R45",
+    "parameter_degrees": [
+      -45,
+      0,
+      45
+    ],
+    "interpretation": "Absolute local pose references; blend from neutral or calculate additive deltas relative to it. Feet remain in stance. Above 45 degrees, schedule a turn step.",
+    "root_rotation": "Turn_L90/R90 animate the root bone. Extract yaw into actor transform or let the root bone drive it; do not apply both."
+  },
+  "events_normalized": {
+    "Attack": {
+      "windup_end": 0.12,
+      "impact": 0.47,
+      "recovery": 0.82
+    },
+    "Jump": {
+      "takeoff": 0.2,
+      "apex": 0.475,
+      "landing": 0.76
+    },
+    "Walk_human": {
+      "foot_L": 0,
+      "foot_R": 0.5
+    },
+    "Walk_quadruped": {
+      "front_L": 0,
+      "hind_R": 0.75,
+      "front_R": 0.5,
+      "hind_L": 0.25
+    }
+  },
+  "implementation_boundary": "Data and authored assets only. No engine code or animation graph is installed."
+}

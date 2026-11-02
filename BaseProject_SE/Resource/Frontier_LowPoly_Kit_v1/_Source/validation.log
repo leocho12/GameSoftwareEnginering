@@ -1,0 +1,516 @@
+GLB_STRUCTURE_CHECKED 132 0
+00:00.937  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Deer_Modular.blend"
+00:00.968  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Fox_Modular.blend"
+00:01.000  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Tiger_Modular.blend"
+00:01.015  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Wolf_Modular.blend"
+00:01.046  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Characters\Human_Modular_Library.blend"
+00:01.078  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Materials\Frontier_Materials.blend"
+00:01.093  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Nature\Nature_Modular_Library.blend"
+00:01.109  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Settlement\Home_Prefab.blend"
+00:01.125  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Settlement\Settlement_Modular_Library.blend"
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Antler_Mesh
+16:39:24 | INFO: Blender create Mesh node Body_Mesh.003
+16:39:24 | INFO: Blender create Mesh node Ear_Mesh.010
+16:39:24 | INFO: Blender create Mesh node Cranium_Mesh.005
+16:39:24 | INFO: Blender create Mesh node LowerJaw_Mesh.003
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.012
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.013
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.014
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.015
+16:39:24 | INFO: Blender create Mesh node Neck_Mesh.005
+16:39:24 | INFO: Blender create Mesh node Tail_Mesh.003
+16:39:24 | INFO: glTF import finished in 0.16s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Antler_Mesh
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Body_Mesh.003
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Ear_Mesh.010
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Cranium_Mesh.005
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node LowerJaw_Mesh.003
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.012
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.013
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.014
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.015
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Neck_Mesh.005
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Tail_Mesh.003
+16:39:24 | INFO: glTF import finished in 0.01s
+16:39:24 | INFO: Data are loaded, start creating Blender stuff
+16:39:24 | INFO: Blender create Mesh node Body_Mesh.002
+16:39:24 | INFO: Blender create Mesh node Ear_Mesh.008
+16:39:24 | INFO: Blender create Mesh node Cranium_Mesh.004
+16:39:24 | INFO: Blender create Mesh node LowerJaw_Mesh.002
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.008
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.009
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.010
+16:39:24 | INFO: Blender create Mesh node Leg_Mesh.011
+16:39:24 | INFO: Blender create Mesh node Neck_Mesh.004
+16:39:24 | INFO: Blender create Mesh node Tail_Mesh.002
+16:39:25 | INFO: glTF import finished in 0.16s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Body_Mesh.002
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Ear_Mesh.008
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Cranium_Mesh.004
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node LowerJaw_Mesh.002
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.008
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.009
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.010
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.011
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Neck_Mesh.004
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Tail_Mesh.002
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Body_Mesh
+16:39:25 | INFO: Blender create Mesh node Ear_Mesh.004
+16:39:25 | INFO: Blender create Mesh node Cranium_Mesh.002
+16:39:25 | INFO: Blender create Mesh node LowerJaw_Mesh
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.001
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.002
+16:39:25 | INFO: Blender create Mesh node Leg_Mesh.003
+16:39:25 | INFO: Blender create Mesh node Neck_Mesh.002
+16:39:25 | INFO: Blender create Mesh node Tail_Mesh
+16:39:25 | INFO: glTF import finished in 0.16s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Body_Mesh
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:25 | INFO: Blender create Mesh node Ear_Mesh.004
+16:39:25 | INFO: glTF import finished in 0.01s
+16:39:25 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Cranium_Mesh.002
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node LowerJaw_Mesh
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.001
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.002
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.003
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Neck_Mesh.002
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Tail_Mesh
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Body_Mesh.001
+16:39:26 | INFO: Blender create Mesh node Ear_Mesh.006
+16:39:26 | INFO: Blender create Mesh node Cranium_Mesh.003
+16:39:26 | INFO: Blender create Mesh node LowerJaw_Mesh.001
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.004
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.005
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.006
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.007
+16:39:26 | INFO: Blender create Mesh node Neck_Mesh.003
+16:39:26 | INFO: Blender create Mesh node Tail_Mesh.001
+16:39:26 | INFO: glTF import finished in 0.15s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Body_Mesh.001
+16:39:26 | INFO: glTF import finished in 0.02s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Ear_Mesh.006
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Cranium_Mesh.003
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node LowerJaw_Mesh.001
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.004
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.005
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.006
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:26 | INFO: Data are loaded, start creating Blender stuff
+16:39:26 | INFO: Blender create Mesh node Leg_Mesh.007
+16:39:26 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Neck_Mesh.003
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Tail_Mesh.001
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Pack_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Cap_Mesh.002
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node VestPanel_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node BootUpper_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node BootUpper_Mesh.001
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Eye_Mesh.002
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Eye_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Palm_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Palm_Mesh.001
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Cap_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Crop_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Cap_Mesh.001
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Cranium_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Cranium_Mesh.001
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Trousers_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Trousers_Mesh.001
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Hip_Mesh
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:27 | INFO: Data are loaded, start creating Blender stuff
+16:39:27 | INFO: Blender create Mesh node Sleeve_Mesh.002
+16:39:27 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.003
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.001
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.004
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.005
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Garment_Mesh.001
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Garment_Mesh
+16:39:28 | INFO: glTF import finished in 0.02s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Garment_Mesh.002
+16:39:28 | INFO: glTF import finished in 0.01s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node BootUpper_Mesh
+16:39:28 | INFO: Blender create Mesh node BootUpper_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Eye_Mesh
+16:39:28 | INFO: Blender create Mesh node Palm_Mesh
+16:39:28 | INFO: Blender create Mesh node Palm_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Cap_Mesh
+16:39:28 | INFO: Blender create Mesh node Cranium_Mesh
+16:39:28 | INFO: Blender create Mesh node Trousers_Mesh
+16:39:28 | INFO: Blender create Mesh node Trousers_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Hip_Mesh
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.002
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.003
+16:39:28 | INFO: Blender create Mesh node Garment_Mesh.001
+16:39:28 | INFO: glTF import finished in 0.24s
+16:39:28 | INFO: Data are loaded, start creating Blender stuff
+16:39:28 | INFO: Blender create Mesh node Pack_Mesh
+16:39:28 | INFO: Blender create Mesh node BootUpper_Mesh
+16:39:28 | INFO: Blender create Mesh node BootUpper_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Eye_Mesh
+16:39:28 | INFO: Blender create Mesh node Palm_Mesh
+16:39:28 | INFO: Blender create Mesh node Palm_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Cap_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Cranium_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Trousers_Mesh
+16:39:28 | INFO: Blender create Mesh node Trousers_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Hip_Mesh
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh
+16:39:28 | INFO: Blender create Mesh node Sleeve_Mesh.001
+16:39:28 | INFO: Blender create Mesh node Garment_Mesh
+16:39:29 | INFO: glTF import finished in 0.25s
+16:39:29 | INFO: Data are loaded, start creating Blender stuff
+16:39:29 | INFO: Blender create Mesh node Pack_Mesh
+16:39:29 | INFO: Blender create Mesh node BootUpper_Mesh
+16:39:29 | INFO: Blender create Mesh node BootUpper_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Eye_Mesh
+16:39:29 | INFO: Blender create Mesh node Palm_Mesh
+16:39:29 | INFO: Blender create Mesh node Palm_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Crop_Mesh
+16:39:29 | INFO: Blender create Mesh node Cranium_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Trousers_Mesh
+16:39:29 | INFO: Blender create Mesh node Trousers_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Hip_Mesh
+16:39:29 | INFO: Blender create Mesh node Sleeve_Mesh.004
+16:39:29 | INFO: Blender create Mesh node Sleeve_Mesh.005
+16:39:29 | INFO: Blender create Mesh node Garment_Mesh.002
+16:39:29 | INFO: glTF import finished in 0.23s
+16:39:29 | INFO: Data are loaded, start creating Blender stuff
+16:39:29 | INFO: Blender create Mesh node Cap_Mesh.002
+16:39:29 | INFO: Blender create Mesh node VestPanel_Mesh
+16:39:29 | INFO: Blender create Mesh node BootUpper_Mesh
+16:39:29 | INFO: Blender create Mesh node BootUpper_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Eye_Mesh.002
+16:39:29 | INFO: Blender create Mesh node Palm_Mesh
+16:39:29 | INFO: Blender create Mesh node Palm_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Crop_Mesh
+16:39:29 | INFO: Blender create Mesh node Cranium_Mesh
+16:39:29 | INFO: Blender create Mesh node Trousers_Mesh
+16:39:29 | INFO: Blender create Mesh node Trousers_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Hip_Mesh
+16:39:29 | INFO: Blender create Mesh node Sleeve_Mesh
+16:39:29 | INFO: Blender create Mesh node Sleeve_Mesh.001
+16:39:29 | INFO: Blender create Mesh node Garment_Mesh
+16:39:29 | INFO: glTF import finished in 0.26s
+16:39:29 | INFO: Data are loaded, start creating Blender stuff
+16:39:29 | INFO: Blender create Mesh node Bush_Mesh
+16:39:29 | INFO: glTF import finished in 0.00s
+16:39:29 | INFO: Data are loaded, start creating Blender stuff
+16:39:29 | INFO: Blender create Mesh node Bush_Mesh.005
+16:39:29 | INFO: glTF import finished in 0.01s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Bush_Mesh.011
+16:39:30 | INFO: glTF import finished in 0.01s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Grass_Mesh
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Grass_Mesh.001
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Grass_Mesh.002
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Log_Mesh
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Path_Mesh
+16:39:30 | INFO: glTF import finished in 0.01s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Reed_Mesh
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Rock_Mesh
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Rock_Mesh.001
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Rock_Mesh.002
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Rock_Mesh.003
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Ground_Mesh.003
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Ground_Mesh.001
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Ground_Mesh.002
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Ground_Mesh
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Trunk_Mesh
+16:39:30 | INFO: glTF import finished in 0.01s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Trunk_Mesh.001
+16:39:30 | INFO: glTF import finished in 0.01s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Trunk_Mesh.002
+16:39:30 | INFO: glTF import finished in 0.01s
+16:39:30 | INFO: Data are loaded, start creating Blender stuff
+16:39:30 | INFO: Blender create Mesh node Trunk_Mesh.005
+16:39:30 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Trunk_Mesh.003
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Trunk_Mesh.004
+16:39:31 | INFO: glTF import finished in 0.01s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Stump_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Drum_Mesh
+16:39:31 | INFO: Blender create Mesh node Frame_Mesh.005
+16:39:31 | INFO: Blender create Mesh node Seat_Mesh
+16:39:31 | INFO: Blender create Mesh node Door_Mesh
+16:39:31 | INFO: Blender create Mesh node Frame_Mesh
+16:39:31 | INFO: Blender create Mesh node Base_Mesh.001
+16:39:31 | INFO: Blender create Mesh node Post_Mesh
+16:39:31 | INFO: Blender create Mesh node Gable_Mesh
+16:39:31 | INFO: Blender create Mesh node RoofPanel_Mesh
+16:39:31 | INFO: Blender create Mesh node RoofPanel_Mesh.001
+16:39:31 | INFO: Blender create Mesh node Step_Mesh
+16:39:31 | INFO: Blender create Mesh node Case_Mesh
+16:39:31 | INFO: Blender create Mesh node Top_Mesh.001
+16:39:31 | INFO: Blender create Mesh node Wall_Mesh
+16:39:31 | INFO: Blender create Mesh node Left_Mesh
+16:39:31 | INFO: Blender create Mesh node Stud_Mesh
+16:39:31 | INFO: Blender create Mesh node Bottom_Mesh
+16:39:31 | INFO: Blender create Mesh node Frame_Mesh.001
+16:39:31 | INFO: glTF import finished in 0.03s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Handle_Mesh.003
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Drum_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Beam_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Frame_Mesh.005
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Pail_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Seat_Mesh
+16:39:31 | INFO: glTF import finished in 0.01s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Barrier_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Pot_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Door_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Post_Mesh.001
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Slab_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Frame_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Tank_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Base_Mesh.001
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Post_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:31 | INFO: Data are loaded, start creating Blender stuff
+16:39:31 | INFO: Blender create Mesh node Sheet_Mesh
+16:39:31 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Gable_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node RoofPanel_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node RoofPanel_Mesh.001
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Sack_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Sandbag_Mesh
+16:39:32 | INFO: glTF import finished in 0.01s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Shelf_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Shaft_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Step_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Seat_Mesh.001
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Case_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Top_Mesh.001
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Wall_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Left_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Stud_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Bottom_Mesh
+16:39:32 | INFO: glTF import finished in 0.00s
+16:39:32 | INFO: Data are loaded, start creating Blender stuff
+16:39:32 | INFO: Blender create Mesh node Frame_Mesh.001
+16:39:32 | INFO: glTF import finished in 0.00s
+VALIDATION_COMPLETE {"glb_files": 132, "blend_files": 9, "checks": 273, "errors": 0, "warnings": 0}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

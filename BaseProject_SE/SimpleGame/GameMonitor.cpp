@@ -56,137 +56,73 @@ void Position(std::ostream &out, float x, float z)
     out << "{\"x\":" << Finite(x) << ",\"z\":" << Finite(z) << '}';
 }
 
-// Monitoring summaries describe existing state; they never change the simulation.
-void VillageOverview(std::ostream &out, const RpgGame &game)
+void VillageOverview(std::ostream &out, const RpgGame &game, int index)
 {
-    int population = 0, hurt = 0, combat = 0, threats = 0;
+    const auto &v = novel::Villages()[index];
+    const auto &s = game.villageStats[index];
     float rescue = 0, obedience = 0, autonomy = 0;
-    for (const auto &npc : game.npcs)
-    {
-        if (npc.hp <= 0)
+    int away = 0;
+    for (const auto &n : game.npcs)
+        if (n.homeVillage == index)
         {
-            ++hurt;
-            continue;
+            rescue += n.traits.rescuePriority;
+            obedience += n.traits.commandObedience;
+            autonomy += n.traits.autonomy;
+            away += n.hp > 0 && novel::VillageAt(n.position.x, n.position.z) != index;
         }
-        ++population;
-        hurt += npc.hp < 100;
-        combat += npc.state == NpcState::Combat;
-        threats += npc.hostile;
-        rescue += Finite(npc.traits.rescuePriority);
-        obedience += Finite(npc.traits.commandObedience);
-        autonomy += Finite(npc.traits.autonomy);
-    }
-
-    struct Rumor
-    {
-        int holders = 0;
-        float confidence = 0;
-        std::int64_t observed = 0;
-        std::vector<std::string> names;
-    };
-
-    std::array<Rumor, 4> rumors{};
-    for (const auto &entry : game.world.Actors())
-    {
-        const auto &npc = entry.second;
-        if (npc.hp <= 0)
-        {
-            ++hurt;
-            continue;
-        }
-        ++population;
-        hurt += npc.hp < 100;
-        rescue += Finite(npc.rescue);
-        obedience += Finite(npc.obedience);
-        autonomy += Finite(npc.autonomy);
-        // Remote personal knowledge is not yet a rumor heard inside the village.
-        if (npc.available && TownNpc::InTown(npc.position.x, npc.position.z) &&
-            npc.brain.belief.aware)
-        {
-            auto &rumor = rumors[int(npc.brain.belief.outcome)];
-            ++rumor.holders;
-            rumor.confidence += Finite(npc.brain.belief.confidence);
-            rumor.observed = std::max(rumor.observed, npc.brain.belief.observed);
-            rumor.names.push_back(npc.name);
-        }
-    }
-    for (const auto &enemy : game.enemies)
-        threats += enemy.hp > 0 && TownNpc::InTown(enemy.position.x, enemy.position.z);
-    const char *mood = "평온";
-    const char *reason = "교전·적대·부상 인원이 없습니다.";
-    if (!population)
-    {
-        mood = "인원 없음";
-        reason = "활동 가능한 등록 인원이 없습니다.";
-    }
-    else if (combat || threats)
-    {
-        mood = "긴장";
-        reason = "등록 인원의 교전·적대 또는 마을 내 몹이 감지됐습니다.";
-    }
-    else if (hurt)
-    {
-        mood = "걱정";
-        reason = "부상 인원이 있어 치료가 필요합니다.";
-    }
-    else if (rumors[int(narrative::Outcome::Failed)].holders)
-    {
-        mood = "침울";
-        reason = "기지 인원이 구조 실패 소식을 알고 있습니다.";
-    }
-    else if (rumors[int(narrative::Outcome::Partial)].holders)
-    {
-        mood = "안도와 걱정";
-        reason = "일부 구조와 손실 소식이 알려졌습니다.";
-    }
-    else if (rumors[int(narrative::Outcome::Success)].holders)
-    {
-        mood = "안도";
-        reason = "기지 인원이 구조 성공 소식을 알고 있습니다.";
-    }
-    else if (rumors[0].holders)
-    {
-        mood = "불안";
-        reason = "실종 소식을 알고 있으나 결과는 아직 확인하지 못했습니다.";
-    }
-    out << ",\"population\":" << population << ",\"atmosphere\":{\"label\":" << Quote(mood)
-        << ",\"reason\":" << Quote(reason) << ",\"basis\":\"derived_registered_npc_state\"}"
-        << ",\"tendencies\":";
-    if (population)
-        out << "{\"rescue_priority\":" << rescue / population
-            << ",\"command_obedience\":" << obedience / population
-            << ",\"autonomy\":" << autonomy / population
-            << ",\"basis\":\"living_registered_npc_mean\"}";
-    else
-        out << "null";
-    out << ",\"rumors\":[";
-    const char *messages[] = {"남쪽에서 인형 2명의 연락이 끊겼다는 소식",
-                              "실종 인형 2명을 구조했다는 소식",
-                              "실종 인형 중 1명만 구조했다는 소식",
-                              "실종 인형 수색에 실패했다는 소식"};
+    out << "{\"id\":" << Quote(v.id) << ",\"name\":" << Quote(v.name)
+        << ",\"description\":" << Quote(v.description) << ",\"population\":" << s.present
+        << ",\"npcs_registered\":" << s.registered << ",\"npcs_present\":" << s.present
+        << ",\"npcs_outside\":" << away
+        << ",\"npcs_remote\":0,\"npcs_incapacitated\":" << s.disabled
+        << ",\"npcs_injured\":" << s.injured << ",\"npcs_hostile\":" << s.hostile
+        << ",\"mobs_inside\":" << s.monsters
+        << ",\"buildings\":6,\"visiting_travelers\":" << s.travelers
+        << ",\"total_silver\":" << s.silver << ",\"atmosphere\":{\"label\":" << Quote(s.label)
+        << ",\"reason\":" << Quote("현재 현장 인원·부상·교전·지갑·개인 소문 인지에서 계산")
+        << ",\"safety\":" << s.safety << ",\"morale\":" << s.morale
+        << ",\"prosperity\":" << s.prosperity << ",\"trust\":" << s.trust
+        << ",\"calm\":" << s.moods[0] << ",\"anxious\":" << s.moods[1]
+        << ",\"frightened\":" << s.moods[2] << ",\"hopeful\":" << s.moods[3]
+        << ",\"basis\":\"physical_presence_and_local_knowledge\"}"
+        << ",\"tendencies\":{\"rescue_priority\":" << rescue / novel::ResidentsPerVillage
+        << ",\"command_obedience\":" << obedience / novel::ResidentsPerVillage
+        << ",\"autonomy\":" << autonomy / novel::ResidentsPerVillage << "},\"rumors\":[";
     bool first = true;
-    for (int i = 0; i < 4; ++i)
+    for (const auto &rumor : game.rumors)
     {
-        const auto &rumor = rumors[i];
-        if (!rumor.holders)
+        std::vector<const TownNpc *> holders;
+        for (const auto &n : game.npcs)
+            if (n.hp > 0 && novel::VillageAt(n.position.x, n.position.z) == index &&
+                std::any_of(n.rumors.begin(),
+                            n.rumors.end(),
+                            [&](const auto &k)
+                            {
+                                return k.rumor == rumor.id;
+                            }))
+                holders.push_back(&n);
+        if (holders.empty())
             continue;
-        if (!first)
-            out << ',';
+        out << (first ? "" : ",") << "{\"id\":" << rumor.id << ",\"text\":" << Quote(rumor.text)
+            << ",\"origin_village_id\":" << Quote(novel::Villages()[rumor.originVillage].id)
+            << ",\"holders\":" << holders.size()
+            << ",\"confidence\":1,\"basis\":\"physical_contact\",\"sources\":[";
         first = false;
-        out << "{\"id\":" << Quote("missing_doll:" + std::to_string(i))
-            << ",\"text\":" << Quote(messages[i])
-            << ",\"confidence\":" << rumor.confidence / rumor.holders
-            << ",\"holders\":" << rumor.holders << ",\"observed_minute\":" << rumor.observed
-            << ",\"basis\":\"local_npc_beliefs\",\"sources\":[";
-        for (std::size_t n = 0; n < rumor.names.size(); ++n)
-        {
-            if (n)
-                out << ',';
-            out << Quote(rumor.names[n]);
-        }
+        for (std::size_t i = 0; i < holders.size(); ++i)
+            out << (i ? "," : "") << Quote(holders[i]->name);
         out << "]}";
     }
-    out << ']';
+    out << "],\"mood_history\":[";
+    bool firstSample = true;
+    for (const auto &sample : game.moodHistory[index])
+    {
+        out << (firstSample ? "" : ",") << "{\"time_s\":" << sample.time
+            << ",\"morale\":" << sample.morale << ",\"safety\":" << sample.safety
+            << ",\"prosperity\":" << sample.prosperity << ",\"population\":" << sample.population
+            << '}';
+        firstSample = false;
+    }
+    out << "]}";
 }
 
 }
@@ -204,183 +140,160 @@ void GameMonitor::Publish(const RpgGame &game)
     const auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
                                std::chrono::system_clock::now().time_since_epoch())
                                .count();
-    int aliveMobs = 0, townMobs = 0, aliveNpcs = 0, present = 0, injured = 0, hostile = 0, away = 0;
+    int aliveMobs = 0, aliveNpcs = 0, traveling = 0;
     for (const auto &e : game.enemies)
-        if (e.hp > 0)
-        {
-            ++aliveMobs;
-            if (TownNpc::InTown(e.position.x, e.position.z))
-                ++townMobs;
-        }
+        aliveMobs += e.hp > 0;
     for (const auto &n : game.npcs)
     {
         aliveNpcs += n.hp > 0;
-        injured += n.hp > 0 && n.hp < 100;
-        hostile += n.hostile;
-        present += TownNpc::InTown(n.position.x, n.position.z);
+        traveling += n.destinationVillage >= 0;
     }
-    for (const auto &entry : game.world.Actors())
-    {
-        const auto &n = entry.second;
-        aliveNpcs += n.hp > 0;
-        injured += n.hp > 0 && n.hp < 100;
-        away += !n.available;
-        present += n.available && TownNpc::InTown(n.position.x, n.position.z);
-    }
-    const auto total = game.npcs.size() + game.world.Actors().size();
     std::ostringstream out;
     out.imbue(std::locale::classic());
     out << std::setprecision(7)
-        << "{\"schema_version\":1,\"type\":\"snapshot\",\"session_id\":" << GetCurrentProcessId()
-        << ",\"sequence\":" << ++sequence << ",\"sent_at_ms\":" << timestamp
-        << ",\"game\":{\"seed\":" << game.seed << ",\"paused\":" << (game.paused ? "true" : "false")
+        << "{\"schema_version\":1,\"world_schema_version\":2,\"type\":\"snapshot\",\"session_id\":"
+        << GetCurrentProcessId() << ",\"sequence\":" << ++sequence
+        << ",\"sent_at_ms\":" << timestamp << ",\"game\":{\"seed\":" << game.seed
+        << ",\"paused\":" << (game.paused ? "true" : "false")
         << ",\"player_down\":" << (game.hp <= 0 ? "true" : "false")
-        << ",\"training\":" << (game.dollTraining.active ? "true" : "false")
-        << ",\"simulation_seconds\":" << Finite(game.time)
-        << ",\"world_clock\":" << Quote(game.world.ClockLabel())
-        << ",\"world_ready\":" << (game.world.Ready() ? "true" : "false")
-        << ",\"world_error\":" << Quote(game.world.error)
-        << ",\"radio_connected\":" << (game.townRadioConnected ? "true" : "false")
-        << "},\"counts\":{\"npcs_total\":" << total << ",\"npcs_active\":" << aliveNpcs
-        << ",\"npcs_incapacitated\":" << total - aliveNpcs << ",\"npcs_remote\":" << away
-        << ",\"mobs_alive\":" << aliveMobs << ",\"mob_slots\":" << game.enemies.size()
+        << ",\"training\":false,\"simulation_seconds\":" << Finite(game.time)
+        << ",\"world_clock\":" << Quote(game.expeditionState.clock.Label())
+        << ",\"world_ready\":true,\"world_error\":\"\",\"radio_connected\":false,\"setting\":\"novel_kingdom\"}"
+        << ",\"counts\":{\"npcs_total\":" << game.npcs.size() << ",\"npcs_active\":" << aliveNpcs
+        << ",\"npcs_incapacitated\":" << game.npcs.size() - aliveNpcs << ",\"npcs_remote\":0"
+        << ",\"npcs_traveling\":" << traveling << ",\"mobs_alive\":" << aliveMobs
+        << ",\"mob_slots\":" << game.enemies.size()
         << ",\"mobs_respawning\":" << game.enemies.size() - aliveMobs
-        << ",\"bandit_groups\":" << game.banditGroups.size()
-        << "},\"villages\":[{\"id\":\"frontier\",\"name\":\"변경 마을 / 그리폰 기지\",\"npcs_registered\":"
-        << total << ",\"npcs_present\":" << present
-        << ",\"npcs_outside\":" << total - present - away << ",\"npcs_remote\":" << away
-        << ",\"npcs_incapacitated\":" << total - aliveNpcs << ",\"npcs_injured\":" << injured
-        << ",\"npcs_hostile\":" << hostile << ",\"mobs_inside\":" << townMobs
-        << ",\"buildings\":" << TownNpc::Buildings().size() << ",\"supplies\":";
-    if (game.world.Ready())
-        out << game.world.Region().supplies;
-    else
-        out << "null";
-    out << ",\"rescued\":";
-    if (game.world.Ready())
-        out << game.world.Region().rescued;
-    else
-        out << "null";
-    VillageOverview(out, game);
-    out << "}],\"npcs\":[";
+        << ",\"bandit_groups\":" << game.banditGroups.size() << "},\"villages\":[";
+    for (int i = 0; i < novel::VillageCount; ++i)
+    {
+        if (i)
+            out << ',';
+        VillageOverview(out, game, i);
+    }
+    out << "],\"corridors\":[";
+    for (int i = 0; i < novel::CorridorCount; ++i)
+    {
+        int alive = 0, slots = 0;
+        for (const auto &e : game.enemies)
+            if (e.band / 10 == i)
+            {
+                ++slots;
+                alive += e.hp > 0;
+            }
+        out << (i ? "," : "") << "{\"from\":" << Quote(novel::Villages()[i].name)
+            << ",\"to\":" << Quote(novel::Villages()[i + 1].name) << ",\"mobs_alive\":" << alive
+            << ",\"mob_slots\":" << slots << ",\"respawning\":" << slots - alive
+            << ",\"distance_units\":" << novel::VillageSpacing << ",\"nominal_player_seconds\":20}";
+    }
+    out << "],\"npcs\":[";
     bool first = true;
     for (const auto &n : game.npcs)
     {
-        if (!first)
-            out << ',';
+        out << (first ? "" : ",");
         first = false;
-        const char *states[] = {"대기", "경계", "교전", "후퇴", "전투 불능"};
+        int current = novel::VillageAt(n.position.x, n.position.z);
         out << "{\"id\":" << Quote("town:" + std::to_string(n.id))
-            << ",\"village_id\":\"frontier\",\"kind\":\"resident\",\"name\":" << Quote(n.name)
-            << ",\"role\":" << Quote(TownNpc::RoleLabel(n.role))
-            << ",\"state\":" << Quote(n.hp <= 0 ? "전투 불능" : states[int(n.state)])
+            << ",\"village_id\":" << Quote(novel::Villages()[n.homeVillage].id)
+            << ",\"current_village_id\":"
+            << (current >= 0 ? Quote(novel::Villages()[current].id) : "null")
+            << ",\"destination_village_id\":"
+            << (n.destinationVillage >= 0 ? Quote(novel::Villages()[n.destinationVillage].id)
+                                          : "null")
+            << ",\"kind\":\"resident\",\"name\":" << Quote(n.name)
+            << ",\"role\":" << Quote(TownNpc::RoleLabel(n.role)) << ",\"state\":"
+            << Quote(n.hp <= 0                       ? "전투 불능"
+                     : n.state == NpcState::Combat   ? "교전"
+                     : n.state == NpcState::Retreat  ? "후퇴"
+                     : n.state == NpcState::Alert    ? "경계"
+                     : n.action == NpcAction::Travel ? "여행"
+                     : n.action == NpcAction::Rest   ? "휴식"
+                                                     : "대기")
+            << ",\"routine\":"
+            << Quote(n.routine == NpcRoutine::Sleep  ? "수면"
+                     : n.routine == NpcRoutine::Meal ? "식사"
+                                                     : "근무")
             << ",\"action\":"
-            << Quote(game.talkingNpc >= 0 && &n == &game.npcs[game.talkingNpc]
-                         ? "대화 중"
-                         : TownNpc::ActionLabel(n.action))
+            << Quote(game.talkingNpc == n.id ? "대화 중" : TownNpc::ActionLabel(n.action))
             << ",\"hp\":" << Finite(n.hp) << ",\"max_hp\":100,\"ammo\":" << n.ammo
             << ",\"location\":"
-            << Quote(TownNpc::InTown(n.position.x, n.position.z) ? "마을 내부" : "마을 외곽")
+            << Quote(current >= 0 ? novel::Villages()[current].name : "마을 사이 교역로")
             << ",\"position\":";
         Position(out, n.position.x, n.position.z);
         out << ",\"reason\":" << Quote(n.mind.selectionReason) << ",\"task\":" << Quote(n.mind.task)
             << ",\"memories\":" << n.mind.memories.size()
             << ",\"beliefs\":" << n.mind.knowledge.size() << ",\"trust\":" << Finite(n.trust)
             << ",\"respect\":" << Finite(n.respect)
-            << ",\"hostile\":" << (n.hostile ? "true" : "false") << ",\"wallet_scrap\":" << n.scrap
-            << ",\"potion_stock\":" << n.potionStock
+            << ",\"hostile\":" << (n.hostile ? "true" : "false")
+            << ",\"wallet_silver\":" << n.silver << ",\"potion_stock\":" << n.potionStock
             << ",\"medical_supplies\":" << n.medicalSupplies
-            << ",\"robbery_target\":" << n.robberyTarget
-            << ",\"criminal_until_s\":" << n.criminalUntil << ",\"available\":true,\"scores\":{";
+            << ",\"criminal_until_s\":" << n.criminalUntil
+            << ",\"courier\":" << (n.courier ? "true" : "false")
+            << ",\"physical_arrivals\":" << n.arrivalCount
+            << ",\"available\":true,\"known_rumors\":[";
+        for (std::size_t i = 0; i < n.rumors.size(); ++i)
+        {
+            const auto &k = n.rumors[i];
+            out << (i ? "," : "") << "{\"rumor_id\":" << k.rumor
+                << ",\"source_npc_id\":" << k.sourceNpc << ",\"learned_at_s\":" << k.learnedAt
+                << ",\"hops\":" << k.hops << '}';
+        }
+        out << "],\"scores\":{";
         for (int i = 0; i < int(n.scores.size()); ++i)
-        {
-            if (i)
-                out << ',';
-            out << Quote(TownNpc::ActionLabel(NpcAction(i))) << ':' << Finite(n.scores[i]);
-        }
+            out << (i ? "," : "") << Quote(TownNpc::ActionLabel(NpcAction(i))) << ':'
+                << Finite(n.scores[i]);
         out << "}}";
     }
-    for (const auto &entry : game.world.Actors())
-    {
-        const auto &n = entry.second;
-        if (!first)
-            out << ',';
-        first = false;
-        out << "{\"id\":" << Quote("world:" + std::to_string(n.id))
-            << ",\"village_id\":\"frontier\",\"kind\":\"companion\",\"name\":" << Quote(n.name)
-            << ",\"role\":\"서사 동료\",\"state\":"
-            << Quote(n.hp <= 0     ? "전투 불능"
-                     : n.available ? "기지 활동"
-                                   : "원격 임무")
-            << ",\"action\":" << Quote(narrative::WorldSimulation::GoalLabel(n.brain.intention))
-            << ",\"hp\":" << Finite(n.hp) << ",\"max_hp\":100,\"ammo\":null,\"location\":"
-            << Quote(n.available
-                         ? (TownNpc::InTown(n.position.x, n.position.z) ? "마을 내부" : "마을 외곽")
-                         : "원격 지역")
-            << ",\"position\":";
-        if (n.available)
-            Position(out, n.position.x, n.position.z);
-        else
-            out << "null";
-        auto r = n.relations.find(narrative::PlayerId);
-        out << ",\"reason\":" << Quote(n.brain.reason)
-            << ",\"task\":" << Quote(narrative::WorldSimulation::TaskLabel(n.task))
-            << ",\"memories\":" << n.memories.size()
-            << ",\"beliefs\":" << (n.brain.belief.aware ? 1 : 0)
-            << ",\"trust\":" << (r == n.relations.end() ? 0 : Finite(r->second.trust))
-            << ",\"respect\":" << (r == n.relations.end() ? 0 : Finite(r->second.respect))
-            << ",\"hostile\":false,\"available\":" << (n.available ? "true" : "false")
-            << ",\"scores\":{";
-        for (int i = 0; i < 3; ++i)
-        {
-            if (i)
-                out << ',';
-            out << Quote(narrative::WorldSimulation::GoalLabel(narrative::Goal(i))) << ':'
-                << Finite(n.brain.desires[i]);
-        }
-        out << "}}";
-    }
-    out << "],\"bandits\":[";
+    out << "],\"bandits\":["; // Existing browser transport key; entries are now monsters.
     for (std::size_t i = 0; i < game.enemies.size(); ++i)
     {
-        const auto &enemy = game.enemies[i];
-        if (i)
-            out << ',';
-        out << "{\"id\":" << i << ",\"band_id\":" << enemy.band << ",\"hp\":" << enemy.hp
-            << ",\"max_hp\":" << enemy.maxHp
-            << ",\"action\":" << Quote(RpgEnemy::ActionName(enemy.action))
-            << ",\"action_label\":" << Quote(RpgEnemy::ActionLabel(enemy.action))
-            << ",\"reason\":" << Quote(enemy.reason)
-            << ",\"aggression\":" << enemy.traits.aggression
-            << ",\"risk_tolerance\":" << enemy.traits.riskTolerance
-            << ",\"provoked\":" << (enemy.provokedUntil > game.time ? "true" : "false")
+        const auto &e = game.enemies[i];
+        out << (i ? "," : "") << "{\"id\":" << i << ",\"band_id\":" << e.band
+            << ",\"corridor_id\":" << e.band / 10 << ",\"hp\":" << e.hp << ",\"max_hp\":" << e.maxHp
+            << ",\"action\":" << Quote(RpgEnemy::ActionName(e.action))
+            << ",\"action_label\":" << Quote(RpgEnemy::ActionLabel(e.action))
+            << ",\"reason\":" << Quote(e.reason) << ",\"aggression\":" << e.traits.aggression
+            << ",\"risk_tolerance\":" << e.traits.riskTolerance
+            << ",\"respawn_remaining_s\":" << std::max(0.0f, e.respawn)
+            << ",\"provoked\":" << (e.provokedUntil > game.time ? "true" : "false")
             << ",\"position\":";
-        Position(out, enemy.position.x, enemy.position.z);
+        Position(out, e.position.x, e.position.z);
         out << ",\"scores\":[";
         for (int score = 0; score < 5; ++score)
-            out << (score ? "," : "") << Finite(enemy.scores[score]);
+            out << (score ? "," : "") << Finite(e.scores[score]);
         out << "]}";
     }
-    out << "],\"objective\":{\"title\":" << Quote(game.PatrolObjective())
-        << ",\"level\":" << game.level
-        << ",\"target_level\":3,\"items_collected\":" << game.itemsCollected
-        << ",\"reported\":" << (game.patrolReported ? "true" : "false")
+    out << "],\"objective\":{\"title\":" << Quote(game.QuestObjective())
+        << ",\"visited_villages\":" << game.VisitedCount() << ",\"kills\":" << game.kills
+        << ",\"reported\":"
+        << (game.expeditionState.rescue.stage == expedition::RescueStage::Completed ? "true"
+                                                                                    : "false")
+        << ",\"clues\":" << game.expeditionState.rescue.ClueCount()
+        << ",\"stage\":" << int(game.expeditionState.rescue.stage)
+        << ",\"actor_id\":" << game.expeditionState.rescue.actorId
+        << "},\"survival\":{\"world_minutes\":" << game.expeditionState.clock.minutes
+        << ",\"hunger\":" << game.expeditionState.needs.hunger
+        << ",\"thirst\":" << game.expeditionState.needs.thirst
+        << ",\"fatigue\":" << game.expeditionState.needs.fatigue
+        << ",\"stamina\":" << game.expeditionState.needs.stamina
+        << ",\"alert_level\":" << game.CurrentAlert()
+        << ",\"resting\":" << (game.expeditionState.resting ? "true" : "false")
         << "},\"story\":{\"status\":" << Quote(game.StoryStatus())
         << ",\"next_step\":" << Quote(game.StoryNextStep())
-        << "},\"economy\":{\"currency\":\"barter_scrap\",\"player_scrap\":" << game.scrap
+        << "},\"economy\":{\"currency\":\"silver_units\",\"player_silver\":" << game.silver
         << ",\"recent_events\":[";
     for (std::size_t i = 0; i < game.economyEvents.size(); ++i)
     {
-        const auto &event = game.economyEvents[i];
-        if (i)
-            out << ',';
-        out << "{\"kind\":" << Quote(event.kind) << ",\"time_s\":" << event.time
-            << ",\"from\":" << event.from << ",\"to\":" << event.to
-            << ",\"amount\":" << event.amount << '}';
+        const auto &e = game.economyEvents[i];
+        out << (i ? "," : "") << "{\"kind\":" << Quote(e.kind) << ",\"time_s\":" << e.time
+            << ",\"from\":" << e.from << ",\"to\":" << e.to << ",\"amount\":" << e.amount << '}';
     }
-    out << "]},\"world_event\":{\"state\":" << int(game.world.Event().state) << ",\"outcome\":"
-        << Quote(narrative::WorldSimulation::OutcomeLabel(game.world.Event().outcome))
-        << ",\"queue_depth\":" << game.world.QueueSize() << "}}";
+    out << "]},\"profiling\":{\"cpu_rumor_contact_ms\":" << game.rumorUpdateMs
+        << ",\"cpu_village_stats_ms\":" << game.villageStatsMs
+        << ",\"cpu_world_update_ms\":" << game.worldUpdateMs
+        << ",\"rumor_contact_transfers_total\":" << game.rumorTransfers
+        << ",\"courier_physical_arrivals_total\":" << game.courierArrivals
+        << ",\"monster_respawns_total\":" << game.monsterRespawns << "}}";
     std::error_code error;
     std::filesystem::create_directories(destination.parent_path(), error);
     auto temporary = destination;

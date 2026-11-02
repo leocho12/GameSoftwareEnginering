@@ -1,6 +1,7 @@
 #pragma once
 #include "DollBehavior.h"
 #include "NpcMind.h"
+#include "NovelWorld.h"
 #include <array>
 #include <deque>
 #include <string>
@@ -39,7 +40,15 @@ enum class NpcAction
     Retreat,
     Help,
     Rest,
-    Rob
+    Rob,
+    Travel
+};
+
+enum class NpcRoutine
+{
+    Work,
+    Meal,
+    Sleep
 };
 
 struct NpcBuilding
@@ -48,9 +57,20 @@ struct NpcBuilding
     const char *name;
 };
 
+struct RumorKnowledge
+{
+    int rumor = -1, sourceNpc = -1, hops = 0;
+    float learnedAt = 0;
+};
+
 struct TownNpc
 {
     int id = 0;
+    int homeVillage = 0, destinationVillage = -1;
+    bool courier = false;
+    float travelWait = 0;
+    int arrivalCount = 0;
+    std::vector<RumorKnowledge> rumors;
     std::string name;
     NpcRole role = NpcRole::Helper;
     NpcTraits traits, personality;
@@ -65,10 +85,17 @@ struct TownNpc
     bool hostile = false, moving = false, playerTarget = false;
     bool mirror = false;
     float attackStarted = -100;
+    float decisionLogAt = 0;
     NpcState state = NpcState::Idle;
     NpcAction action = NpcAction::Work;
-    std::array<float, 7> scores{};
-    int scrap = 0, potionStock = 0, medicalSupplies = 0;
+    std::array<float, 8> scores{};
+    int silver = 0, potionStock = 0, medicalSupplies = 0;
+    int rationStock = 0, waterStock = 0;
+    NpcRoutine routine = NpcRoutine::Work;
+    int routineKey = -1;
+    DollPoint routineGoal;
+    bool serviceOpen = true;
+    float walkSpeed = 1.65f;
     int robberyTarget = -1, criminalTarget = -1;
     float robberyCooldown = 0, robberyProgress = 0, robbedUntil = 0, criminalUntil = 0;
     std::map<int, int> stolenGoods;
@@ -78,7 +105,7 @@ struct TownNpc
     int pathX = 9999, pathZ = 9999;
     int kills = 0, helped = 0;
     static bool InTown(float x, float z);
-    static const std::array<NpcBuilding, 6> &Buildings();
+    static const std::vector<NpcBuilding> &Buildings();
     static const char *RoleName(NpcRole role);
     static const char *ActionName(NpcAction action);
     static const char *RoleLabel(NpcRole role);

@@ -47,7 +47,7 @@ int main()
 {
     RpgGame game;
     game.Reset(42);
-    assert(game.npcs.size() == 20 && game.enemies.size() == 9);
+    assert(game.npcs.size() == 100 && game.enemies.size() == 200);
     std::set<int> roles;
     for (const auto &npc : game.npcs)
     {
@@ -76,22 +76,22 @@ int main()
 
     game.player = {game.npcs[0].position.x, game.npcs[0].position.z};
     game.talkingNpc = 0;
-    int potions = game.potions, money = game.scrap;
+    int potions = game.potions, money = game.silver;
     game.NpcChoice(1);
-    assert(game.potions == potions + 1 && game.scrap == money - 3);
+    assert(game.potions == potions + 1 && game.silver == money - 3);
     game.NpcChoice(2);
-    assert(game.potions == potions && game.scrap == money - 1);
-    game.scrap = 0;
+    assert(game.potions == potions && game.silver == money - 1);
+    game.silver = 0;
     game.NpcChoice(1);
-    assert(game.potions == potions && game.scrap == 0);
+    assert(game.potions == potions && game.silver == 0);
 
     game.player = {game.npcs[15].position.x, game.npcs[15].position.z};
     game.talkingNpc = 15;
-    game.scrap = 10;
+    game.silver = 10;
     game.NpcChoice(2);
-    assert(game.scrap == 10);
+    assert(game.silver == 10);
     game.NpcChoice(1);
-    assert(game.scrap == 6 && game.potions == potions);
+    assert(game.silver == 6 && game.potions == potions);
 
     game.player = {game.npcs[17].position.x, game.npcs[17].position.z};
     game.talkingNpc = 17;

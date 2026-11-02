@@ -45,28 +45,8 @@ Renderer::Renderer(int w, int h)
     Resize(w, h);
     wchar_t path[MAX_PATH]{};
     GetModuleFileNameW(nullptr, path, MAX_PATH);
-    std::wstring base(path);
-    base = base.substr(0, base.find_last_of(L"\\/") + 1) + L"Assets\\";
-    HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-    portraits[0] = LoadPng(base + L"alpha.png", portraitAspects[0]);
-    portraits[1] = LoadPng(base + L"bravo.png", portraitAspects[1]);
-    portraits[2] = LoadPng(base + L"enemy.png", portraitAspects[2]);
-    const wchar_t *names[] = {
-        L"4type", L"m4a1", L"ump45", L"hk416", L"g11", L"guard", L"ripper", L"jaeger"};
-    for (int i = 0; i < int(characters.size()); ++i)
-    {
-        std::wstring stem = base + L"GFL\\" + names[i];
-        float aspect = 1;
-        if (characters[i].Load(stem + L".gfa"))
-            characterTextures[i] = LoadPng(stem + L".png", aspect);
-        if (!characterTextures[i])
-        {
-            characters[i].Clear();
-            std::fprintf(stderr, "GFL character %d unavailable; using placeholder.\n", i);
-        }
-    }
-    if (SUCCEEDED(hr))
-        CoUninitialize();
+    resources.Load(std::filesystem::path(path).parent_path() / "Assets" / "World" /
+                   "kingdom.rpack");
 }
 
 Renderer::~Renderer()
@@ -76,6 +56,7 @@ Renderer::~Renderer()
 
 void Renderer::Shutdown()
 {
+    resources.Shutdown();
     for (auto &t : characterTextures)
     {
         if (t)
@@ -206,6 +187,7 @@ void Renderer::Ring(float x, float y, float z, float radius, float r, float g, f
 void Renderer::Sprite(
     float x, float y, float z, int kind, int frame, GLuint texture, float aspect, bool mirror)
 {
+    bool generated = !texture;
     if (!texture)
     {
         texture = effects.Sprite(kind, frame);
@@ -228,9 +210,9 @@ void Renderer::Sprite(
     float rx = .745f * w * .5f, rz = -.667f * w * .5f;
     glColor4f(1, 1, 1, 1);
     glBegin(GL_QUADS);
-    glTexCoord2f(mirror ? 1.0f : 0.0f, 1);
+    glTexCoord2f(mirror ? 1.0f : 0.0f, generated ? .96f : 1);
     glVertex3f(x - rx, y + .025f, z - rz);
-    glTexCoord2f(mirror ? 0.0f : 1.0f, 1);
+    glTexCoord2f(mirror ? 0.0f : 1.0f, generated ? .96f : 1);
     glVertex3f(x + rx, y + .025f, z + rz);
     glTexCoord2f(mirror ? 0.0f : 1.0f, 0);
     glVertex3f(x + rx, y + h, z + rz);
@@ -308,10 +290,10 @@ WorldPoint Renderer::Pick(int x, int y) const
 bool Renderer::IsUi(int x, int y, const RpgGame &game) const
 {
     float px = UIX(x, width), py = UIY(y, height);
-    return py < 100 || py > 700 || (game.storyJournalOpen && In(px, py, 120, 110, 1040, 575)) ||
+    return py < 110 || py > 700 || (game.storyJournalOpen && In(px, py, 120, 110, 1040, 575)) ||
            ((game.talkingActor || game.talkingNpc >= 0) && In(px, py, 745, 185, 520, 470)) ||
            (game.worldDebug && In(px, py, 15, 180, 710, 495)) ||
-           (game.inventory && In(px, py, 950, 115, 310, 420));
+           (game.inventory && In(px, py, 950, 120, 310, 480));
 }
 
 int Renderer::ViewRadius() const
@@ -322,6 +304,15 @@ int Renderer::ViewRadius() const
 
 void Renderer::Environment(const RpgGame &game)
 {
+    if (resources.Ready())
+    {
+        if (!shadowPass)
+            effects.Lit(model, game.time, 8);
+        resources.Environment(game, ViewRadius(), shadowPass);
+        glUseProgram(0);
+        return;
+    }
+
     if (game.dollTraining.active)
     {
         if (!shadowPass)
@@ -403,45 +394,36 @@ void Renderer::Environment(const RpgGame &game)
 
 void Renderer::Actors(const RpgGame &game)
 {
-    if (game.dollTraining.active)
+    if (resources.Ready())
     {
-        DollActors(game.dollTraining);
-        return;
+        if (!shadowPass)
+            effects.Lit(model, game.time, 8);
+        resources.Actors(game, ViewRadius());
+        glUseProgram(0);
+        if (shadowPass)
+            return;
     }
+
     glUseProgram(0);
     glDisable(GL_LIGHTING);
     glDisable(GL_FOG);
     glActiveTexture(GL_TEXTURE0);
-    // Draw far-to-near so transparent borders blend over the objects behind them.
-    std::vector<int> order;
-    order.push_back(-1);
+    std::vector<int> order{-1};
+    const float radius = float(ViewRadius() + 2);
     for (int i = 0; i < int(game.npcs.size()); ++i)
-        if (std::abs(game.npcs[i].position.x - game.player.x) < ViewRadius() &&
-            std::abs(game.npcs[i].position.z - game.player.z) < ViewRadius())
+        if (std::abs(game.npcs[i].position.x - game.player.x) < radius &&
+            std::abs(game.npcs[i].position.z - game.player.z) < radius)
             order.push_back(-2 - i);
     for (int i = 0; i < int(game.enemies.size()); ++i)
-        if (game.enemies[i].hp > 0)
+        if (game.enemies[i].hp > 0 &&
+            std::abs(game.enemies[i].position.x - game.player.x) < radius &&
+            std::abs(game.enemies[i].position.z - game.player.z) < radius)
             order.push_back(i);
-    std::vector<narrative::ActorId> worldOrder;
-    for (const auto &entry : game.world.Actors())
-    {
-        const auto &actor = entry.second;
-        if (!actor.available || std::abs(actor.position.x - game.player.x) > ViewRadius() ||
-            std::abs(actor.position.z - game.player.z) > ViewRadius())
-            continue;
-        worldOrder.push_back(entry.first);
-        order.push_back(-1000 - int(worldOrder.size()) + 1);
-    }
     auto position = [&](int index)
     {
-        if (index <= -1000)
-        {
-            auto p = game.world.Find(worldOrder[-1000 - index])->position;
-            return WorldPoint{p.x, p.z};
-        }
         if (index < -1)
         {
-            auto p = game.npcs[-2 - index].position;
+            const auto &p = game.npcs[-2 - index].position;
             return WorldPoint{p.x, p.z};
         }
         return index == -1 ? game.player : game.enemies[index].position;
@@ -455,134 +437,85 @@ void Renderer::Actors(const RpgGame &game)
               });
     for (int index : order)
     {
-        auto p = position(index);
-        if (index <= -1000)
-        {
-            const auto &actor = *game.world.Find(worldOrder[-1000 - index]);
-            int appearance = 1 + int(actor.id % 4);
-            if (!Character(appearance,
-                           actor.moving ? "move" : "wait",
-                           game.time,
-                           p.x,
-                           0,
-                           p.z,
-                           game.worldBodies.at(actor.id).mirror))
-                Sprite(p.x, 0, p.z, 1, actor.moving ? int(game.time * 8) % 8 : 0);
-            if (!shadowPass)
-                Ring(p.x, .04f, p.z, .4f, .3f, .85f, 1);
-        }
-        else if (index < -1)
+        auto point = position(index);
+        bool moving = false, mirror = false;
+        int kind = 0;
+        float health = float(game.hp) / game.MaxHp();
+        if (index < -1)
         {
             const auto &npc = game.npcs[-2 - index];
-            // Shared original SD presentation; these are still separately authored NPCs.
-            int appearance = 1 + npc.id % 4;
-            bool attacking = npc.hp > 0 && game.time - npc.attackStarted < .35f;
-            const char *clip = attacking ? "attack" : npc.moving ? "move" : "wait";
-            float clock = attacking ? game.time - npc.attackStarted : game.time + npc.id * .13f;
-            if (!Character(appearance,
-                           clip,
-                           clock,
-                           p.x,
-                           npc.hp <= 0 ? -.35f : 0,
-                           p.z,
-                           npc.mirror,
-                           !attacking))
-                Sprite(p.x,
-                       npc.hp <= 0 ? -.35f : 0,
-                       p.z,
-                       int(npc.role) % 2,
-                       npc.moving ? int(game.time * 8) % 8 : 0);
-            if (!shadowPass)
-                Ring(p.x,
-                     .04f,
-                     p.z,
-                     .32f,
-                     npc.hostile ? 1 : .3f,
-                     npc.role == NpcRole::Merchant ? .9f : .5f,
-                     npc.role == NpcRole::Medic ? .9f : .3f);
+            kind = 1 + (int(npc.role) % 2);
+            moving = npc.moving;
+            mirror = npc.mirror;
+            health = npc.hp / 100;
         }
-        else if (index == -1)
+        else if (index >= 0)
         {
-            bool attack = game.time - game.attackStarted < .35f;
-            std::string clip = game.hp <= 0  ? "die"
-                               : attack      ? "attack"
-                               : game.moving ? "move"
-                                             : "wait";
-            float clock = attack ? game.time - game.attackStarted : game.time;
-            // The original SD is a temporary visual proxy for the human commander.
-            if (!Character(0,
-                           clip,
-                           clock,
-                           p.x,
-                           0,
-                           p.z,
-                           game.aim.x < game.player.x,
-                           game.hp > 0 && !attack))
-                Sprite(p.x, 0, p.z, 0, game.moving ? int(game.time * 10) % 8 : 0);
+            kind = 3;
+            moving = game.enemies[index].moving;
+            mirror = game.enemies[index].mirror;
+            health = float(game.enemies[index].hp) / game.enemies[index].maxHp;
         }
         else
         {
-            const auto &enemy = game.enemies[index];
-            bool attacking = game.time - enemy.attackStarted < .35f;
-            const char *clip = attacking ? "attack" : enemy.moving ? "move" : "wait";
-            if (!Character(enemy.appearance,
-                           clip,
-                           attacking ? game.time - enemy.attackStarted : game.time + index * .11f,
-                           p.x,
-                           0,
-                           p.z,
-                           enemy.mirror,
-                           !attacking))
-                Sprite(p.x, 0, p.z, 2, int(game.time * 8) % 8);
-            if (!shadowPass)
-                Ring(p.x,
-                     .04f,
-                     p.z,
-                     .35f,
-                     1,
-                     enemy.action == BanditAction::Attack ? .2f : .65f,
-                     .15f);
+            moving = game.moving;
+            mirror = game.aim.x < game.player.x;
         }
+        if (!resources.Ready())
+            Sprite(point.x,
+                   health <= 0 ? -.35f : 0,
+                   point.z,
+                   kind,
+                   moving ? int(game.time * 8) % 8 : 0,
+                   0,
+                   .8f,
+                   mirror);
         if (!shadowPass)
         {
-            float ratio = index <= -1000 ? game.world.Find(worldOrder[-1000 - index])->hp / 100
-                          : index < -1   ? game.npcs[-2 - index].hp / 100
-                          : index == -1 ? float(game.hp) / game.MaxHp()
-                                        : float(game.enemies[index].hp) / game.enemies[index].maxHp;
-            Line(p.x - .3f, 1.95f, p.z + .27f, p.x + .3f, 1.95f, p.z - .27f, .12f, .12f, .12f);
-            Line(p.x - .3f,
-                 1.96f,
-                 p.z + .27f,
-                 p.x - .3f + .6f * ratio,
-                 1.96f,
-                 p.z + .27f - .54f * ratio,
-                 index < 0 ? .3f : 1,
-                 .5f,
+            Ring(point.x,
+                 .035f,
+                 point.z,
+                 .32f,
+                 index >= 0 ? 1.0f : .4f,
+                 index >= 0 ? .35f : .8f,
+                 .35f);
+            Line(point.x - .3f,
+                 1.75f,
+                 point.z + .27f,
+                 point.x + .3f,
+                 1.75f,
+                 point.z - .27f,
+                 .12f,
+                 .12f,
+                 .12f);
+            Line(point.x - .3f,
+                 1.76f,
+                 point.z + .27f,
+                 point.x - .3f + .6f * health,
+                 1.76f,
+                 point.z + .27f - .54f * health,
+                 index >= 0 ? 1.0f : .3f,
+                 .65f,
                  .3f);
         }
     }
     if (shadowPass)
         return;
-    if (game.world.Ready() && game.world.Event().playerAccepted &&
-        game.world.Event().state == narrative::EventState::Active)
-    {
-        auto target = game.world.Settings().search;
-        Ring(target.x, .06f, target.z, .8f, .3f, 1, .6f);
-        if (!Character(1, "wait", game.time, target.x, -.35f, target.z))
-            Sprite(target.x, .0f, target.z, 1, 0);
-    }
     for (const auto &drop : game.drops)
     {
         auto p = drop.position;
-        Cube(p.x,
-             .22f,
-             p.z,
-             .22f,
-             .30f,
-             .22f,
-             drop.potion ? .25f : .9f,
-             drop.potion ? .9f : .65f,
-             .3f);
+        if (std::hypot(p.x - game.player.x, p.z - game.player.z) > ViewRadius())
+            continue;
+        if (!resources.Ready())
+            Cube(p.x,
+                 .22f,
+                 p.z,
+                 .22f,
+                 .30f,
+                 .22f,
+                 drop.potion ? .25f : .9f,
+                 drop.potion ? .9f : .65f,
+                 .3f);
         Ring(p.x, .04f, p.z, .3f, .8f, .8f, .3f);
     }
     glDepthMask(GL_FALSE);
@@ -610,69 +543,78 @@ void Renderer::Actors(const RpgGame &game)
 
 void Renderer::Hud(const RpgGame &game)
 {
-    if (game.dollTraining.active)
-    {
-        DollHud(game.dollTraining, game.paused);
-        return;
-    }
-    Panel(0, 0, 1280, 98, .035f, .065f, .08f, .96f);
-    Text(24, 16, "변경 마을 / 주변 사냥터", 24, .95f, .87f, .67f);
-    Text(24, 53, "인간 지휘관 · 4식 SD 시험 외형", 13, .65f, .76f, .74f);
+    const auto &state = game.expeditionState;
+    const auto &needs = state.needs;
+    Panel(0, 0, 1280, 110, .035f, .065f, .08f, .96f);
+    Text(24, 12, "왕국 교역로 / 수색과 귀환", 21, .95f, .87f, .67f);
+    Text(24, 44, state.clock.Label(), 14);
+    Text(24,
+         76,
+         "허기 " + std::to_string(int(needs.hunger)) + " · 갈증 " +
+             std::to_string(int(needs.thirst)) + " · 피로 " + std::to_string(int(needs.fatigue)),
+         13);
+    Text(420, 12, "체력 " + std::to_string(game.hp) + " / 100", 20);
+    Panel(420, 44, 360, 12, .15f, .19f, .19f);
+    Panel(420, 44, 360 * float(game.hp) / 100, 12, .28f, .76f, .48f);
     Text(420,
-         15,
-         "레벨 " + std::to_string(game.level) + "  |  체력 " + std::to_string(game.hp) + " / " +
-             std::to_string(game.MaxHp()),
-         20);
-    Panel(420, 47, 360, 13, .15f, .19f, .19f);
-    Panel(420, 47, 360 * float(game.hp) / game.MaxHp(), 13, .28f, .76f, .48f);
-    Text(420,
-         68,
-         "경험치 " + std::to_string(game.experience) + " / " +
-             std::to_string(game.NextExperience()),
+         65,
+         "기력 " + std::to_string(int(needs.stamina)) + " / " +
+             std::to_string(int(needs.MaxStamina(game.hp))),
+         13);
+    Panel(420, 89, 360, 8, .15f, .19f, .19f);
+    Panel(420, 89, 360 * needs.stamina / 100, 8, .3f, .62f, .9f);
+    Text(850, 12, "지역 경보 " + std::to_string(game.CurrentAlert()) + " / 4", 20);
+    Text(850,
+         45,
+         "무기 숙련 " + std::to_string(state.progress.WeaponSkill()) + " · " +
+             (state.progress.Veteran() ? "노련한 전투자" : "신참 모험가"),
          14);
     Text(850,
-         16,
-         "공격 " + std::to_string(game.AttackPower()) + "  방어 " + std::to_string(game.Defense()),
-         19);
-    Text(850,
-         48,
-         "처치 " + std::to_string(game.kills) + "  누적 경험치 " +
-             std::to_string(game.totalExperience),
-         14);
-    Panel(24, 115, 710, 115, .04f, .08f, .09f, .92f);
-    Text(38, 126, "첫 레벨 목표 | 외곽 순찰", 18, .95f, .85f, .55f);
-    Text(38, 154, game.PatrolObjective(), 16, .9f, .88f, .75f);
-    Text(38, 180, game.PatrolHint(), 12);
-    Text(38,
-         204,
-         "진행: 레벨 " + std::to_string(game.level) + "/3 · 전리품 " +
-             std::to_string(std::min(game.itemsCollected, 2)) + "/2 · 보고 " +
-             (game.patrolReported ? "완료" : "대기") + " · I: 능력치 확인",
-         12);
+         77,
+         "식량 " + std::to_string(state.rations) + " · 식수 " + std::to_string(state.water) +
+             " · 은화 " + std::to_string(game.silver),
+         13);
+    Panel(24, 120, 710, 107, .04f, .08f, .09f, .92f);
+    Text(38, 128, "첫 의뢰 | 실종 사냥꾼 수색", 18, .95f, .85f, .55f);
+    Text(38, 157, game.QuestObjective(), 15, .9f, .88f, .75f);
+    Text(38, 188, game.QuestHint(), 12);
+    if (state.resting)
+        Text(440, 247, "휴식 중 · R 또는 이동으로 중단", 20, .5f, .9f, .7f);
     if (game.inventory)
     {
-        Panel(950, 115, 310, 420, .04f, .07f, .09f, .96f);
-        Text(975, 139, "가방 / 능력치 [I]", 22);
-        Text(975, 192, "회복약: " + std::to_string(game.potions), 18);
-        Text(975, 227, "부품 (교환 재화): " + std::to_string(game.scrap), 18);
-        Text(975, 279, "레벨업 자동 성장", 18, .9f, .77f, .45f);
-        Text(975, 315, "최대 체력 +20", 16);
-        Text(975, 346, "공격력 +3 / 방어력 +1", 16);
-        Text(975, 390, "회복약은 최대 체력 50% 회복", 13);
-        Text(975, 422, "회복약 구매 3 · 판매 2 · 치료 2", 12);
-        Text(975, 450, "처치 전리품·임무 보상으로 부품 확보", 12);
+        Panel(950, 120, 310, 480, .04f, .07f, .09f, .96f);
+        Text(975, 138, "탐사 보급품 [I]", 22);
+        Text(975, 181, "회복약: " + std::to_string(game.potions) + " [Q]", 17);
+        Text(975, 220, "식량: " + std::to_string(state.rations) + " / 6 [B]", 17);
+        Text(975, 259, "식수: " + std::to_string(state.water) + " / 6 [T]", 17);
+        Text(975, 298, "은화: " + std::to_string(game.silver), 17);
+        Text(975,
+             337,
+             "공격 " + std::to_string(game.AttackPower()) + " / 방어 " +
+                 std::to_string(game.Defense()),
+             16);
+        Text(975,
+             376,
+             "실적: 전투 " + std::to_string(state.progress.combatWins) + " / 구조 " +
+                 std::to_string(state.progress.rescues),
+             14);
+        Text(975, 417, "허기·갈증·피로가 기력에 영향", 13);
+        Text(975, 451, "상인: 4 식량 / 5 식수 (각 은화 1)", 12);
+        Text(975, 485, "마을 휴식 R: 피로·기력 회복", 13);
+        Text(975, 520, "일과·이동 중에는 상점 영업 중단", 12);
+        Text(975, 558, "실시간 진행 · Esc로 일시정지", 12);
     }
     Panel(0, 704, 1280, 96, .035f, .065f, .08f, .96f);
-    Text(
-        24,
-        717,
-        "WASD 이동 · 마우스 조준 · 좌클릭/Space 공격 · E 줍기 · Q 회복약 · I 가방 · F 대화 · L 일지 · Esc 정지",
-        16);
     Text(24,
-         751,
-         game.message.empty() ? "F6: Doll AI 구조 훈련 · 휠 확대/축소 · F11 전체화면"
+         716,
+         "WASD 이동 · 조준/좌클릭 공격 · G 달리기 · C 은신 · E 조사/호위/줍기 · F 대화 · L 일지",
+         14);
+    Text(24, 744, "Q 회복약 · B 식량 · T 식수 · R 마을 휴식 · I 보급품 · Esc 정지", 14);
+    Text(24,
+         774,
+         game.message.empty() ? "F → 3: 단서/보고 · 소문은 주민의 실제 이동과 대면으로 전달됩니다."
                               : game.message,
-         15,
+         12,
          .9f,
          .79f,
          .51f);
@@ -683,18 +625,16 @@ void Renderer::Hud(const RpgGame &game)
     {
         Panel(0, 0, 1280, 800, .01f, .025f, .035f, .65f);
         Panel(330, 270, 620, 250, .06f, .11f, .13f, .98f);
-        Text(365, 300, game.hp <= 0 ? "전투 불능" : "일시정지", 28);
-        Text(365,
-             365,
-             game.hp <= 0 ? "Enter: 같은 맵에서 처음부터 재시작"
-                          : "Esc: 계속 / Enter: 같은 맵 처음부터",
-             18);
-        Text(365, 411, "N: 새 랜덤 맵 (경험치와 아이템 초기화)", 16);
+        Text(365, 300, game.hp <= 0 ? "탐사 실패" : "일시정지", 28);
+        Text(365, 365, "Enter: 같은 시드에서 재시작 / N: 새 시드", 18);
+        Text(365, 411, "재시작하면 보급품·숙련·의뢰가 초기화됩니다.", 16);
+        Text(365, 460, "Esc: 계속", 16);
     }
 }
 
 void Renderer::Draw(const RpgGame &game, int, int)
 {
+    resources.BeginFrame();
     glUseProgram(0);
     glActiveTexture(GL_TEXTURE0);
     glDisable(GL_TEXTURE_2D);
@@ -729,6 +669,7 @@ void Renderer::Draw(const RpgGame &game, int, int)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     Hud(game);
+    resources.Profile(game.time);
 }
 
 void Renderer::ContactShadows(const RpgGame &game)

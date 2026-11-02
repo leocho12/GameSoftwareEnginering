@@ -1,0 +1,1219 @@
+{
+  "format": "RPK1",
+  "version": 1,
+  "animation_fps": 20,
+  "texture_cells": 10,
+  "source": "Resource/Frontier_LowPoly_Kit_v1",
+  "bytes": 28718683,
+  "sha256": "41d9dbf64d7912639d63b43393387012f97f2e39140f402f976ddcd681c2dd4e",
+  "assets": [
+    {
+      "name": "Player_Commander",
+      "source": "Characters\\Presets\\Player_Commander.glb",
+      "vertices": 5360,
+      "triangles": 2568,
+      "bones": 46,
+      "bounds": [
+        -0.541846513748169,
+        0.0035000001080334187,
+        -0.11900000274181366,
+        0.541846513748169,
+        1.8320000171661377,
+        0.22329430282115936
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "NPC_Scout",
+      "source": "Characters\\Presets\\NPC_Scout.glb",
+      "vertices": 4958,
+      "triangles": 2394,
+      "bones": 46,
+      "bounds": [
+        -0.541846513748169,
+        0.0035000001080334187,
+        -0.2849999964237213,
+        0.541846513748169,
+        1.8200000524520874,
+        0.22329430282115936
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "NPC_Resident",
+      "source": "Characters\\Presets\\NPC_Resident.glb",
+      "vertices": 4672,
+      "triangles": 2264,
+      "bones": 46,
+      "bounds": [
+        -0.541846513748169,
+        0.0035000001080334187,
+        -0.11900000274181366,
+        0.541846513748169,
+        1.8240000009536743,
+        0.22329430282115936
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "NPC_Worker",
+      "source": "Characters\\Presets\\NPC_Worker.glb",
+      "vertices": 4888,
+      "triangles": 2356,
+      "bones": 46,
+      "bounds": [
+        -0.541846513748169,
+        0.0035000001080334187,
+        -0.2849999964237213,
+        0.541846513748169,
+        1.8240000009536743,
+        0.22329430282115936
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "Tiger",
+      "source": "Animals\\Tiger.glb",
+      "vertices": 5748,
+      "triangles": 2652,
+      "bones": 31,
+      "bounds": [
+        -0.3327999711036682,
+        -0.013000001199543476,
+        -1.6244370937347412,
+        0.3327999711036682,
+        1.2089998722076416,
+        1.187399983406067
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "Wolf",
+      "source": "Animals\\Wolf.glb",
+      "vertices": 4516,
+      "triangles": 2140,
+      "bones": 31,
+      "bounds": [
+        -0.24959999322891235,
+        -0.006900001782923937,
+        -1.12123703956604,
+        0.24959999322891235,
+        1.4175158739089966,
+        1.0109000205993652
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "Fox",
+      "source": "Animals\\Fox.glb",
+      "vertices": 4660,
+      "triangles": 2204,
+      "bones": 31,
+      "bounds": [
+        -0.1664000004529953,
+        0.014549998566508293,
+        -0.9542824029922485,
+        0.1664000004529953,
+        0.9231157898902893,
+        0.671999990940094
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "Deer",
+      "source": "Animals\\Deer.glb",
+      "vertices": 4452,
+      "triangles": 2136,
+      "bones": 31,
+      "bounds": [
+        -0.35529613494873047,
+        0.004999998491257429,
+        -0.6855640411376953,
+        0.35529613494873047,
+        2.3218374252319336,
+        0.9660000205039978
+      ],
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ]
+    },
+    {
+      "name": "Floor_Concrete_2x2",
+      "source": "Settlement\\Modules\\Floor_Concrete_2x2.glb",
+      "vertices": 96,
+      "triangles": 44,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.10999999940395355,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Floor_Timber_2x2",
+      "source": "Settlement\\Modules\\Floor_Timber_2x2.glb",
+      "vertices": 216,
+      "triangles": 108,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.15449999272823334,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Wall_Concrete_2m",
+      "source": "Settlement\\Modules\\Wall_Concrete_2m.glb",
+      "vertices": 120,
+      "triangles": 56,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.09000000357627869,
+        1.0,
+        2.5999999046325684,
+        0.12999999523162842
+      ],
+      "clips": []
+    },
+    {
+      "name": "Wall_Timber_2m",
+      "source": "Settlement\\Modules\\Wall_Timber_2m.glb",
+      "vertices": 384,
+      "triangles": 192,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.10000000149011612,
+        1.0,
+        2.5999999046325684,
+        0.07999999821186066
+      ],
+      "clips": []
+    },
+    {
+      "name": "Wall_Doorway_2m",
+      "source": "Settlement\\Modules\\Wall_Doorway_2m.glb",
+      "vertices": 120,
+      "triangles": 60,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.09000000357627869,
+        1.0,
+        2.5999999046325684,
+        0.1599999964237213
+      ],
+      "clips": []
+    },
+    {
+      "name": "Wall_Window_2m",
+      "source": "Settlement\\Modules\\Wall_Window_2m.glb",
+      "vertices": 120,
+      "triangles": 60,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.09000000357627869,
+        1.0,
+        2.5999999046325684,
+        0.23499999940395355
+      ],
+      "clips": []
+    },
+    {
+      "name": "Post_Timber_2p6m",
+      "source": "Settlement\\Modules\\Post_Timber_2p6m.glb",
+      "vertices": 96,
+      "triangles": 44,
+      "bones": 0,
+      "bounds": [
+        -0.09000000357627869,
+        0.0,
+        -0.09000000357627869,
+        0.09000000357627869,
+        2.5999999046325684,
+        0.09000000357627869
+      ],
+      "clips": []
+    },
+    {
+      "name": "Beam_Timber_2m",
+      "source": "Settlement\\Modules\\Beam_Timber_2m.glb",
+      "vertices": 96,
+      "triangles": 44,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.09000000357627869,
+        1.0,
+        0.18000000715255737,
+        0.09000000357627869
+      ],
+      "clips": []
+    },
+    {
+      "name": "Roof_Slope_L_2x2",
+      "source": "Settlement\\Modules\\Roof_Slope_L_2x2.glb",
+      "vertices": 294,
+      "triangles": 156,
+      "bones": 0,
+      "bounds": [
+        -2.0116207599639893,
+        -0.09000000357627869,
+        -1.0,
+        0.009401463903486729,
+        1.0799075365066528,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Roof_Slope_R_2x2",
+      "source": "Settlement\\Modules\\Roof_Slope_R_2x2.glb",
+      "vertices": 294,
+      "triangles": 156,
+      "bones": 0,
+      "bounds": [
+        -0.011620848439633846,
+        -0.09000000357627869,
+        -1.0,
+        2.009401559829712,
+        1.0841349363327026,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Roof_Gable_4m",
+      "source": "Settlement\\Modules\\Roof_Gable_4m.glb",
+      "vertices": 18,
+      "triangles": 8,
+      "bones": 0,
+      "bounds": [
+        -2.0,
+        0.0,
+        -0.09000000357627869,
+        2.0,
+        1.0499999523162842,
+        0.09000000357627869
+      ],
+      "clips": []
+    },
+    {
+      "name": "Roof_Flat_2x2",
+      "source": "Settlement\\Modules\\Roof_Flat_2x2.glb",
+      "vertices": 48,
+      "triangles": 24,
+      "bones": 0,
+      "bounds": [
+        -1.0099999904632568,
+        0.0,
+        -1.0099999904632568,
+        1.0099999904632568,
+        0.1850000023841858,
+        1.0299999713897705
+      ],
+      "clips": []
+    },
+    {
+      "name": "Door_Timber_0p92x2p05",
+      "source": "Settlement\\Modules\\Door_Timber_0p92x2p05.glb",
+      "vertices": 156,
+      "triangles": 72,
+      "bones": 0,
+      "bounds": [
+        0.0,
+        0.0,
+        -0.032499998807907104,
+        0.9200000166893005,
+        2.049999952316284,
+        0.07878460735082626
+      ],
+      "clips": []
+    },
+    {
+      "name": "Window_Frame_1x1",
+      "source": "Settlement\\Modules\\Window_Frame_1x1.glb",
+      "vertices": 144,
+      "triangles": 72,
+      "bones": 0,
+      "bounds": [
+        -0.550000011920929,
+        -0.5099999904632568,
+        -0.05999999865889549,
+        0.550000011920929,
+        0.5099999904632568,
+        0.05999999865889549
+      ],
+      "clips": []
+    },
+    {
+      "name": "Stairs_Concrete_3step",
+      "source": "Settlement\\Modules\\Stairs_Concrete_3step.glb",
+      "vertices": 72,
+      "triangles": 36,
+      "bones": 0,
+      "bounds": [
+        -0.6000000238418579,
+        0.0,
+        -0.44999998807907104,
+        0.6000000238418579,
+        0.6000000238418579,
+        0.44999998807907104
+      ],
+      "clips": []
+    },
+    {
+      "name": "Table_Work",
+      "source": "Settlement\\Modules\\Table_Work.glb",
+      "vertices": 192,
+      "triangles": 92,
+      "bones": 0,
+      "bounds": [
+        -0.675000011920929,
+        0.0,
+        -0.375,
+        0.675000011920929,
+        0.7925000190734863,
+        0.375
+      ],
+      "clips": []
+    },
+    {
+      "name": "Chair",
+      "source": "Settlement\\Modules\\Chair.glb",
+      "vertices": 216,
+      "triangles": 104,
+      "bones": 0,
+      "bounds": [
+        -0.22499999403953552,
+        0.0,
+        -0.2199999988079071,
+        0.22499999403953552,
+        0.9350000023841858,
+        0.2199999988079071
+      ],
+      "clips": []
+    },
+    {
+      "name": "Stool",
+      "source": "Settlement\\Modules\\Stool.glb",
+      "vertices": 120,
+      "triangles": 60,
+      "bones": 0,
+      "bounds": [
+        -0.1899999976158142,
+        0.0,
+        -0.1899999976158142,
+        0.1899999976158142,
+        0.4699999988079071,
+        0.1899999976158142
+      ],
+      "clips": []
+    },
+    {
+      "name": "Bed_Field",
+      "source": "Settlement\\Modules\\Bed_Field.glb",
+      "vertices": 336,
+      "triangles": 160,
+      "bones": 0,
+      "bounds": [
+        -0.4300000071525574,
+        0.0,
+        -0.9900000095367432,
+        0.4300000071525574,
+        0.6200000047683716,
+        0.9900000095367432
+      ],
+      "clips": []
+    },
+    {
+      "name": "Shelf_Metal",
+      "source": "Settlement\\Modules\\Shelf_Metal.glb",
+      "vertices": 192,
+      "triangles": 96,
+      "bones": 0,
+      "bounds": [
+        -0.5,
+        0.0,
+        -0.20000000298023224,
+        0.5,
+        1.5199999809265137,
+        0.20000000298023224
+      ],
+      "clips": []
+    },
+    {
+      "name": "Supply_Crate",
+      "source": "Settlement\\Modules\\Supply_Crate.glb",
+      "vertices": 192,
+      "triangles": 92,
+      "bones": 0,
+      "bounds": [
+        -0.4000000059604645,
+        -0.004999999888241291,
+        -0.2849999964237213,
+        0.4000000059604645,
+        0.7850000262260437,
+        0.3100000023841858
+      ],
+      "clips": []
+    },
+    {
+      "name": "Barrel_Steel",
+      "source": "Settlement\\Modules\\Barrel_Steel.glb",
+      "vertices": 288,
+      "triangles": 176,
+      "bones": 0,
+      "bounds": [
+        -0.2930000126361847,
+        0.03999999910593033,
+        -0.2930000126361847,
+        0.2930000126361847,
+        0.8299999833106995,
+        0.2930000126361847
+      ],
+      "clips": []
+    },
+    {
+      "name": "Jerrycan",
+      "source": "Settlement\\Modules\\Jerrycan.glb",
+      "vertices": 168,
+      "triangles": 84,
+      "bones": 0,
+      "bounds": [
+        -0.1599999964237213,
+        0.019999999552965164,
+        -0.08500000089406967,
+        0.1599999964237213,
+        0.6050000190734863,
+        0.08500000089406967
+      ],
+      "clips": []
+    },
+    {
+      "name": "Sack",
+      "source": "Settlement\\Modules\\Sack.glb",
+      "vertices": 268,
+      "triangles": 128,
+      "bones": 0,
+      "bounds": [
+        -0.2199999988079071,
+        0.0,
+        -0.17119017243385315,
+        0.2199999988079071,
+        0.5799999833106995,
+        0.17119017243385315
+      ],
+      "clips": []
+    },
+    {
+      "name": "Bucket",
+      "source": "Settlement\\Modules\\Bucket.glb",
+      "vertices": 142,
+      "triangles": 80,
+      "bones": 0,
+      "bounds": [
+        -0.17877620458602905,
+        0.02500000037252903,
+        -0.17000000178813934,
+        0.17877620458602905,
+        0.5271701812744141,
+        0.17000000178813934
+      ],
+      "clips": []
+    },
+    {
+      "name": "Shovel",
+      "source": "Settlement\\Modules\\Shovel.glb",
+      "vertices": 220,
+      "triangles": 116,
+      "bones": 0,
+      "bounds": [
+        -0.11500000208616257,
+        0.0,
+        -0.023000000044703484,
+        0.11500000208616257,
+        1.2542083263397217,
+        0.029500000178813934
+      ],
+      "clips": []
+    },
+    {
+      "name": "Axe",
+      "source": "Settlement\\Modules\\Axe.glb",
+      "vertices": 72,
+      "triangles": 40,
+      "bones": 0,
+      "bounds": [
+        -0.03999999910593033,
+        0.029000798240303993,
+        -0.054999999701976776,
+        0.23000000417232513,
+        0.8100000023841858,
+        0.054999999701976776
+      ],
+      "clips": []
+    },
+    {
+      "name": "Cooking_Pot",
+      "source": "Settlement\\Modules\\Cooking_Pot.glb",
+      "vertices": 264,
+      "triangles": 128,
+      "bones": 0,
+      "bounds": [
+        -0.1899999976158142,
+        0.029999999329447746,
+        -0.1899999976158142,
+        0.1899999976158142,
+        0.30250000953674316,
+        0.1899999976158142
+      ],
+      "clips": []
+    },
+    {
+      "name": "Lamp_Utility",
+      "source": "Settlement\\Modules\\Lamp_Utility.glb",
+      "vertices": 240,
+      "triangles": 116,
+      "bones": 0,
+      "bounds": [
+        -0.10000000149011612,
+        0.0,
+        -0.08500000089406967,
+        0.10000000149011612,
+        0.3199999928474426,
+        0.08500000089406967
+      ],
+      "clips": []
+    },
+    {
+      "name": "Fence_Timber_2m",
+      "source": "Settlement\\Modules\\Fence_Timber_2m.glb",
+      "vertices": 96,
+      "triangles": 48,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.05999999865889549,
+        1.0,
+        1.2999999523162842,
+        0.05999999865889549
+      ],
+      "clips": []
+    },
+    {
+      "name": "Sandbag_Barrier",
+      "source": "Settlement\\Modules\\Sandbag_Barrier.glb",
+      "vertices": 1728,
+      "triangles": 768,
+      "bones": 0,
+      "bounds": [
+        -0.9448274970054626,
+        -0.019999999552965164,
+        -0.20923243463039398,
+        1.1048275232315063,
+        0.6200000047683716,
+        0.20923243463039398
+      ],
+      "clips": []
+    },
+    {
+      "name": "Concrete_Barrier",
+      "source": "Settlement\\Modules\\Concrete_Barrier.glb",
+      "vertices": 24,
+      "triangles": 12,
+      "bones": 0,
+      "bounds": [
+        -0.800000011920929,
+        0.0,
+        -0.2800000011920929,
+        0.800000011920929,
+        0.8500000238418579,
+        0.2800000011920929
+      ],
+      "clips": []
+    },
+    {
+      "name": "Home_Prefab",
+      "source": "Settlement\\Home_Prefab.glb",
+      "vertices": 6072,
+      "triangles": 3048,
+      "bones": 0,
+      "bounds": [
+        -2.0899999141693115,
+        -0.36000001430511475,
+        -2.0899999141693115,
+        3.0,
+        3.6841349601745605,
+        3.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Broadleaf_01",
+      "source": "Nature\\Modules\\Tree_Broadleaf_01.glb",
+      "vertices": 1498,
+      "triangles": 704,
+      "bones": 0,
+      "bounds": [
+        -2.030852794647217,
+        -0.009417152963578701,
+        -1.8901424407958984,
+        2.0047976970672607,
+        4.144000053405762,
+        1.9771053791046143
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Broadleaf_02",
+      "source": "Nature\\Modules\\Tree_Broadleaf_02.glb",
+      "vertices": 1498,
+      "triangles": 704,
+      "bones": 0,
+      "bounds": [
+        -1.9519184827804565,
+        -0.008074220269918442,
+        -1.8281134366989136,
+        2.0754101276397705,
+        4.572999954223633,
+        1.8781042098999023
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Broadleaf_03",
+      "source": "Nature\\Modules\\Tree_Broadleaf_03.glb",
+      "vertices": 1498,
+      "triangles": 704,
+      "bones": 0,
+      "bounds": [
+        -1.9610095024108887,
+        -0.007066292222589254,
+        -1.9505809545516968,
+        1.9158273935317993,
+        5.001999378204346,
+        1.9207508563995361
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Pine_01",
+      "source": "Nature\\Modules\\Tree_Pine_01.glb",
+      "vertices": 248,
+      "triangles": 118,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -0.9510565400123596,
+        1.0,
+        3.868499994277954,
+        0.9510565400123596
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Pine_02",
+      "source": "Nature\\Modules\\Tree_Pine_02.glb",
+      "vertices": 248,
+      "triangles": 118,
+      "bones": 0,
+      "bounds": [
+        -1.2000000476837158,
+        0.0,
+        -1.1412677764892578,
+        1.2000000476837158,
+        4.900000095367432,
+        1.1412677764892578
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Dead",
+      "source": "Nature\\Modules\\Tree_Dead.glb",
+      "vertices": 166,
+      "triangles": 90,
+      "bones": 0,
+      "bounds": [
+        -0.6087885499000549,
+        -0.008046816103160381,
+        -0.20860537886619568,
+        1.0279178619384766,
+        3.2023890018463135,
+        0.31134623289108276
+      ],
+      "clips": []
+    },
+    {
+      "name": "Tree_Stump",
+      "source": "Nature\\Modules\\Tree_Stump.glb",
+      "vertices": 108,
+      "triangles": 64,
+      "bones": 0,
+      "bounds": [
+        -0.30000001192092896,
+        0.0,
+        -0.2954423129558563,
+        0.2819077968597412,
+        0.4650000035762787,
+        0.2954423129558563
+      ],
+      "clips": []
+    },
+    {
+      "name": "Log_Fallen",
+      "source": "Nature\\Modules\\Log_Fallen.glb",
+      "vertices": 120,
+      "triangles": 72,
+      "bones": 0,
+      "bounds": [
+        -1.0099999904632568,
+        0.01000000536441803,
+        -0.19972187280654907,
+        1.0,
+        0.4300000071525574,
+        0.19972187280654907
+      ],
+      "clips": []
+    },
+    {
+      "name": "Bush_01",
+      "source": "Nature\\Modules\\Bush_01.glb",
+      "vertices": 720,
+      "triangles": 320,
+      "bones": 0,
+      "bounds": [
+        -0.7043606638908386,
+        0.027267958968877792,
+        -0.5995018482208252,
+        0.7089542746543884,
+        0.9189624190330505,
+        0.6602508425712585
+      ],
+      "clips": []
+    },
+    {
+      "name": "Bush_02",
+      "source": "Nature\\Modules\\Bush_02.glb",
+      "vertices": 864,
+      "triangles": 384,
+      "bones": 0,
+      "bounds": [
+        -0.7043606638908386,
+        0.0040547484531998634,
+        -0.5995018482208252,
+        0.7089542746543884,
+        0.8312323689460754,
+        0.6602508425712585
+      ],
+      "clips": []
+    },
+    {
+      "name": "Bush_03",
+      "source": "Nature\\Modules\\Bush_03.glb",
+      "vertices": 1008,
+      "triangles": 448,
+      "bones": 0,
+      "bounds": [
+        -0.7043606638908386,
+        0.03079744055867195,
+        -0.6510987877845764,
+        0.7089542746543884,
+        0.939304530620575,
+        0.6602508425712585
+      ],
+      "clips": []
+    },
+    {
+      "name": "Grass_Patch_01",
+      "source": "Nature\\Modules\\Grass_Patch_01.glb",
+      "vertices": 171,
+      "triangles": 57,
+      "bones": 0,
+      "bounds": [
+        -0.47524961829185486,
+        0.0,
+        -0.43097779154777527,
+        0.4951511323451996,
+        0.3920536935329437,
+        0.45313799381256104
+      ],
+      "clips": []
+    },
+    {
+      "name": "Grass_Patch_02",
+      "source": "Nature\\Modules\\Grass_Patch_02.glb",
+      "vertices": 234,
+      "triangles": 78,
+      "bones": 0,
+      "bounds": [
+        -0.4362434446811676,
+        0.0,
+        -0.4821852147579193,
+        0.46525248885154724,
+        0.34672796726226807,
+        0.45540159940719604
+      ],
+      "clips": []
+    },
+    {
+      "name": "Grass_Patch_03",
+      "source": "Nature\\Modules\\Grass_Patch_03.glb",
+      "vertices": 297,
+      "triangles": 99,
+      "bones": 0,
+      "bounds": [
+        -0.46403855085372925,
+        0.0,
+        -0.47690045833587646,
+        0.4553191661834717,
+        0.3975817859172821,
+        0.46862906217575073
+      ],
+      "clips": []
+    },
+    {
+      "name": "Rock_01",
+      "source": "Nature\\Modules\\Rock_01.glb",
+      "vertices": 129,
+      "triangles": 64,
+      "bones": 0,
+      "bounds": [
+        -0.4671940207481384,
+        0.0,
+        -0.33137473464012146,
+        0.472935289144516,
+        0.6930693984031677,
+        0.3419724702835083
+      ],
+      "clips": []
+    },
+    {
+      "name": "Rock_02",
+      "source": "Nature\\Modules\\Rock_02.glb",
+      "vertices": 129,
+      "triangles": 64,
+      "bones": 0,
+      "bounds": [
+        -0.6253343820571899,
+        0.0,
+        -0.5122982263565063,
+        0.6412814855575562,
+        0.8541184067726135,
+        0.488446980714798
+      ],
+      "clips": []
+    },
+    {
+      "name": "Rock_03",
+      "source": "Nature\\Modules\\Rock_03.glb",
+      "vertices": 144,
+      "triangles": 64,
+      "bones": 0,
+      "bounds": [
+        -0.8813947439193726,
+        0.0,
+        -0.5983030796051025,
+        0.8882460594177246,
+        1.1396807432174683,
+        0.6325526237487793
+      ],
+      "clips": []
+    },
+    {
+      "name": "Rock_04",
+      "source": "Nature\\Modules\\Rock_04.glb",
+      "vertices": 144,
+      "triangles": 64,
+      "bones": 0,
+      "bounds": [
+        -1.0876877307891846,
+        0.0,
+        -0.6617775559425354,
+        0.9324709177017212,
+        1.4056936502456665,
+        0.6617270112037659
+      ],
+      "clips": []
+    },
+    {
+      "name": "Terrain_Soil_2x2",
+      "source": "Nature\\Modules\\Terrain_Soil_2x2.glb",
+      "vertices": 384,
+      "triangles": 128,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        -0.03084895946085453,
+        -1.0,
+        1.0,
+        0.028933772817254066,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Terrain_Grass_2x2",
+      "source": "Nature\\Modules\\Terrain_Grass_2x2.glb",
+      "vertices": 384,
+      "triangles": 128,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        -0.03084895946085453,
+        -1.0,
+        1.0,
+        0.028933772817254066,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Terrain_Rock_2x2",
+      "source": "Nature\\Modules\\Terrain_Rock_2x2.glb",
+      "vertices": 384,
+      "triangles": 128,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        -0.03084895946085453,
+        -1.0,
+        1.0,
+        0.028933772817254066,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Terrain_Concrete_2x2",
+      "source": "Nature\\Modules\\Terrain_Concrete_2x2.glb",
+      "vertices": 81,
+      "triangles": 128,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Path_2x2",
+      "source": "Nature\\Modules\\Path_2x2.glb",
+      "vertices": 624,
+      "triangles": 252,
+      "bones": 0,
+      "bounds": [
+        -1.0,
+        -0.05000000074505806,
+        -1.0,
+        1.0,
+        0.05000000074505806,
+        1.0
+      ],
+      "clips": []
+    },
+    {
+      "name": "Reed_Patch",
+      "source": "Nature\\Modules\\Reed_Patch.glb",
+      "vertices": 390,
+      "triangles": 208,
+      "bones": 0,
+      "bounds": [
+        -0.23483988642692566,
+        -0.006746903993189335,
+        -0.249720498919487,
+        0.23611001670360565,
+        0.7825736999511719,
+        0.25545263290405273
+      ],
+      "clips": []
+    }
+  ]
+}

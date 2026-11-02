@@ -1,3 +1,5 @@
+> **이전 버전 자료** — 2026-10-22 세계관·레벨·외형 기준은 [NOVEL_WORLD_PROTOTYPE.md](NOVEL_WORLD_PROTOTYPE.md), 원문 근거는 [NOVEL_WORLD_REFERENCE.md](NOVEL_WORLD_REFERENCE.md), 메시 연결은 [RESOURCE_WORLD_INTEGRATION.md](RESOURCE_WORLD_INTEGRATION.md)를 우선한다. 아래의 옛 세계관·수치·리소스는 현재 확정 기준이 아니다.
+
 # 야적 무리와 첫 레벨 목표
 
 2026-10-14 · 코드·리소스 적용 / C++ 빌드·게임 실행 미검증

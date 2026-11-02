@@ -82,49 +82,6 @@ void Key(unsigned char key, int, int)
         game.ClearInput();
         return;
     }
-    if (game.dollTraining.active)
-    {
-        if (game.paused)
-            return;
-        auto &training = game.dollTraining;
-        switch (key)
-        {
-        case '1':
-            training.SetCommand(DollCommand::Rescue);
-            break;
-        case '2':
-            training.SetCommand(DollCommand::Hold);
-            break;
-        case '3':
-            training.SetCommand(DollCommand::None);
-            break;
-        case 'r':
-            training.Start();
-            break;
-        case '\t':
-            training.Start(true);
-            break;
-        case '[':
-            training.selectedTrait = (training.selectedTrait + 4) % 5;
-            break;
-        case ']':
-            training.selectedTrait = (training.selectedTrait + 1) % 5;
-            break;
-        case '-':
-            training.AdjustTrait(-.1f);
-            break;
-        case '+':
-        case '=':
-            training.AdjustTrait(.1f);
-            break;
-        case '0':
-            training.RestoreTraits();
-            break;
-        default:
-            break;
-        }
-        return;
-    }
     if (game.paused || game.hp <= 0)
     {
         if (key == 13)
@@ -133,32 +90,12 @@ void Key(unsigned char key, int, int)
             game.Reset(std::random_device{}());
         return;
     }
-    if (key == 'v')
+    if (key == 'v' || key == 'm')
     {
         game.worldDebug = !game.worldDebug;
         return;
     }
-    if (key == 'b')
-    {
-        const auto &actors = game.world.Actors();
-        if (!actors.empty())
-        {
-            auto next = actors.upper_bound(game.selectedWorldActor);
-            game.selectedWorldActor = (next == actors.end() ? actors.begin() : next)->first;
-        }
-        return;
-    }
-    if (key == 't')
-    {
-        game.FastForwardWorld();
-        return;
-    }
-    if (game.talkingActor && (key == '1' || key == '2'))
-    {
-        game.WorldChoice(key - '0');
-        return;
-    }
-    if (game.talkingNpc >= 0 && (key == '1' || key == '2'))
+    if (game.talkingNpc >= 0 && (key >= '1' && key <= '5'))
     {
         game.NpcChoice(key - '0');
         return;
@@ -175,12 +112,11 @@ void Key(unsigned char key, int, int)
     }
     if (key == 'l')
     {
+        if (game.talkingNpc >= 0)
+            return;
+        game.inventory = false;
         game.storyJournalOpen = !game.storyJournalOpen;
-        return;
-    }
-    if (key == 'k')
-    {
-        game.townRadioConnected = !game.townRadioConnected;
+        game.ClearInput();
         return;
     }
     if (key == 'f')
@@ -205,9 +141,21 @@ void Key(unsigned char key, int, int)
     case 'q':
         game.Heal();
         break;
+    case 'r':
+        game.ToggleRest();
+        break;
+    case 'b':
+        game.EatRation();
+        break;
+    case 't':
+        game.DrinkWater();
+        break;
     case 'i':
+        if (game.talkingNpc >= 0)
+            break;
+        game.storyJournalOpen = false;
         game.inventory = !game.inventory;
-        game.firing = false;
+        game.ClearInput();
         break;
     default:
         break;
@@ -216,16 +164,6 @@ void Key(unsigned char key, int, int)
 
 void Special(int key, int, int)
 {
-    if (key == GLUT_KEY_F6)
-    {
-        game.ClearInput();
-        if (game.dollTraining.active)
-            game.dollTraining.Stop();
-        else
-            game.dollTraining.Start();
-        game.paused = false;
-        return;
-    }
     if (key == GLUT_KEY_F11)
     {
         static bool full = false;
@@ -282,10 +220,10 @@ int main(int argc, char **argv)
     int initialH = std::max(480, std::min(1080, int(work.bottom - work.top) - 100));
     glutInitWindowSize(initialW, initialH);
     glutInitWindowPosition(work.left + 30, work.top + 30);
-    int window = glutCreateWindow("G&K RPG Level One");
+    int window = glutCreateWindow("Kingdom Trade Roads RPG");
     if (window <= 0)
         return 1;
-    SetWindowTextW(WindowFromDC(wglGetCurrentDC()), L"외곽 사냥터 | RPG 첫 레벨");
+    SetWindowTextW(WindowFromDC(wglGetCurrentDC()), L"왕국 교역로 | 실종자 수색과 귀환");
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
     GLenum status = glewInit();
     if (status != GLEW_OK || !GLEW_VERSION_3_0)

@@ -2,256 +2,349 @@
 #include "RpgGame.h"
 #include <Windows.h>
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <locale>
 
 namespace
 {
-std::filesystem::path RuntimeDirectory()
+float Distance(DollPoint a, DollPoint b)
 {
-    wchar_t path[MAX_PATH]{};
-    GetModuleFileNameW(nullptr, path, MAX_PATH);
-    return std::filesystem::path(path).parent_path();
+    return std::hypot(a.x - b.x, a.z - b.z);
 }
+
+float Milliseconds(std::chrono::steady_clock::time_point start)
+{
+    return std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - start)
+        .count();
+}
+}
+
+int RpgGame::VisitedCount() const
+{
+    return int(std::count(visitedVillages.begin(), visitedVillages.end(), true));
 }
 
 std::string RpgGame::StoryStatus() const
 {
-    std::string status =
-        patrolReported ? "현장 순찰: 복귀 보고 완료" : "현장 순찰: 성장·물자 회수 중";
-    if (world.Ready() && world.ResultReported())
-        status += " / 구조 보고: " +
-                  std::string(narrative::WorldSimulation::OutcomeLabel(world.Event().outcome));
-    else if (world.Ready() && world.PlayerAware())
-        status += " / 실종 인형의 구조 요청 확인";
-    return status;
+    return QuestObjective();
 }
 
 std::string RpgGame::StoryNextStep() const
 {
-    if (!world.Ready())
-        return "구조 사건 자료를 불러오지 못했습니다. 현장 순찰 목표는 계속할 수 있습니다.";
-    if (world.ResultReported())
-        return patrolReported
-                   ? "현장 시험 임무 종료. 중계소·수송차 본편 퀘스트는 아직 미구현입니다."
-                   : "구조 보고는 일지에 보관됩니다. 순찰 목표를 마치고 경비에게 F로 보고하세요.";
-    bool canTalk = false;
-    for (const auto &entry : world.Actors())
-        canTalk |= world.CanTalk(entry.first);
-    if (!world.PlayerAware())
-        return canTalk
-                   ? "기지의 미라 또는 벨에게 F로 대화해 지역 소식을 확인하세요."
-                   : "동료가 현장 임무로 기지를 비웠습니다. 순찰을 진행하며 귀환 보고를 기다리세요.";
-    if (world.Event().playerAccepted && world.Event().state == narrative::EventState::Active &&
-        world.Event().participants.empty())
-        return "직접 수색 수락: 남쪽 길 초록색 구조 표식으로 이동 → E 구조.";
-    if (!world.Event().participants.empty())
-        return "동료가 수색에 출발했습니다. 기지 귀환 후 F로 보고를 확인하세요.";
-    if (world.Event().state != narrative::EventState::Active)
-        return "구조 요청의 최종 보고를 아직 듣지 못했습니다. 동료에게 F로 확인하세요.";
-    return canTalk ? "동료에게 F 대화 → 1 직접 수색 / 2 자율 판단. 귀환 후 F로 보고 확인."
-                   : "동료가 구조 임무를 진행 중입니다. 기지 귀환 후 F로 결과를 확인하세요.";
+    return QuestHint();
 }
 
 void RpgGame::InitializeWorld()
 {
+    // Former story assets are deliberately not loaded. Keep their source as history only.
+    world = narrative::WorldSimulation{};
     worldBodies.clear();
     talkingActor = selectedWorldActor = 0;
     worldDebug = false;
+    visitedVillages.fill(false);
+    visitedVillages[0] = true;
+    villageStats = {};
+    for (auto &history : moodHistory)
+        history.clear();
+    rumors.clear();
+    rumorTransfers = courierArrivals = monsterRespawns = nextRumorId = 0;
+    rumorTimer = statsTimer = worldWindowMs = 0;
+    worldUpdateMs = rumorUpdateMs = villageStatsMs = 0;
     worldLogCursor = 0;
-    if (!world.Load(RuntimeDirectory() / "Assets" / "AI"))
-        return;
-    for (const auto &entry : world.Actors())
+    const char *news[] = {"아플리아로 향하는 상단이 호위할 모험가를 찾는다고 한다.",
+                          "카디낙 길목의 여관에 여행객이 늘었다고 한다.",
+                          "하멜른 주민들이 산길의 마수 흔적을 경계하고 있다고 한다.",
+                          "키르멜트 후방으로 보낼 물자가 부족하다고 한다.",
+                          "쿠락트 산록의 사냥꾼들이 위험한 발자국을 보았다고 한다."};
+    for (int i = 0; i < novel::VillageCount; ++i)
     {
-        TownNpc body;
-        body.position = {entry.second.position.x, entry.second.position.z};
-        body.home = body.position;
-        worldBodies.emplace(entry.first, body);
-        if (!selectedWorldActor)
-            selectedWorldActor = entry.first;
+        rumors.push_back({nextRumorId++, i, news[i], 0, 600, i == 1 ? 1 : -1});
+        for (int j : {0, 1, 2, 5})
+            npcs[i * novel::ResidentsPerVillage + j].rumors.push_back({i, -1, 0, 0});
     }
-    LogWorld();
+    fires.clear();
+    for (const auto &v : novel::Villages())
+        fires.push_back({v.x + 2, v.z + 3});
+    UpdateVillageStats();
+}
+
+void RpgGame::TravelNpc(TownNpc &npc, float dt)
+{
+    if (npc.destinationVillage < 0)
+    {
+        int current = novel::VillageAt(npc.position.x, npc.position.z);
+        if (current < 0)
+            current = npc.homeVillage;
+        if (current != npc.homeVillage)
+            npc.destinationVillage = npc.homeVillage;
+        else if (current == 0)
+            npc.destinationVillage = 1;
+        else if (current == novel::VillageCount - 1)
+            npc.destinationVillage = current - 1;
+        else
+            npc.destinationVillage = current + ((npc.id % 2) ? 1 : -1);
+        npc.path.clear();
+        npc.pathTimer = 0;
+    }
+    const auto &destination = novel::Villages()[npc.destinationVillage];
+    // First reach the clear road, then travel along it. No simulated teleporting.
+    WorldPoint goal{destination.x, destination.z};
+    if (std::abs(npc.position.z - 3) > .3f)
+        goal = {npc.position.x, 3};
+    MoveNpc(npc, goal, dt);
+    if (Distance(npc.position, {destination.x, destination.z}) < .45f)
+    {
+        npc.routineKey = -1;
+        ++courierArrivals;
+        ++npc.arrivalCount;
+        npc.travelWait = 12;
+        npc.destinationVillage = -1;
+        npc.action = NpcAction::Work;
+        npc.decisionTimer = 1;
+        npc.path.clear();
+        npc.Remember("physical_village_arrival");
+    }
+}
+
+void RpgGame::AddLocalRumor(WorldPoint origin, const std::string &text, int sentiment)
+{
+    int village = novel::VillageAt(origin.x, origin.z);
+    if (village < 0)
+        village = std::clamp(int(std::round((origin.x - 3) / novel::VillageSpacing)), 0, 4);
+    // Bound repeated incidents and retained knowledge during long play sessions.
+    for (const auto &r : rumors)
+        if (r.originVillage == village && r.text == text && time - r.createdAt < 20)
+            return;
+    if (rumors.size() >= 64)
+        return;
+    Rumor rumor{nextRumorId++, village, text, time, time + 600, sentiment};
+    bool witnessed = false;
+    for (auto &n : npcs)
+        if (n.hp > 0 && Distance(n.position, {origin.x, origin.z}) <= 6 &&
+            LineOfSight(origin, {n.position.x, n.position.z}))
+        {
+            n.rumors.push_back({rumor.id, -1, 0, time});
+            witnessed = true;
+        }
+    if (witnessed)
+        rumors.push_back(rumor);
+}
+
+void RpgGame::UpdateRumors()
+{
+    auto start = std::chrono::steady_clock::now();
+    rumors.erase(std::remove_if(rumors.begin(),
+                                rumors.end(),
+                                [&](const Rumor &r)
+                                {
+                                    return r.expiresAt <= time;
+                                }),
+                 rumors.end());
+    for (auto &n : npcs)
+        n.rumors.erase(std::remove_if(n.rumors.begin(),
+                                      n.rumors.end(),
+                                      [&](const auto &k)
+                                      {
+                                          return std::none_of(rumors.begin(),
+                                                              rumors.end(),
+                                                              [&](const Rumor &r)
+                                                              {
+                                                                  return r.id == k.rumor;
+                                                              });
+                                      }),
+                       n.rumors.end());
+    std::map<int, std::vector<RumorKnowledge>> before;
+    for (const auto &n : npcs)
+        before[n.id] = n.rumors;
+    // Snapshot knowledge prevents same-tick chains across the world.
+    for (auto &receiver : npcs)
+    {
+        if (receiver.hp <= 0)
+            continue;
+        for (const auto &sender : npcs)
+        {
+            if (sender.id == receiver.id || sender.hp <= 0 ||
+                Distance(sender.position, receiver.position) > 4 ||
+                !LineOfSight({sender.position.x, sender.position.z},
+                             {receiver.position.x, receiver.position.z}))
+                continue;
+            for (const auto &k : before[sender.id])
+            {
+                if (std::any_of(receiver.rumors.begin(),
+                                receiver.rumors.end(),
+                                [&](const auto &known)
+                                {
+                                    return known.rumor == k.rumor;
+                                }))
+                    continue;
+                receiver.rumors.push_back({k.rumor, sender.id, k.hops + 1, time});
+                ++rumorTransfers;
+            }
+        }
+    }
+    rumorUpdateMs = Milliseconds(start);
+}
+
+void RpgGame::UpdateVillageStats()
+{
+    auto start = std::chrono::steady_clock::now();
+    villageStats = {};
+    for (const auto &n : npcs)
+    {
+        ++villageStats[n.homeVillage].registered;
+        villageStats[n.homeVillage].disabled += n.hp <= 0;
+        int location = novel::VillageAt(n.position.x, n.position.z);
+        if (n.hp <= 0 || location < 0)
+            continue;
+        auto &s = villageStats[location];
+        ++s.present;
+        s.injured += n.hp < 80;
+        s.hostile += n.criminalUntil > time || n.hostile;
+        s.combat += n.state == NpcState::Combat;
+        s.travelers += n.homeVillage != location;
+        s.silver += n.silver;
+        s.trust += n.trust * 100;
+        bool anxious = false, hopeful = false;
+        for (const auto &k : n.rumors)
+            for (const auto &r : rumors)
+                if (r.id == k.rumor)
+                {
+                    anxious |= r.sentiment < 0;
+                    hopeful |= r.sentiment > 0;
+                }
+        s.rumorHolders += !n.rumors.empty();
+        int mood = n.hp < 35 || n.robbedUntil > time ? 2 : hopeful ? 3 : anxious ? 1 : 0;
+        ++s.moods[mood];
+    }
+    for (const auto &e : enemies)
+    {
+        int v = novel::VillageAt(e.position.x, e.position.z);
+        if (v >= 0 && e.hp > 0)
+            ++villageStats[v].monsters;
+    }
+    for (int i = 0; i < novel::VillageCount; ++i)
+    {
+        auto &s = villageStats[i];
+        s.trust = s.present ? s.trust / s.present : 0;
+        s.safety =
+            std::clamp(100.0f - s.monsters * 15 - s.combat * 5 - s.hostile * 8, 0.0f, 100.0f);
+        s.morale = s.present ? std::clamp((s.moods[0] * 75.0f + s.moods[1] * 45.0f +
+                                           s.moods[2] * 15.0f + s.moods[3] * 90.0f) /
+                                              s.present,
+                                          0.0f,
+                                          100.0f)
+                             : 0;
+        s.prosperity =
+            s.present ? std::clamp(float(s.silver) / (s.present * 12) * 100, 0.0f, 100.0f) : 0;
+        s.label = !s.present      ? "인원 없음"
+                  : s.safety < 60 ? "위험"
+                  : s.morale < 50 ? "불안"
+                                  : "평온";
+        auto &history = moodHistory[i];
+        history.push_back({time, s.morale, s.safety, s.prosperity, s.present});
+        if (history.size() > 120)
+            history.pop_front();
+    }
+    villageStatsMs = Milliseconds(start);
 }
 
 void RpgGame::UpdateWorld(float dt)
 {
-    if (!world.Ready())
-        return;
-    world.SetConversation(talkingActor);
-    world.Advance(dt, townRadioConnected);
-    for (const auto &entry : world.Actors())
+    auto start = std::chrono::steady_clock::now();
+    int location = novel::VillageAt(player.x, player.z);
+    if (location >= 0 && !visitedVillages[location])
     {
-        auto id = entry.first;
-        const auto &actor = entry.second;
-        if (!actor.available)
-            continue;
-        auto &body = worldBodies.at(id);
-        body.position = {actor.position.x, actor.position.z};
-        body.moving = false;
-        body.pathTimer -= dt;
-        if (id == talkingActor)
-        {
-            body.path.clear();
-            world.SetPosition(id, actor.position, false);
-            continue;
-        }
-        if (actor.task == narrative::Task::Departing || actor.task == narrative::Task::WalkingHome)
-        {
-            auto target =
-                actor.task == narrative::Task::Departing ? world.Settings().exit : actor.home;
-            MoveNpc(body, {target.x, target.z}, dt);
-            world.SetPosition(id, {body.position.x, body.position.z}, body.moving);
-            if (std::hypot(body.position.x - target.x, body.position.z - target.z) < .35f)
-            {
-                body.path.clear();
-                if (actor.task == narrative::Task::Departing)
-                    world.ArrivedAtExit(id);
-                else
-                    world.ArrivedHome(id);
-            }
-            else if (actor.task == narrative::Task::Departing &&
-                     world.Minute() - actor.taskSince > world.Settings().departureTimeout)
-            {
-                world.AbortDeparture(id);
-                body.path.clear();
-            }
-        }
-        else
-            world.SetPosition(id, actor.position, false);
+        visitedVillages[location] = true;
+        Notify(std::string(novel::Villages()[location].name) + " 도착 · 방문 " +
+               std::to_string(VisitedCount()) + "/5");
     }
-    if (talkingActor)
+    rumorTimer -= dt;
+    statsTimer -= dt;
+    if (rumorTimer <= 0)
     {
-        const auto *a = world.Find(talkingActor);
-        if (!a || !world.CanTalk(talkingActor) ||
-            std::hypot(a->position.x - player.x, a->position.z - player.z) > 3 ||
-            !LineOfSight(player, {a->position.x, a->position.z}))
-        {
-            Notify(world.Text("busy"));
-            talkingActor = 0;
-        }
+        UpdateRumors();
+        rumorTimer = 1;
     }
-    LogWorld();
+    const bool publish = statsTimer <= 0;
+    if (publish)
+    {
+        UpdateVillageStats();
+        statsTimer = 1;
+    }
+    worldWindowMs += Milliseconds(start);
+    if (publish)
+    {
+        worldUpdateMs = worldWindowMs;
+        worldWindowMs = 0;
+        LogWorld();
+    }
 }
 
+// Archived narrative adapters stay inert; WorldRescue belongs to the active expedition.
 bool RpgGame::InteractWorldActor()
 {
-    if (!world.Ready())
-        return false;
-    narrative::ActorId nearest = 0;
-    float distance = 2.4f;
-    int town = NearestNpc();
-    if (town >= 0)
-        distance = std::hypot(npcs[town].position.x - player.x, npcs[town].position.z - player.z);
-    for (const auto &entry : world.Actors())
-    {
-        const auto &a = entry.second;
-        float d = std::hypot(a.position.x - player.x, a.position.z - player.z);
-        if (a.available && d < distance && LineOfSight(player, {a.position.x, a.position.z}))
-        {
-            nearest = a.id;
-            distance = d;
-        }
-    }
-    if (!nearest)
-        return false;
-    if (!world.Talk(nearest))
-    {
-        Notify(world.Text("busy"));
-        return true;
-    }
-    talkingNpc = -1;
-    talkingActor = selectedWorldActor = nearest;
-    world.SetConversation(nearest);
-    world.SetPosition(nearest, world.Find(nearest)->position, false);
-    firing = false;
-    Notify(world.Dialogue(nearest));
-    return true;
+    return false;
 }
 
-void RpgGame::WorldChoice(int choice)
+void RpgGame::WorldChoice(int)
 {
-    if (paused || hp <= 0 || dollTraining.active || !talkingActor)
-        return;
-    const auto *a = world.Find(talkingActor);
-    if (!a || std::hypot(a->position.x - player.x, a->position.z - player.z) > 3 ||
-        !LineOfSight(player, {a->position.x, a->position.z}))
-        return;
-    if (world.Choose(talkingActor, choice))
-        Notify(choice == 1 ? world.Text("accepted") : "각자의 판단으로 움직이도록 했습니다.");
-    else
-        Notify("현재 선택할 수 없습니다. 이미 출발했거나 사건이 종료되었습니다.");
-    LogWorld();
 }
 
 bool RpgGame::WorldRescue()
 {
-    if (paused || hp <= 0 || dollTraining.active)
+    if (paused || hp <= 0 || talkingNpc >= 0 || inventory || storyJournalOpen)
         return false;
-    auto target = world.Settings().search;
-    if (!LineOfSight(player, {target.x, target.z}))
-        return false;
-    if (!world.PlayerRescue({player.x, player.z}))
-        return false;
-    Notify(world.Text("player_rescue"));
-    LogWorld();
-    return true;
+    if (BeginEscort())
+        return true;
+    WorldPoint trail{novel::Villages()[1].x + 20, 3};
+    if (std::hypot(player.x - trail.x, player.z - trail.z) <= 3 && LineOfSight(player, trail))
+    {
+        LearnRescueClue(2);
+        return true;
+    }
+    return false;
 }
 
 void RpgGame::FastForwardWorld()
 {
-    if (paused || hp <= 0 || dollTraining.active || !worldDebug)
-        return;
-    // Remote clock only: local navigation still requires actual travel and arrival.
-    world.SetConversation(talkingActor);
-    world.Advance(10.0 * world.Settings().minuteSeconds, townRadioConnected);
-    Notify("진단: 월드 시간 +10분 (로컬 이동은 실제 도착 필요)");
-    LogWorld();
 }
 
 void RpgGame::LogWorld()
 {
-    const auto &entries = world.Journal();
-    if (worldLogCursor >= entries.size())
-        return;
-    auto directory = RuntimeDirectory() / "Profiles";
+    wchar_t executable[MAX_PATH]{};
+    GetModuleFileNameW(nullptr, executable, MAX_PATH);
+    auto directory = std::filesystem::path(executable).parent_path() / "Profiles";
     std::error_code error;
     std::filesystem::create_directories(directory, error);
-    auto path = directory / "world_ai.jsonl";
+    auto path = directory / "novel_world.jsonl";
     if (std::filesystem::exists(path, error) &&
         std::filesystem::file_size(path, error) > 5 * 1024 * 1024)
     {
-        auto previous = directory / "world_ai.previous.jsonl";
+        auto previous = directory / "novel_world.previous.jsonl";
         std::filesystem::remove(previous, error);
         error.clear();
         std::filesystem::rename(path, previous, error);
         if (error)
             return;
     }
-    std::ofstream output(path, std::ios::app);
-    output.imbue(std::locale::classic());
-    if (!output)
-        return;
-    for (; worldLogCursor < entries.size(); ++worldLogCursor)
+    std::ofstream out(path, std::ios::app);
+    out.imbue(std::locale::classic());
+    out << "{\"schema_version\":1,\"event\":\"physical_world_simulation\",\"game_seconds\":" << time
+        << ",\"npc_count\":" << npcs.size() << ",\"mob_slots\":" << enemies.size()
+        << ",\"rumor_contact_transfers_total\":" << rumorTransfers
+        << ",\"courier_physical_arrivals_total\":" << courierArrivals
+        << ",\"monster_respawns_total\":" << monsterRespawns
+        << ",\"cpu_rumor_contact_ms\":" << rumorUpdateMs
+        << ",\"cpu_village_stats_ms\":" << villageStatsMs
+        << ",\"cpu_world_compute_window_ms\":" << worldUpdateMs << ",\"villages\":[";
+    for (int i = 0; i < novel::VillageCount; ++i)
     {
-        const auto &e = entries[worldLogCursor];
-        output << "{\"schema_version\":1,\"seed\":" << seed << ",\"event_id\":" << e.eventId
-               << ",\"sequence\":" << e.sequence << ",\"game_minute\":" << e.minute
-               << ",\"actor_id\":" << e.actor << ",\"target_id\":" << e.target << ",\"kind\":\""
-               << e.kind << "\",\"supplies_delta\":" << e.suppliesDelta
-               << ",\"rescued_delta\":" << e.rescuedDelta << ",\"injury\":" << e.injury
-               << ",\"trust_delta\":" << e.trustDelta << ",\"outcome\":" << int(e.outcome)
-               << ",\"cpu_world_update_ms\":" << world.updateMs
-               << ",\"cpu_goal_eval_ms\":" << world.decisionMs
-               << ",\"queue_depth\":" << world.QueueSize()
-               << ",\"events_processed_total\":" << world.processedEvents;
-        if (e.kind == "decision")
-            output << ",\"belief_confidence\":" << e.confidence << ",\"goal_scores\":["
-                   << e.scores[0] << ',' << e.scores[1] << ',' << e.scores[2]
-                   << "],\"selected_goal\":" << e.intention << ",\"reason\":\"" << e.reason
-                   << "\",\"rescue_contributions\":[" << e.contributions[0] << ','
-                   << e.contributions[1] << ',' << e.contributions[2] << ',' << e.contributions[3]
-                   << ',' << e.contributions[4] << ']';
-        output << "}\n";
+        const auto &s = villageStats[i];
+        out << (i ? "," : "") << "{\"id\":\"" << novel::Villages()[i].id
+            << "\",\"population\":" << s.present << ",\"safety\":" << s.safety
+            << ",\"morale\":" << s.morale << ",\"prosperity\":" << s.prosperity << '}';
     }
+    out << "]}\n";
 }

@@ -35,17 +35,28 @@ WorldPoint Point(DollPoint p)
 
 bool TownNpc::InTown(float x, float z)
 {
-    return x >= -8 && x <= 14 && z >= -8 && z <= 14;
+    return novel::VillageAt(x, z) >= 0;
 }
 
-const std::array<NpcBuilding, 6> &TownNpc::Buildings()
+const std::vector<NpcBuilding> &TownNpc::Buildings()
 {
-    static const std::array<NpcBuilding, 6> buildings{{{-4, -4, 4, 3, "보급 상점"},
-                                                       {4, -4, 4, 3, "진료소"},
-                                                       {11, -4, 3, 3, "경비 초소"},
-                                                       {-4, 10, 4, 3, "숙소"},
-                                                       {4, 10, 4, 3, "구호 식당"},
-                                                       {11, 10, 3, 3, "교역 창고"}}};
+    static const std::vector<NpcBuilding> buildings = []
+    {
+        std::vector<NpcBuilding> result;
+        const NpcBuilding local[] = {{-4, -4, 4, 3, "연금술 상점"},
+                                     {4, -4, 4, 3, "치유소"},
+                                     {11, -4, 3, 3, "경비 초소"},
+                                     {-4, 10, 4, 3, "여관"},
+                                     {4, 10, 4, 3, "공동 식당"},
+                                     {11, 10, 3, 3, "교역 창고"}};
+        for (const auto &v : novel::Villages())
+            for (auto building : local)
+            {
+                building.x += v.x - 3;
+                result.push_back(building);
+            }
+        return result;
+    }();
     return buildings;
 }
 
@@ -58,20 +69,20 @@ const char *TownNpc::RoleName(NpcRole role)
 
 const char *TownNpc::ActionName(NpcAction action)
 {
-    const char *names[] = {"work", "patrol", "attack", "retreat", "help", "rest", "rob"};
+    const char *names[] = {"work", "patrol", "attack", "retreat", "help", "rest", "rob", "travel"};
     return names[int(action)];
 }
 
 const char *TownNpc::RoleLabel(NpcRole role)
 {
-    const char *names[] = {
-        "상인", "의무관", "경비", "사냥꾼", "무법자", "악당", "사기꾼", "구호 주민"};
+    const char *names[] = {"상인", "치유사", "경비", "사냥꾼", "무법자", "악당", "사기꾼", "주민"};
     return names[int(role)];
 }
 
 const char *TownNpc::ActionLabel(NpcAction action)
 {
-    const char *names[] = {"업무", "순찰", "교전", "위험 회피", "동료 지원", "휴식·재장전", "약탈"};
+    const char *names[] = {
+        "업무", "순찰", "교전", "위험 회피", "동료 지원", "휴식·집중", "약탈", "마을 간 이동"};
     return names[int(action)];
 }
 
@@ -85,9 +96,10 @@ void TownNpc::Remember(const std::string &event)
 void RpgGame::InitializeTown()
 {
     npcUpdateCpuMs = npcDecisionCpuMs = npcPathCpuMs = npcMetricsTimer = 0;
+    npcLogCpuMs = 0;
     npcDecisions = npcPathReplans = 0;
     npcDebug = false;
-    townRadioConnected = true;
+    townRadioConnected = false;
     townCoordinationTimer = 0;
     npcs.clear();
     talkingNpc = -1;
@@ -100,28 +112,36 @@ void RpgGame::InitializeTown()
     };
 
     const Profile profiles[] = {
-        {"윤서", NpcRole::Merchant, -5, -1}, {"민호", NpcRole::Merchant, -2, -1},
-        {"로만", NpcRole::Merchant, 11, 7},  {"해린", NpcRole::Medic, 3, -1},
-        {"소라", NpcRole::Medic, 5, -1},     {"도윤", NpcRole::Guard, 11, -1},
-        {"유진", NpcRole::Guard, 14, 3},     {"태오", NpcRole::Guard, 3, 14},
-        {"서진", NpcRole::Hunter, 18, 3},    {"가온", NpcRole::Hunter, 3, 18},
-        {"린", NpcRole::Hunter, -12, 3},     {"까마귀", NpcRole::Outlaw, 19, 8},
-        {"들개", NpcRole::Outlaw, 8, 19},    {"발터", NpcRole::Bully, 13, 6},
-        {"렉스", NpcRole::Bully, 6, 13},     {"도하", NpcRole::Swindler, -5, 5},
-        {"실크", NpcRole::Swindler, 8, 6},   {"나리", NpcRole::Helper, 3, 7},
-        {"지안", NpcRole::Helper, 6, 7},     {"보람", NpcRole::Helper, -5, 7}};
-    for (int i = 0; i < 20; ++i)
+        {"엘린", NpcRole::Merchant, -5, -1}, {"마르코", NpcRole::Merchant, -2, -1},
+        {"테오", NpcRole::Merchant, 11, 7},  {"세라", NpcRole::Medic, 3, 0},
+        {"이리스", NpcRole::Medic, 5, -1},   {"에른", NpcRole::Guard, 11, -1},
+        {"루카", NpcRole::Guard, 14, 3},     {"오웬", NpcRole::Guard, 3, 14},
+        {"핀", NpcRole::Hunter, 12, 5},      {"레온", NpcRole::Hunter, 6, 12},
+        {"미아", NpcRole::Hunter, -7, 4},    {"까마귀", NpcRole::Outlaw, 13, 8},
+        {"브룬", NpcRole::Outlaw, 8, 13},    {"볼트", NpcRole::Bully, 13, 6},
+        {"크로", NpcRole::Bully, 6, 13},     {"로웰", NpcRole::Swindler, -5, 5},
+        {"실비", NpcRole::Swindler, 8, 6},   {"니아", NpcRole::Helper, 3, 6},
+        {"로제", NpcRole::Helper, 6, 7},     {"베른", NpcRole::Helper, -5, 7}};
+    for (int slot = 0; slot < novel::VillageCount * novel::ResidentsPerVillage; ++slot)
     {
+        const int i = slot % novel::ResidentsPerVillage;
+        const int village = slot / novel::ResidentsPerVillage;
+        const auto &settlement = novel::Villages()[village];
         TownNpc npc;
-        npc.id = i;
-        npc.name = profiles[i].name;
+        npc.id = slot;
+        npc.homeVillage = village;
+        npc.courier = i == 1 || i == 2;
+        npc.travelWait = 5 + i * 4;
+        npc.name = profiles[i].name + std::string(" ") + std::to_string(village + 1);
         npc.role = profiles[i].role;
-        npc.scrap = npc.role == NpcRole::Merchant                               ? 20
-                    : npc.role == NpcRole::Outlaw || npc.role == NpcRole::Bully ? 2
-                                                                                : 8;
+        npc.silver = npc.role == NpcRole::Merchant                               ? 20
+                     : npc.role == NpcRole::Outlaw || npc.role == NpcRole::Bully ? 2
+                                                                                 : 8;
         npc.potionStock = npc.role == NpcRole::Merchant ? 5 : 0;
         npc.medicalSupplies = npc.role == NpcRole::Medic ? 5 : 0;
-        npc.home = npc.position = {profiles[i].x, profiles[i].z};
+        npc.rationStock = npc.role == NpcRole::Merchant ? 6 : 0;
+        npc.waterStock = npc.role == NpcRole::Merchant ? 8 : 0;
+        npc.home = npc.position = {profiles[i].x + settlement.x - 3, profiles[i].z};
         // Spawn on a verified walkable point near the requested workplace.
         for (int d = 0; d < 5 && !Fits(Point(npc.position)); ++d)
             npc.position.x += 1;
@@ -165,12 +185,17 @@ void RpgGame::InitializeTown()
         t.aggression = std::clamp(t.aggression + (i % 3 - 1) * .035f, 0.0f, 1.0f);
         t.objectivePriority = .5f + .08f * (i % 5);
         t.ammoConservation = .35f + .1f * (i % 4);
+        if (village == 2)
+            t.teamSupport = std::min(1.0f, t.teamSupport + .12f);
+        if (village == 3)
+            t.objectivePriority = std::min(1.0f, t.objectivePriority + .1f);
+        if (village == 4)
+            t.selfPreservation = std::min(1.0f, t.selfPreservation + .1f);
         npc.personality = t;
         npc.resistance = .65f + .04f * (i % 5);
         npc.decisionTimer = .025f * i;
         npc.perceptionTimer = .01f * i;
-        npc.radio = npc.role == NpcRole::Guard || npc.role == NpcRole::Hunter ||
-                    npc.role == NpcRole::Medic || npc.role == NpcRole::Helper;
+        npc.radio = false;
         npc.mind.relationships[-1] = {npc.trust, npc.respect, 0};
         npcs.push_back(npc);
     }
@@ -178,7 +203,8 @@ void RpgGame::InitializeTown()
 
 void RpgGame::DecideNpc(TownNpc &npc)
 {
-    CpuTimer timer{npcDecisionCpuMs};
+    const auto decisionStarted = std::chrono::steady_clock::now();
+    const auto previousAction = npc.action;
     ++npcDecisions;
     npc.enemyTarget = npc.allyTarget = npc.criminalTarget = -1;
     npc.playerTarget = false;
@@ -239,8 +265,19 @@ void RpgGame::DecideNpc(TownNpc &npc)
     if (npc.ammo == 0 || npc.hp < 60)
         s[int(NpcAction::Rest)] =
             .4f + t.coverPreference * .3f + (npc.ammo == 0 ? .65f * t.ammoConservation : 0);
+    // Routine priorities only override peaceful work, never a known threat or injury.
+    if (npc.enemyTarget < 0 && !npc.playerTarget && npc.allyTarget < 0 && npc.hp >= 60 &&
+        npc.routine != NpcRoutine::Work)
+    {
+        s[int(NpcAction::Patrol)] = -1;
+        s[int(NpcAction::Work)] = npc.routine == NpcRoutine::Meal ? 1.0f : -1;
+        s[int(NpcAction::Rest)] = npc.routine == NpcRoutine::Sleep ? 1.0f : -1;
+    }
     int previousRobberyTarget = npc.robberyTarget;
-    DecideRobbery(npc);
+    if (npc.routine == NpcRoutine::Work)
+        DecideRobbery(npc);
+    else
+        npc.robberyTarget = -1;
     if (previousRobberyTarget != npc.robberyTarget)
         npc.robberyProgress = 0;
     if (npc.role == NpcRole::Guard)
@@ -295,11 +332,19 @@ void RpgGame::DecideNpc(TownNpc &npc)
     npc.action = next;
     if (next != NpcAction::Rob)
         npc.robberyProgress = 0;
-    LogNpc(npc, "decision");
+    npcDecisionCpuMs +=
+        std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - decisionStarted)
+            .count();
+    if (next != previousAction || time >= npc.decisionLogAt)
+    {
+        npc.decisionLogAt = time + 5;
+        LogNpc(npc, "decision");
+    }
 }
 
 void RpgGame::MoveNpc(TownNpc &npc, WorldPoint target, float dt, bool profileNpc)
 {
+    npc.goal = {target.x, target.z};
     int tx = int(std::round(target.x)), tz = int(std::round(target.z));
     if ((tx != npc.pathX || tz != npc.pathZ || npc.path.empty()) && npc.pathTimer <= 0)
     {
@@ -361,7 +406,7 @@ void RpgGame::MoveNpc(TownNpc &npc, WorldPoint target, float dt, bool profileNpc
     }
     auto p = Point(npc.position);
     auto before = p;
-    float step = std::min(d, 1.65f * dt);
+    float step = std::min(d, npc.walkSpeed * dt);
     Move(p, (next.x - p.x) / d * step, (next.z - p.z) / d * step);
     npc.position = {p.x, p.z};
     npc.moving = p.x != before.x || p.z != before.z;
@@ -378,7 +423,7 @@ void RpgGame::UpdateTown(float dt)
         if (npc.hp > 0 && npc.perceptionTimer <= 0)
         {
             PerceiveNpc(npc);
-            npc.perceptionTimer = .2f;
+            npc.perceptionTimer = .5f;
         }
     }
     townCoordinationTimer -= dt;
@@ -394,6 +439,13 @@ void RpgGame::UpdateTown(float dt)
         npc.serviceCooldown = std::max(0.0f, npc.serviceCooldown - dt);
         npc.robberyCooldown = std::max(0.0f, npc.robberyCooldown - dt);
         npc.pathTimer -= dt;
+        UpdateNpcRoutine(npc);
+        if (IsRescueActor(npc.id))
+        {
+            npc.state = npc.hp <= 0 ? NpcState::Disabled : NpcState::Idle;
+            npc.action = NpcAction::Rest;
+            continue;
+        }
         if (npc.hp <= 0)
         {
             if (!npc.stolenGoods.empty())
@@ -407,6 +459,11 @@ void RpgGame::UpdateTown(float dt)
                 npc.hostile = false;
                 npc.recovery = 0;
                 npc.path.clear();
+                // Recovery is not physical travel; do not teleport remote news home.
+                npc.rumors.clear();
+                npc.mind.knowledge.clear();
+                npc.destinationVillage = -1;
+                npc.travelWait = 12;
                 npc.Remember("recovered_at_home");
             }
             continue;
@@ -424,10 +481,23 @@ void RpgGame::UpdateTown(float dt)
                 DecideNpc(npc);
                 npc.decisionTimer = .5f;
             }
+            if (npc.courier && npc.hp >= 35 && npc.enemyTarget < 0 && npc.criminalTarget < 0 &&
+                npc.robbedUntil <= time &&
+                (npc.destinationVillage >= 0 || npc.routine == NpcRoutine::Work))
+            {
+                npc.travelWait -= dt;
+                if (npc.destinationVillage >= 0 || npc.travelWait <= 0)
+                    npc.action = NpcAction::Travel;
+            }
             switch (npc.action)
             {
+            case NpcAction::Travel:
+                TravelNpc(npc, dt);
+                break;
             case NpcAction::Work:
-                MoveNpc(npc, Point(npc.home), dt);
+                if (!npc.courier || npc.travelWait <= 0 ||
+                    novel::VillageAt(npc.position.x, npc.position.z) == npc.homeVillage)
+                    MoveNpc(npc, Point(npc.routineGoal), dt);
                 break;
             case NpcAction::Patrol:
             {
@@ -449,11 +519,11 @@ void RpgGame::UpdateTown(float dt)
                 break;
             }
             case NpcAction::Retreat:
-                MoveNpc(npc, {3, 3}, dt);
+                MoveNpc(npc, {novel::Villages()[npc.homeVillage].x, 3}, dt);
                 break;
             case NpcAction::Rest:
-                if (Distance(npc.position, npc.home) > 1)
-                    MoveNpc(npc, Point(npc.home), dt);
+                if (Distance(npc.position, npc.routineGoal) > 1)
+                    MoveNpc(npc, Point(npc.routineGoal), dt);
                 else
                 {
                     npc.hp = std::min(100.0f, npc.hp + 5 * dt);
@@ -593,10 +663,8 @@ void RpgGame::UpdateTown(float dt)
                     else
                     {
                         auto &e = enemies[npc.enemyTarget];
-                        e.hp = std::max(0, e.hp - 12);
-                        if (e.hp == 0)
+                        if (DamageMonster(e, 12, false))
                         {
-                            e.respawn = 45;
                             ++npc.kills;
                             npc.Remember("hunt_success");
                             npc.mind.Remember(
@@ -637,6 +705,7 @@ void RpgGame::UpdateTown(float dt)
     {
         LogNpc(npcs.front(), "performance_window");
         npcUpdateCpuMs = npcDecisionCpuMs = npcPathCpuMs = npcMetricsTimer = 0;
+        npcLogCpuMs = 0;
         npcDecisions = npcPathReplans = 0;
     }
 }
@@ -659,7 +728,7 @@ int RpgGame::NearestNpc() const
 
 void RpgGame::InteractNpc()
 {
-    if (paused || hp <= 0 || dollTraining.active)
+    if (paused || hp <= 0 || dollTraining.active || inventory || storyJournalOpen)
         return;
     talkingNpc = NearestNpc();
     if (talkingNpc < 0)
@@ -672,18 +741,15 @@ void RpgGame::InteractNpc()
     auto &selected = npcs[talkingNpc];
     selected.moving = false;
     selected.path.clear();
-    if (selected.role == NpcRole::Guard && PatrolReady() && !patrolReported)
+    if (IsRescueActor(selected.id))
     {
-        patrolReported = true;
-        scrap += 5;
-        RecordEconomy("patrol_reward", -2, -1, 5);
-        Notify("첫 순찰 보고 완료 · 부품 +5 · I로 성장한 능력치를 확인하세요.");
+        Notify(selected.name + ": 1번으로 호위를 시작하세요. 목적지는 아플리아 외곽입니다.");
         return;
     }
     if (selected.robbedUntil > time)
     {
         Notify(selected.name +
-               ": 부품을 약탈당했습니다. 범죄자를 제압하면 도난 물자를 회수할 수 있습니다.");
+               ": 은화를 약탈당했습니다. 범죄자를 제압하면 도난 물자를 회수할 수 있습니다.");
         return;
     }
     bool grateful = false;
@@ -704,42 +770,66 @@ void RpgGame::NpcChoice(int choice)
         talkingNpc = -1;
         return;
     }
+    if (RescueDialogue(npc, choice))
+        return;
+    bool localService =
+        npc.serviceOpen && Distance(npc.position, npc.home) <= 2 && npc.destinationVillage < 0;
+    if ((npc.role == NpcRole::Merchant || npc.role == NpcRole::Medic) && !localService)
+    {
+        Notify("식사·수면·이동 중에는 영업하지 않습니다. 근무 시간에 일터에서 만나세요.");
+        return;
+    }
     if (npc.serviceCooldown > 0)
     {
         Notify("잠시 기다려 주세요.");
         return;
     }
+    if (npc.role == NpcRole::Merchant && (choice == 4 || choice == 5))
+    {
+        int &stock = choice == 4 ? npc.rationStock : npc.waterStock;
+        int &supply = choice == 4 ? expeditionState.rations : expeditionState.water;
+        if (stock > 0 && supply < 6 && TransferSilver(silver, npc.silver, 1))
+        {
+            --stock;
+            ++supply;
+            RecordEconomy(choice == 4 ? "ration_purchase" : "water_purchase", -1, npc.id, 1);
+            Notify(choice == 4 ? "은화 1개로 식량 1개 구매." : "은화 1개로 식수 1개 구매.");
+        }
+        else
+            Notify("은화·상인 재고가 필요합니다. 보급품은 각각 6개까지 휴대합니다.");
+        return;
+    }
     switch (npc.role)
     {
     case NpcRole::Merchant:
-        if (choice == 1 && npc.potionStock > 0 && TransferScrap(scrap, npc.scrap, 3))
+        if (choice == 1 && npc.potionStock > 0 && TransferSilver(silver, npc.silver, 3))
         {
             --npc.potionStock;
             RecordEconomy("potion_purchase", -1, npc.id, 3);
             ++potions;
-            Notify("부품 3개로 회복약 1개 구매.");
+            Notify("은화 3개로 회복약 1개 구매.");
         }
-        else if (choice == 2 && potions > 0 && TransferScrap(npc.scrap, scrap, 2))
+        else if (choice == 2 && potions > 0 && TransferSilver(npc.silver, silver, 2))
         {
             --potions;
             ++npc.potionStock;
             RecordEconomy("potion_sale", npc.id, -1, 2);
-            Notify("회복약 1개 판매: 부품 2개 획득.");
+            Notify("회복약 1개 판매: 은화 2개 획득.");
         }
         else
-            Notify("구매: 부품 3개와 상인 재고 필요 / 판매: 회복약과 상인 부품 2개 필요.");
+            Notify("구매: 은화 3개와 상인 재고 필요 / 판매: 회복약과 상인 은화 2개 필요.");
         break;
     case NpcRole::Medic:
         if (choice == 1 && hp < MaxHp() && npc.medicalSupplies > 0 &&
-            TransferScrap(scrap, npc.scrap, 2))
+            TransferSilver(silver, npc.silver, 2))
         {
             --npc.medicalSupplies;
             RecordEconomy("medical_service", -1, npc.id, 2);
             hp = MaxHp();
-            Notify("부품 2개로 치료 완료.");
+            Notify("은화 2개로 치료 완료.");
         }
         else
-            Notify("치료: 부품 2개와 의약 재고가 필요합니다. 상처가 없으면 치료하지 않습니다.");
+            Notify("치료: 은화 2개와 의약 재고가 필요합니다. 상처가 없으면 치료하지 않습니다.");
         break;
     case NpcRole::Helper:
         if (choice == 1 && hp < MaxHp())
@@ -753,13 +843,13 @@ void RpgGame::NpcChoice(int choice)
             Notify("광장에서도 적의 추격에 주의하세요. 사냥터에는 사냥꾼이 있습니다.");
         break;
     case NpcRole::Swindler:
-        if (choice == 1 && TransferScrap(scrap, npc.scrap, 4))
+        if (choice == 1 && TransferSilver(silver, npc.silver, 4))
         {
             RecordEconomy("fraud", -1, npc.id, 4);
             npc.trust = std::max(0.0f, npc.trust - .1f);
             npc.serviceCooldown = 20;
             npc.Remember("fake_goods_sold");
-            Notify("보증 없는 특가 상자를 샀지만 안은 비어 있었습니다. 부품 -4.");
+            Notify("보증 없는 특가 상자를 샀지만 안은 비어 있었습니다. 은화 -4.");
         }
         else
         {
@@ -769,12 +859,12 @@ void RpgGame::NpcChoice(int choice)
         break;
     case NpcRole::Outlaw:
     case NpcRole::Bully:
-        if (choice == 1 && TransferScrap(scrap, npc.scrap, 2))
+        if (choice == 1 && TransferSilver(silver, npc.silver, 2))
         {
             RecordEconomy("extortion", -1, npc.id, 2);
             npc.serviceCooldown = 20;
             npc.hostile = false;
-            Notify("통행료로 부품 2개를 냈습니다.");
+            Notify("통행료로 은화 2개를 냈습니다.");
         }
         else
         {
@@ -789,8 +879,10 @@ void RpgGame::NpcChoice(int choice)
         {
             npc.mind.commandStatus = npc.hp < 35 ? "accepted_with_modification" : "accepted";
             npc.mind.commandUntil = time + 20;
-            npc.home = npc.hp < 35 ? DollPoint{3, 3} : DollPoint{player.x, player.z};
+            npc.home = npc.hp < 35 ? DollPoint{novel::Villages()[npc.homeVillage].x, 3}
+                                   : DollPoint{player.x, player.z};
             npc.path.clear();
+            npc.routineKey = -1;
             npc.decisionTimer = 0;
             npc.trust = std::min(1.0f, npc.trust + .02f);
             Notify(npc.hp < 35 ? "부상으로 광장을 순찰 거점으로 변경하겠습니다."
@@ -802,7 +894,7 @@ void RpgGame::NpcChoice(int choice)
                 npc.mind.commandStatus = "questioned";
             Notify(choice == 1
                        ? "현재 신뢰로는 명령을 바로 수행하기 어렵습니다."
-                       : "야적은 무리로 순찰합니다. 관찰 중인 무리를 모두 공격할 필요는 없습니다.");
+                       : "마수는 교역로 주변에 서식합니다. 도로를 따라가면 다음 마을이 나옵니다.");
         }
         break;
     }
@@ -814,6 +906,7 @@ void RpgGame::NpcChoice(int choice)
 
 void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
 {
+    CpuTimer logTimer{npcLogCpuMs};
     static std::ofstream stream;
     static std::filesystem::path directory;
     static bool attempted = false;
@@ -843,12 +936,12 @@ void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
            << ",\"time_s\":" << time << ",\"npc_id\":" << npc.id << ",\"role\":\""
            << TownNpc::RoleName(npc.role) << "\",\"action\":\"" << TownNpc::ActionName(npc.action)
            << "\",\"state\":" << int(npc.state) << ",\"hp\":" << npc.hp
-           << ",\"wallet_scrap\":" << npc.scrap << ",\"robbery_target\":" << npc.robberyTarget
+           << ",\"wallet_silver\":" << npc.silver << ",\"robbery_target\":" << npc.robberyTarget
            << ",\"criminal_target\":" << npc.criminalTarget
            << ",\"enemy_target\":" << npc.enemyTarget << ",\"ally_target\":" << npc.allyTarget
            << ",\"trust\":" << npc.trust << ",\"memory_count\":" << npc.memory.size()
            << ",\"cpu_update_ms\":" << npcUpdateCpuMs << ",\"cpu_decision_ms\":" << npcDecisionCpuMs
-           << ",\"cpu_pathfinding_ms\":" << npcPathCpuMs
+           << ",\"cpu_log_ms\":" << npcLogCpuMs << ",\"cpu_pathfinding_ms\":" << npcPathCpuMs
            << ",\"window_simulation_s\":" << npcMetricsTimer
            << ",\"decisions_count\":" << npcDecisions
            << ",\"path_replans_count\":" << npcPathReplans << ",\"scores\":{";
@@ -882,7 +975,7 @@ void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
                << ",\"direct\":" << (fact.direct ? "true" : "false")
                << ",\"observed_at_s\":" << fact.timestamp
                << ",\"confidence\":" << fact.Confidence(time) << ",\"x\":" << fact.position.x
-               << ",\"z\":" << fact.position.z << ",\"observed_scrap\":" << fact.carriedScrap
+               << ",\"z\":" << fact.position.z << ",\"observed_scrap\":" << fact.carriedSilver
                << ",\"hp\":" << fact.hp << '}';
     }
     stream << "],\"relationships\":[";

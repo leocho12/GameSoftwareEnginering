@@ -26,7 +26,7 @@ float Distance(DollPoint a, DollPoint b)
 }
 }
 
-bool RpgGame::TransferScrap(int &from, int &to, int amount)
+bool RpgGame::TransferSilver(int &from, int &to, int amount)
 {
     if (&from == &to || amount <= 0 || from < amount ||
         to > std::numeric_limits<int>::max() - amount)
@@ -58,13 +58,13 @@ void RpgGame::DecideRobbery(TownNpc &npc)
         const auto &fact = entry.second;
         auto *victim = FindNpc(npcs, fact.subject);
         if (fact.kind != NpcFact::Ally || fact.Confidence(time) <= .25f || fact.hp <= 0 ||
-            fact.carriedScrap <= 0 || !victim || victim->id == npc.id ||
+            fact.carriedSilver <= 0 || !victim || victim->id == npc.id ||
             victim->role == NpcRole::Guard || victim->role == NpcRole::Outlaw ||
             victim->role == NpcRole::Bully ||
             (talkingNpc >= 0 && npcs[talkingNpc].id == victim->id))
             continue;
-        float score = .45f + npc.traits.aggression * .4f + (npc.scrap < 4 ? .3f : 0) +
-                      std::min(fact.carriedScrap, 10) * .015f - guards * .4f -
+        float score = .45f + npc.traits.aggression * .4f + (npc.silver < 4 ? .3f : 0) +
+                      std::min(fact.carriedSilver, 10) * .015f - guards * .4f -
                       Distance(npc.position, fact.position) * .015f;
         if (score > best)
         {
@@ -80,7 +80,7 @@ void RpgGame::DecideRobbery(TownNpc &npc)
 void RpgGame::StepRobbery(TownNpc &npc, float dt)
 {
     auto *victim = FindNpc(npcs, npc.robberyTarget);
-    if (!victim || victim->hp <= 0 || victim->scrap <= 0 ||
+    if (!victim || victim->hp <= 0 || victim->silver <= 0 ||
         (talkingNpc >= 0 && npcs[talkingNpc].id == victim->id))
     {
         npc.robberyProgress = 0;
@@ -122,8 +122,8 @@ bool RpgGame::ResolveRobbery(int robberId, int victimId)
         !LineOfSight({robber->position.x, robber->position.z},
                      {victim->position.x, victim->position.z}))
         return false;
-    int amount = std::min(3, victim->scrap);
-    if (!TransferScrap(victim->scrap, robber->scrap, amount))
+    int amount = std::min(3, victim->silver);
+    if (!TransferSilver(victim->silver, robber->silver, amount))
         return false;
     robber->stolenGoods[victimId] += amount;
     robber->robberyCooldown = 30;
@@ -151,9 +151,12 @@ bool RpgGame::ResolveRobbery(int robberId, int victimId)
             observer.decisionTimer = 0;
         }
     RecordEconomy("robbery", victimId, robberId, amount);
+    AddLocalRumor({robber->position.x, robber->position.z},
+                  "장터에서 약탈이 일어나 경비가 수사 중이라고 한다.",
+                  -1);
     if (std::hypot(player.x - robber->position.x, player.z - robber->position.z) < 12 &&
         LineOfSight(player, {robber->position.x, robber->position.z}))
-        Notify(robber->name + "이(가) " + victim->name + "의 부품 " + std::to_string(amount) +
+        Notify(robber->name + "이(가) " + victim->name + "의 은화 " + std::to_string(amount) +
                "개를 약탈했습니다. 범죄자를 제압하면 회수됩니다.");
     LogNpc(*robber, "robbery_success");
     LogNpc(*victim, "robbery_victim");
@@ -165,8 +168,8 @@ void RpgGame::RecoverStolenGoods(TownNpc &robber)
     for (auto &entry : robber.stolenGoods)
     {
         auto *victim = FindNpc(npcs, entry.first);
-        int amount = std::min(entry.second, robber.scrap);
-        if (victim && TransferScrap(robber.scrap, victim->scrap, amount))
+        int amount = std::min(entry.second, robber.silver);
+        if (victim && TransferSilver(robber.silver, victim->silver, amount))
         {
             entry.second -= amount;
             RecordEconomy("stolen_goods_returned", robber.id, victim->id, amount);
@@ -207,12 +210,12 @@ void RpgGame::RecordEconomy(const char *kind, int from, int to, int amount)
     auto balance = [&](int id)
     {
         if (id == -1)
-            return scrap;
+            return silver;
         auto *npc = FindNpc(npcs, id);
-        return npc ? npc->scrap : -1;
+        return npc ? npc->silver : -1;
     };
     out << "{\"event\":\"" << kind << "\",\"game_seconds\":" << time << ",\"from_npc_id\":" << from
         << ",\"to_npc_id\":" << to << ",\"amount\":" << amount
-        << ",\"currency\":\"barter_scrap\",\"from_balance\":" << balance(from)
-        << ",\"to_balance\":" << balance(to) << ",\"player_scrap\":" << scrap << "}\n";
+        << ",\"currency\":\"silver_units\",\"from_balance\":" << balance(from)
+        << ",\"to_balance\":" << balance(to) << ",\"player_silver\":" << silver << "}\n";
 }

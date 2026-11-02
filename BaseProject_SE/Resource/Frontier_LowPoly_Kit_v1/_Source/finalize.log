@@ -1,0 +1,248 @@
+00:00.594  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Characters\Human_Modular_Library.blend"
+INFO Draco is available, use library at C:\Program Files (x86)\Steam\steamapps\common\Blender\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files (x86)\Steam\steamapps\common\Blender\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+16:35:21 | INFO: Starting glTF 2.0 export
+16:35:21 | INFO: Extracting primitive: Cap_Mesh.002
+16:35:21 | INFO: Primitives created: 2
+16:35:21 | INFO: Extracting primitive: VestPanel_Mesh
+16:35:21 | INFO: Primitives created: 2
+16:35:21 | INFO: Extracting primitive: BootUpper_Mesh
+16:35:21 | INFO: Primitives created: 3
+16:35:21 | INFO: Extracting primitive: BootUpper_Mesh.001
+16:35:21 | INFO: Primitives created: 3
+16:35:21 | INFO: Extracting primitive: Eye_Mesh.002
+16:35:21 | INFO: Primitives created: 4
+16:35:21 | INFO: Extracting primitive: Palm_Mesh
+16:35:21 | INFO: Primitives created: 1
+16:35:21 | INFO: Extracting primitive: Palm_Mesh.001
+16:35:21 | INFO: Primitives created: 1
+16:35:21 | INFO: Extracting primitive: Crop_Mesh
+16:35:21 | INFO: Primitives created: 1
+16:35:21 | INFO: Extracting primitive: Cranium_Mesh
+16:35:21 | INFO: Primitives created: 1
+16:35:21 | INFO: Extracting primitive: Trousers_Mesh
+16:35:21 | INFO: Primitives created: 2
+16:35:21 | INFO: Extracting primitive: Trousers_Mesh.001
+16:35:21 | INFO: Primitives created: 2
+16:35:21 | INFO: Extracting primitive: Hip_Mesh
+16:35:21 | INFO: Primitives created: 3
+16:35:21 | INFO: Extracting primitive: Sleeve_Mesh
+16:35:21 | INFO: Primitives created: 1
+16:35:21 | INFO: Extracting primitive: Sleeve_Mesh.001
+16:35:21 | INFO: Primitives created: 1
+16:35:21 | INFO: Extracting primitive: Garment_Mesh
+16:35:21 | INFO: Primitives created: 3
+16:35:23 | INFO: Finished glTF 2.0 export in 1.8760719299316406 s
+
+16:35:23 | INFO: Starting glTF 2.0 export
+16:35:23 | INFO: Extracting primitive: Pack_Mesh
+16:35:23 | INFO: Primitives created: 2
+16:35:23 | INFO: Extracting primitive: BootUpper_Mesh
+16:35:23 | INFO: Primitives created: 3
+16:35:23 | INFO: Extracting primitive: BootUpper_Mesh.001
+16:35:23 | INFO: Primitives created: 3
+16:35:23 | INFO: Extracting primitive: Eye_Mesh
+16:35:23 | INFO: Primitives created: 4
+16:35:23 | INFO: Extracting primitive: Palm_Mesh
+16:35:23 | INFO: Primitives created: 1
+16:35:23 | INFO: Extracting primitive: Palm_Mesh.001
+16:35:23 | INFO: Primitives created: 1
+16:35:23 | INFO: Extracting primitive: Cap_Mesh.001
+16:35:23 | INFO: Primitives created: 1
+16:35:23 | INFO: Extracting primitive: Cranium_Mesh.001
+16:35:23 | INFO: Primitives created: 1
+16:35:23 | INFO: Extracting primitive: Trousers_Mesh
+16:35:23 | INFO: Primitives created: 2
+16:35:23 | INFO: Extracting primitive: Trousers_Mesh.001
+16:35:23 | INFO: Primitives created: 2
+16:35:23 | INFO: Extracting primitive: Hip_Mesh
+16:35:23 | INFO: Primitives created: 3
+16:35:23 | INFO: Extracting primitive: Sleeve_Mesh
+16:35:23 | INFO: Primitives created: 1
+16:35:23 | INFO: Extracting primitive: Sleeve_Mesh.001
+16:35:23 | INFO: Primitives created: 1
+16:35:23 | INFO: Extracting primitive: Garment_Mesh
+16:35:23 | INFO: Primitives created: 3
+16:35:25 | INFO: Finished glTF 2.0 export in 1.9853262901306152 s
+
+16:35:25 | INFO: Starting glTF 2.0 export
+16:35:25 | INFO: Extracting primitive: BootUpper_Mesh
+16:35:25 | INFO: Primitives created: 3
+16:35:25 | INFO: Extracting primitive: BootUpper_Mesh.001
+16:35:25 | INFO: Primitives created: 3
+16:35:25 | INFO: Extracting primitive: Eye_Mesh
+16:35:25 | INFO: Primitives created: 4
+16:35:25 | INFO: Extracting primitive: Palm_Mesh
+16:35:25 | INFO: Primitives created: 1
+16:35:25 | INFO: Extracting primitive: Palm_Mesh.001
+16:35:25 | INFO: Primitives created: 1
+16:35:25 | INFO: Extracting primitive: Cap_Mesh
+16:35:25 | INFO: Primitives created: 1
+16:35:25 | INFO: Extracting primitive: Cranium_Mesh
+16:35:25 | INFO: Primitives created: 1
+16:35:25 | INFO: Extracting primitive: Trousers_Mesh
+16:35:25 | INFO: Primitives created: 2
+16:35:25 | INFO: Extracting primitive: Trousers_Mesh.001
+16:35:25 | INFO: Primitives created: 2
+16:35:25 | INFO: Extracting primitive: Hip_Mesh
+16:35:25 | INFO: Primitives created: 3
+16:35:25 | INFO: Extracting primitive: Sleeve_Mesh.002
+16:35:25 | INFO: Primitives created: 1
+16:35:25 | INFO: Extracting primitive: Sleeve_Mesh.003
+16:35:25 | INFO: Primitives created: 1
+16:35:25 | INFO: Extracting primitive: Garment_Mesh.001
+16:35:25 | INFO: Primitives created: 2
+16:35:27 | INFO: Finished glTF 2.0 export in 1.908233404159546 s
+
+16:35:27 | INFO: Starting glTF 2.0 export
+16:35:27 | INFO: Extracting primitive: Pack_Mesh
+16:35:27 | INFO: Primitives created: 2
+16:35:27 | INFO: Extracting primitive: BootUpper_Mesh
+16:35:27 | INFO: Primitives created: 3
+16:35:27 | INFO: Extracting primitive: BootUpper_Mesh.001
+16:35:27 | INFO: Primitives created: 3
+16:35:27 | INFO: Extracting primitive: Eye_Mesh
+16:35:27 | INFO: Primitives created: 4
+16:35:27 | INFO: Extracting primitive: Palm_Mesh
+16:35:27 | INFO: Primitives created: 1
+16:35:27 | INFO: Extracting primitive: Palm_Mesh.001
+16:35:27 | INFO: Primitives created: 1
+16:35:27 | INFO: Extracting primitive: Crop_Mesh
+16:35:27 | INFO: Primitives created: 1
+16:35:27 | INFO: Extracting primitive: Cranium_Mesh.001
+16:35:27 | INFO: Primitives created: 1
+16:35:27 | INFO: Extracting primitive: Trousers_Mesh
+16:35:27 | INFO: Primitives created: 2
+16:35:27 | INFO: Extracting primitive: Trousers_Mesh.001
+16:35:27 | INFO: Primitives created: 2
+16:35:27 | INFO: Extracting primitive: Hip_Mesh
+16:35:27 | INFO: Primitives created: 3
+16:35:27 | INFO: Extracting primitive: Sleeve_Mesh.004
+16:35:27 | INFO: Primitives created: 1
+16:35:27 | INFO: Extracting primitive: Sleeve_Mesh.005
+16:35:27 | INFO: Primitives created: 1
+16:35:27 | INFO: Extracting primitive: Garment_Mesh.002
+16:35:27 | INFO: Primitives created: 3
+16:35:29 | INFO: Finished glTF 2.0 export in 1.8745973110198975 s
+
+Info: Saved as "Human_Modular_Library.blend"
+RIG_FINALIZED HUM_7H_v1
+00:08.782  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Tiger_Modular.blend"
+16:35:29 | INFO: Starting glTF 2.0 export
+16:35:29 | INFO: Extracting primitive: Body_Mesh
+16:35:29 | INFO: Primitives created: 2
+16:35:29 | INFO: Extracting primitive: Ear_Mesh.004
+16:35:29 | INFO: Primitives created: 2
+16:35:29 | INFO: Extracting primitive: Cranium_Mesh.002
+16:35:29 | INFO: Primitives created: 7
+16:35:29 | INFO: Extracting primitive: LowerJaw_Mesh
+16:35:29 | INFO: Primitives created: 2
+16:35:29 | INFO: Extracting primitive: Leg_Mesh
+16:35:29 | INFO: Primitives created: 1
+16:35:29 | INFO: Extracting primitive: Leg_Mesh.001
+16:35:29 | INFO: Primitives created: 1
+16:35:29 | INFO: Extracting primitive: Leg_Mesh.002
+16:35:29 | INFO: Primitives created: 1
+16:35:29 | INFO: Extracting primitive: Leg_Mesh.003
+16:35:29 | INFO: Primitives created: 1
+16:35:29 | INFO: Extracting primitive: Neck_Mesh.002
+16:35:29 | INFO: Primitives created: 1
+16:35:29 | INFO: Extracting primitive: Tail_Mesh
+16:35:29 | INFO: Primitives created: 1
+16:35:30 | INFO: Finished glTF 2.0 export in 1.3399081230163574 s
+00:14.454  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Tiger.png'
+00:18.782  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Tiger_Run.png'
+00:24.750  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Tiger_Motion_Sheet.png'
+
+Info: Saved as "Tiger_Modular.blend"
+RIG_FINALIZED FELINE_TIGER_v1
+00:24.766  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Wolf_Modular.blend"
+16:35:45 | INFO: Starting glTF 2.0 export
+16:35:45 | INFO: Extracting primitive: Body_Mesh.001
+16:35:45 | INFO: Primitives created: 3
+16:35:45 | INFO: Extracting primitive: Ear_Mesh.006
+16:35:45 | INFO: Primitives created: 1
+16:35:45 | INFO: Extracting primitive: Cranium_Mesh.003
+16:35:45 | INFO: Primitives created: 4
+16:35:45 | INFO: Extracting primitive: LowerJaw_Mesh.001
+16:35:45 | INFO: Primitives created: 2
+16:35:45 | INFO: Extracting primitive: Leg_Mesh.004
+16:35:45 | INFO: Primitives created: 1
+16:35:45 | INFO: Extracting primitive: Leg_Mesh.005
+16:35:45 | INFO: Primitives created: 1
+16:35:45 | INFO: Extracting primitive: Leg_Mesh.006
+16:35:45 | INFO: Primitives created: 1
+16:35:45 | INFO: Extracting primitive: Leg_Mesh.007
+16:35:45 | INFO: Primitives created: 1
+16:35:45 | INFO: Extracting primitive: Neck_Mesh.003
+16:35:45 | INFO: Primitives created: 1
+16:35:45 | INFO: Extracting primitive: Tail_Mesh.001
+16:35:45 | INFO: Primitives created: 1
+16:35:46 | INFO: Finished glTF 2.0 export in 1.3376390933990479 s
+00:30.688  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Wolf.png'
+00:34.875  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Wolf_Run.png'
+
+Info: Saved as "Wolf_Modular.blend"
+RIG_FINALIZED CANINE_WOLF_v1
+00:34.891  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Fox_Modular.blend"
+16:35:55 | INFO: Starting glTF 2.0 export
+16:35:55 | INFO: Extracting primitive: Body_Mesh.002
+16:35:55 | INFO: Primitives created: 2
+16:35:55 | INFO: Extracting primitive: Ear_Mesh.008
+16:35:55 | INFO: Primitives created: 1
+16:35:55 | INFO: Extracting primitive: Cranium_Mesh.004
+16:35:55 | INFO: Primitives created: 4
+16:35:55 | INFO: Extracting primitive: LowerJaw_Mesh.002
+16:35:55 | INFO: Primitives created: 2
+16:35:55 | INFO: Extracting primitive: Leg_Mesh.008
+16:35:55 | INFO: Primitives created: 2
+16:35:55 | INFO: Extracting primitive: Leg_Mesh.009
+16:35:55 | INFO: Primitives created: 2
+16:35:55 | INFO: Extracting primitive: Leg_Mesh.010
+16:35:55 | INFO: Primitives created: 2
+16:35:55 | INFO: Extracting primitive: Leg_Mesh.011
+16:35:55 | INFO: Primitives created: 2
+16:35:55 | INFO: Extracting primitive: Neck_Mesh.004
+16:35:55 | INFO: Primitives created: 1
+16:35:55 | INFO: Extracting primitive: Tail_Mesh.002
+16:35:55 | INFO: Primitives created: 2
+16:35:57 | INFO: Finished glTF 2.0 export in 1.333808183670044 s
+00:40.469  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Fox.png'
+00:44.547  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Fox_Run.png'
+
+Info: Saved as "Fox_Modular.blend"
+RIG_FINALIZED CANINE_FOX_v1
+00:44.579  blend            | Read blend: "C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Animals\Deer_Modular.blend"
+16:36:05 | INFO: Starting glTF 2.0 export
+16:36:05 | INFO: Extracting primitive: Antler_Mesh
+16:36:05 | INFO: Primitives created: 1
+16:36:05 | INFO: Extracting primitive: Body_Mesh.003
+16:36:05 | INFO: Primitives created: 1
+16:36:05 | INFO: Extracting primitive: Ear_Mesh.010
+16:36:05 | INFO: Primitives created: 1
+16:36:05 | INFO: Extracting primitive: Cranium_Mesh.005
+16:36:05 | INFO: Primitives created: 4
+16:36:05 | INFO: Extracting primitive: LowerJaw_Mesh.003
+16:36:05 | INFO: Primitives created: 1
+16:36:05 | INFO: Extracting primitive: Leg_Mesh.012
+16:36:05 | INFO: Primitives created: 2
+16:36:05 | INFO: Extracting primitive: Leg_Mesh.013
+16:36:05 | INFO: Primitives created: 2
+16:36:05 | INFO: Extracting primitive: Leg_Mesh.014
+16:36:05 | INFO: Primitives created: 2
+16:36:05 | INFO: Extracting primitive: Leg_Mesh.015
+16:36:05 | INFO: Primitives created: 2
+16:36:05 | INFO: Extracting primitive: Neck_Mesh.005
+16:36:05 | INFO: Primitives created: 1
+16:36:05 | INFO: Extracting primitive: Tail_Mesh.003
+16:36:05 | INFO: Primitives created: 1
+16:36:06 | INFO: Finished glTF 2.0 export in 1.3284492492675781 s
+00:50.032  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Deer.png'
+00:54.047  render           | Saved: 'C:\Users\leoch\Documents\GitHub\GameSoftwareEnginering\BaseProject_SE\Resource\Frontier_LowPoly_Kit_v1\Previews\Deer_Run.png'
+
+Info: Saved as "Deer_Modular.blend"
+RIG_FINALIZED CERVID_DEER_v1
+ANIMATION_FINALIZATION_COMPLETE
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

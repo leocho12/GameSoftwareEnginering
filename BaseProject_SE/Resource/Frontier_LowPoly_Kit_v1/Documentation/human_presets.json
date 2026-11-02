@@ -1,0 +1,49 @@
+{
+  "common": [
+    "Pelvis_Trousers",
+    "Leg_Trousers_L",
+    "Leg_Trousers_R",
+    "Boot_L",
+    "Boot_R",
+    "Glove_L",
+    "Glove_R"
+  ],
+  "presets": {
+    "Player_Commander": [
+      "Head_A",
+      "Face_Alert",
+      "Hair_Crop",
+      "Torso_FieldJacket",
+      "Sleeve_FieldJacket_L",
+      "Sleeve_FieldJacket_R",
+      "Accessory_TacticalVest",
+      "Accessory_Cap"
+    ],
+    "NPC_Scout": [
+      "Head_B",
+      "Face_Calm",
+      "Hair_Tied",
+      "Torso_FieldJacket",
+      "Sleeve_FieldJacket_L",
+      "Sleeve_FieldJacket_R",
+      "Accessory_Backpack"
+    ],
+    "NPC_Resident": [
+      "Head_A",
+      "Face_Calm",
+      "Hair_Bob",
+      "Torso_CivilianShirt",
+      "Sleeve_CivilianShirt_L",
+      "Sleeve_CivilianShirt_R"
+    ],
+    "NPC_Worker": [
+      "Head_B",
+      "Face_Calm",
+      "Hair_Crop",
+      "Torso_WorkerCoat",
+      "Sleeve_WorkerCoat_L",
+      "Sleeve_WorkerCoat_R",
+      "Accessory_Backpack"
+    ]
+  }
+}

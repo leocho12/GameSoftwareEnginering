@@ -1,3 +1,5 @@
+> **이전 버전 자료** — 2026-10-22 세계관·레벨·외형 기준은 [NOVEL_WORLD_PROTOTYPE.md](NOVEL_WORLD_PROTOTYPE.md), 원문 근거는 [NOVEL_WORLD_REFERENCE.md](NOVEL_WORLD_REFERENCE.md), 메시 연결은 [RESOURCE_WORLD_INTEGRATION.md](RESOURCE_WORLD_INTEGRATION.md)를 우선한다. 아래의 옛 세계관·수치·리소스는 현재 확정 기준이 아니다.
+
 # ADBS Phase 1 — Doll 2명과 구조 상황 1개
 
 사용자 첨부 ADBS 설계의 최소 단계만 구현한다. 유전 알고리즘·전략 개체군·Fitness·모방·Commander Profile·소대 문화·Save/Load는 구현하지 않았다. 반복 실행만으로 Trait가 학습되지 않는다. 20회 임무 후 학습 분화는 이번 단계의 검증 목표가 아니다.

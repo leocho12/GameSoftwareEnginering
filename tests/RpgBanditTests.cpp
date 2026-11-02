@@ -1,4 +1,4 @@
-// Link RpgGame, RpgEconomy, RpgBandits, RpgWorld, WorldSimulation, TownNpc, TownKnowledge, DollBehavior.
+// Link RpgGame, RpgEconomy, RpgBandits, RpgWorld, RpgExpedition, WorldSimulation, TownNpc, TownKnowledge, DollBehavior.
 #include "../BaseProject_SE/SimpleGame/RpgGame.h"
 #include <cassert>
 #include <cmath>
@@ -26,26 +26,18 @@ void Advance(RpgGame &game, int frames)
 int main()
 {
     RpgGame game;
-    for (unsigned seed = 0; seed < 8; ++seed)
+    game.Reset(42);
+    assert(game.enemies.size() == 200 && game.banditGroups.size() == 40);
+    for (int corridor = 0; corridor < 4; ++corridor)
     {
-        game.Reset(seed);
-        assert(game.enemies.size() == 9 && game.banditGroups.size() == 3);
-        for (int band = 0; band < 3; ++band)
-        {
-            int count = 0;
-            const auto &camp = game.banditGroups[band].camp;
-            for (const auto &enemy : game.enemies)
-                if (enemy.band == band)
-                {
-                    ++count;
-                    assert(enemy.hp > 0 && game.Fits(enemy.position));
-                    assert(!TownNpc::InTown(enemy.position.x, enemy.position.z));
-                    assert(std::hypot(enemy.position.x - camp.x, enemy.position.z - camp.z) < 4);
-                    assert(std::hypot(enemy.position.x - game.player.x,
-                                      enemy.position.z - game.player.z) > 14);
-                }
-            assert(count == 3);
-        }
+        int count = 0;
+        for (const auto &enemy : game.enemies)
+            if (enemy.band / 10 == corridor)
+            {
+                ++count;
+                assert(enemy.hp > 0 && game.Fits(enemy.position));
+            }
+        assert(count == 50);
     }
     Isolate(game);
     game.enemies.push_back({{3.5f, 3}, 40, 40});
@@ -73,31 +65,25 @@ int main()
     assert(game.enemies[1].provokedUntil > game.time);
     assert(game.enemies[2].provokedUntil < game.time);
 
-    // A wiped camp cannot refill immediately, even when the player has left it behind.
     Isolate(game);
-    game.banditGroups.push_back({{100, 100}, {100, 100}});
-    game.enemies.push_back({{100, 100}, 0, 40});
-    game.enemies[0].band = 0;
-    Advance(game, 120);
-    assert(game.enemies[0].hp == 0);
-    assert(game.banditGroups[0].respawnTimer > 40);
-
-    Isolate(game);
-    assert(!game.PatrolReady());
-    game.AddExperience(100);
-    assert(game.level == 3 && !game.PatrolReady());
-    game.drops = {{{3, 3}, false}, {{3, 3}, true}};
-    game.Pickup();
-    assert(game.itemsCollected == 2 && game.PatrolReady());
+    assert(!game.QuestReady());
+    game.visitedVillages.fill(true);
+    game.kills = 12;
+    assert(!game.QuestReady()); // Old kill/visit counters cannot complete a rescue.
+    game.expeditionState.rescue.stage = expedition::RescueStage::Returned;
+    assert(game.QuestReady());
     TownNpc guard;
     guard.role = NpcRole::Guard;
     guard.position = {3, 3};
     game.npcs.push_back(guard);
-    int scrap = game.scrap;
+    int silver = game.silver;
     game.InteractNpc();
-    assert(game.patrolReported && game.scrap == scrap + 5);
-    game.InteractNpc();
-    assert(game.scrap == scrap + 5);
+    assert(game.silver == silver); // Opening the dialogue never awards a quest.
+    game.NpcChoice(3);
+    assert(game.expeditionState.rescue.stage == expedition::RescueStage::Completed);
+    assert(game.silver == silver + 12);
+    game.NpcChoice(3);
+    assert(game.silver == silver + 12);
     game.Reset(42);
-    assert(game.itemsCollected == 0 && !game.patrolReported);
+    assert(game.itemsCollected == 0 && !game.QuestReady());
 }

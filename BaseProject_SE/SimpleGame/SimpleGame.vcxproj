@@ -158,11 +158,14 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="CharacterAnimation.h" />
     <ClInclude Include="DollBehavior.h" />
+    <ClInclude Include="WorldResources.h" />
+    <ClInclude Include="NovelWorld.h" />
     <ClInclude Include="TownNpc.h" />
     <ClInclude Include="GameMonitor.h" />
     <ClInclude Include="WorldSimulation.h" />
     <ClInclude Include="NpcMind.h" />
-    <ClInclude Include="RpgGame.h" /><ClInclude Include="GridTypes.h" />
+    <ClInclude Include="RpgGame.h" />
+    <ClInclude Include="ExpeditionRules.h" /><ClInclude Include="GridTypes.h" />
     <ClInclude Include="RenderEffects.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -176,12 +179,14 @@
     <ClCompile Include="TownNpc.cpp" />
     <ClCompile Include="WorldSimulation.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="GameMonitor.cpp" />
+    <ClCompile Include="WorldResources.cpp" />
     <ClCompile Include="RpgWorld.cpp" />
     <ClCompile Include="RendererWorld.cpp" />
     <ClCompile Include="TownKnowledge.cpp" />
     <ClCompile Include="RpgEconomy.cpp" />
     <ClCompile Include="RpgBandits.cpp" />
     <ClCompile Include="RpgGame.cpp" />
+    <ClCompile Include="RpgExpedition.cpp" />
     <ClCompile Include="RenderEffects.cpp" />
     <ClCompile Include="SimpleGame.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -207,19 +212,14 @@
     <IntDir>$(ProjectDir).build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Target Name="CopyTutorialAssets" AfterTargets="Build">
-    <ItemGroup>
-      <NarrativeAssets Include="$(ProjectDir)Assets\AI\*.tsv" />
-      <TutorialAssets Include="$(ProjectDir)Assets\*.png" />
-      <GflAssets Include="$(ProjectDir)Assets\GFL\*.png;$(ProjectDir)Assets\GFL\*.gfa;$(ProjectDir)Assets\GFL\manifest.json" />
-    </ItemGroup>
-    <MakeDir Directories="$(OutDir)Assets" />
-    <MakeDir Directories="$(OutDir)Assets\AI" />
-    <Copy SourceFiles="@(NarrativeAssets)" DestinationFolder="$(OutDir)Assets\AI" SkipUnchangedFiles="true" />
-    <MakeDir Directories="$(OutDir)Assets\GFL" />
-    <Copy SourceFiles="@(GflAssets)" DestinationFolder="$(OutDir)Assets\GFL" SkipUnchangedFiles="true" Condition="'@(GflAssets)' != ''" />
-    <Copy SourceFiles="@(TutorialAssets)" DestinationFolder="$(OutDir)Assets" SkipUnchangedFiles="true" Condition="'@(TutorialAssets)' != ''" />
-  </Target>
+
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <Target Name="CopyWorldResources" AfterTargets="Build">
+    <ItemGroup>
+      <WorldAssets Include="$(ProjectDir)Assets\World\kingdom.rpack;$(ProjectDir)Assets\World\manifest.json" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutDir)Assets\World" />
+    <Copy SourceFiles="@(WorldAssets)" DestinationFolder="$(OutDir)Assets\World" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

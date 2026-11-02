@@ -174,6 +174,7 @@ out vec3 world;
 out vec4 shadowPos;
 out vec4 tint;
 out float distanceEye;
+out vec3 resourceUv;
 void main(){
  vec4 eye=gl_ModelViewMatrix*gl_Vertex;
  gl_Position=gl_ProjectionMatrix*eye;
@@ -183,16 +184,19 @@ void main(){
  shadowPos=shadowFromEye*eye;
  tint=gl_Color;
  distanceEye=length(eye.xyz);
+ resourceUv=gl_MultiTexCoord0.xyz;
 })GLSL";
 const char *litFs = R"GLSL(#version 130
 uniform sampler2D shadowMap;
 uniform sampler2D grassMaterial;
 uniform sampler2D roadMaterial;
 uniform sampler2D metalMaterial;
+uniform sampler2D resourceAtlas;
 uniform float clockTime;
 uniform int material;
 uniform int useShadow;
 in vec3 normalEye;in vec3 normalWorld;in vec3 world;in vec4 shadowPos;in vec4 tint;in float distanceEye;
+in vec3 resourceUv;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1)),f.x),f.y);}
 void main(){
@@ -211,8 +215,7 @@ void main(){
   base=mix(base,vec3(0.14,0.19,0.12),noise(world.xz*0.5)*0.18);
  }else if(material==2){
   base = mix(base, texture2D(roadMaterial, world.xz * 0.25).rgb, 0.88);
-  float marking=(1.0-step(0.075,abs(fract(world.x*0.25)-0.5)))*step(0.35,fract(world.z*0.28));
-  base=mix(base,vec3(0.58,0.52,0.33),marking*0.65);
+  base *= 0.92 + noise(world.xz * 6.0) * 0.16;
  }else if(material==3){
   float waves=sin(world.x*4.5+clockTime*1.6)*sin(world.z*3.5-clockTime)+noise(world.xz*3.0+clockTime*0.2);
   base=mix(vec3(0.035,0.15,0.16),vec3(0.18,0.39,0.37),waves*0.22+0.38);
@@ -222,19 +225,26 @@ void main(){
     vec3 axis = abs(normalize(normalWorld));
     vec2 surface = axis.y > axis.x && axis.y > axis.z ? world.xz :
         (axis.x > axis.z ? world.zy : world.xy);
-    vec4 metal = texture2D(metalMaterial, surface * 0.25);
-    float ribCoordinate = surface.x * 5.0;
-    float ribWidth = max(fwidth(ribCoordinate), 0.001);
-    float rib = 1.0 - smoothstep(0.055 - ribWidth, 0.055 + ribWidth,
-        abs(fract(ribCoordinate) - 0.5));
-    rib *= 1.0 - smoothstep(0.2, 0.7, ribWidth);
-    base = mix(base * metal.rgb * (1.0 - rib * 0.18),
-        vec3(0.32, 0.16, 0.08), metal.a * 0.58);
+    float board = abs(fract(surface.y * 3.0) - 0.5);
+    float seam = 1.0 - smoothstep(0.012, 0.045, board);
+    float grain = noise(vec2(surface.x * 9.0, surface.y * 0.8));
+    base *= 0.76 + grain * 0.35 - seam * 0.22;
  }
  else if (material == 5)
  {
     base = mix(base, texture2D(grassMaterial, world.xz * 0.25).rgb, 0.90);
     base *= 0.88 + noise(world.xz * 0.18) * 0.24;
+ }
+ else if (material == 8)
+ {
+    float tile = floor(resourceUv.z + 0.5);
+    vec2 cell = vec2(mod(tile, 8.0), floor(tile / 8.0));
+    vec2 atlasUv = (cell * 260.0 + 2.0 + fract(resourceUv.xy) * 256.0) / 2080.0;
+    base = tint.rgb * texture2D(resourceAtlas, atlasUv).rgb;
+ }
+ else if (material == 7)
+ {
+    base *= 0.90 + noise(world.xz * 2.0 + world.y * 4.0) * 0.16;
  }
  else if (material == 6)
  {
@@ -507,6 +517,7 @@ void RenderEffects::Lit(const GLdouble *view, float time, int material)
     glBindTexture(GL_TEXTURE_2D, shadowDepth);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(glGetUniformLocation(litProgram, "shadowMap"), 1);
+    glUniform1i(glGetUniformLocation(litProgram, "resourceAtlas"), 0);
     const char *samplers[] = {"grassMaterial", "roadMaterial", "metalMaterial"};
     for (int i = 0; i < int(terrainMaterials.size()); ++i)
     {
@@ -713,10 +724,13 @@ void RenderEffects::CreateSprites()
                     g.FillEllipse(&outline, 49, 51, 5, 7);
                     g.FillEllipse(&outline, 76, 51, 5, 7);
                     g.FillRectangle(&coat, 23, 77 + int(swing * .4f), 19, 37);
-                    g.FillRectangle(&outline, 72, 81, 43, 12);
-                    g.FillRectangle(&outline, 101, 77, 19, 7);
+                    g.FillRectangle(&outline, 103, 54, 5, 87);
+                    g.FillEllipse(&accent, 98, 43, 15, 20);
                     g.FillRectangle(&accent, 47, 84, 12, 14);
                     g.FillRectangle(&outline, 55, 99, 10, 20);
+                    Point robe[] = {Point(42, 83), Point(85, 83), Point(96, 126), Point(31, 126)};
+                    g.FillPolygon(&coat, robe, 4);
+                    g.FillRectangle(&accent, 40, 99, 47, 5);
                 }
             }
             Rect rect(0, 0, 512, 640);

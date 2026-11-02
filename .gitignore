@@ -39,3 +39,13 @@ BaseProject_SE/SimpleGame/.build/
 # Runtime AI prototype logs
 **/Profiles/adbs*.jsonl
 **/Profiles/npc_ai*.jsonl
+
+# Per-PC Blender connection settings and last probe result
+tools/blender/local.settings.json
+tools/blender/connection.local.json
+
+# Novel world and resource rendering diagnostics
+**/Profiles/novel_world*.jsonl
+**/Profiles/monster_ai*.jsonl
+**/Profiles/resource_render*.jsonl
+**/Profiles/economy*.jsonl

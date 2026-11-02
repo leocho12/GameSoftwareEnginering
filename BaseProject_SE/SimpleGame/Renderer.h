@@ -2,6 +2,7 @@
 #include "RpgGame.h"
 #include "RenderEffects.h"
 #include "CharacterAnimation.h"
+#include "WorldResources.h"
 #include "Dependencies/glew.h"
 #include <array>
 #include <string>
@@ -27,6 +28,7 @@ class Renderer
     bool cameraReady = false, shadowPass = false;
     float zoom = 9;
     RenderEffects effects;
+    WorldResources resources;
     std::array<CharacterAnimation, 8> characters;
     std::array<GLuint, 8> characterTextures{};
     std::array<GLuint, 3> portraits{};

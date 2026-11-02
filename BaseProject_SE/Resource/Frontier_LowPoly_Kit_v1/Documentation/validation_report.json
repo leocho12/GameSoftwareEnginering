@@ -1,0 +1,2561 @@
+{
+  "blender_version": "5.2.2 LTS",
+  "checks": [
+    {
+      "file": "Animals/Deer.glb",
+      "format": "GLB",
+      "meshes": 11,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "80178793b1a244df1d275dc557c3485e63a05b6c57b0e1b9d49c65e4ee45526f",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Antlers.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "fb6ef4820b63cce141701644eefac6eea3bd8e0fdc881a8f05a1e254fe67d1e1",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Body.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "0f02eeedebfe0c2ad5aacde995b1a758d18f25547010859fd20cb678dad48fa7",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Ears.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "64655957a4afb9666a3fd21ad8674d8e2c660f173694598deca32bedd3cd6ede",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Head.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "0966060b88c725cd816ff150b220caccb200c0d2b8426a44f7b00513e13e23e8",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Jaw.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9e43cd201409a41f70657b06ae1eab60f7cf31ccdaa83ba280e32ff6c1abc4cf",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_F_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "c1ae7aa8a60d8e9c4adb9a7698c99a3dfff46f38e01d5475c72a37013ec86b7f",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_F_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "38e1dec202e81cf2f1c2840cf23339966df29cf0b5665e30f20233e22616c6d6",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_H_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "32c3e0bc598ba06f34f8fcda15757434f02ca1bb109b40e8c0f11e05f1f3c787",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_H_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9f20d4003e289bc7887219c30a0ac9c10684d8e8a513d39d221b8d3408414418",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Neck.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "8a662030b8eb8faae1641c5bbebd88f2e10ce8ad58a9f37d7a4fd89868ba3a15",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Tail.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "2098fd75836ba55be0c4242dcebb060c9ff77e3d68b62e5d55cb5d4a8c88059e",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox.glb",
+      "format": "GLB",
+      "meshes": 10,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "6148d65d594b3e1438e7a6e92310f6deabada9e3139beb73159dadd1fc5692fc",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Body.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "cf4643e5c5c6782944bc21c1424db2fc3b095516a9900e513e008fe016ea4883",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Ears.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "1e5d5f19dc9b36319f2113410674345442c907d746ad081bdd49e87d0a6ee34e",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Head.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "28a7496185aeaa5216b6e79b3118db357520e662cc0606af9fd0ddd8e73f5821",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Jaw.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "3e07974c6d04d19985253055090cc4e3186147d99ccd32158635d84204cfe995",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_F_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "e3536b20d471d43ca02e4c470a80c86f20b1318e9683fbf1f15f89549b9d5dc8",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_F_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9f47800b4502e2336b57613c8729a496218402225541ff69c49591ad6e07619b",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_H_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "4dbbc86899497684eab837562d91efb43d1ed2e43c61a3b01abf17cb3f1fce7c",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_H_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "bcc751a625e1c29acc24f8ff0434f7884eef423aee36280830339ff1f07db33c",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Neck.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "170ccaed50c1e81b11db776bcfa8e8c1b00556b8d262f5f60039f3b47faa1f7f",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Tail.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "4a26560914baa3200de5102955c4e0d934b9add27c74ac91db8f970744ebc6fd",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger.glb",
+      "format": "GLB",
+      "meshes": 10,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "f53d24ae5b94698e8493a9200c02fb1763ac021e4baccce25042178d9f1aeb3c",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Body.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b49437048da76ea21d710638c747d5be0415a12c448f6668e03b1ede116839b4",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Ears.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ee8eda05b37693681ecbd589bc93adb08ca9e4212c4d20340371871992657f33",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Head.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "8b65548468561481be965347b225240cbcb8093f908eaed73d2d65084ee8488e",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Jaw.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "54bc1ddc068be87ea2fdd3a51d901cfad544926e63e670d86c9679af89e31e73",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_F_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "c7cc0cd1fa4a0415cf037e176fb99382580d59cd83d705991ea6bc48d2c9a042",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_F_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "18327ebc8c10245dcd341c6da190a5d743cf3737e65eb84b4a2c586cf9c9f490",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_H_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "00e1d955c5c8ea6d466217cde10d56ee406af5289674456e85c6b6c0da06fd05",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_H_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "1a8c317471d8991277d15d33311650de6196dc56c3c8de85ab51a2b1b70754cc",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Neck.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "0cb3b2e4edce1c03cc6a2f16aa1e4ce31a53197824eefe7b77b3fba4d8f1280a",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Tail.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "5d0a94911400311060410cd0ad0277b6df1593b69882c3a3c236e6b4cde89568",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf.glb",
+      "format": "GLB",
+      "meshes": 10,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "e0bc970ca061d395832620c4d855ef9b9df0190d3a25417b0e8cb07ebccd9b33",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Body.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b8fddcc79355d586d7a8d019fa3be941e6b0428947a6eaba630c5dd231c3b518",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Ears.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "dec70c044fd2ae87728cab0324f15cc20351ec1e9fbfefebe8f89ab22f5e0f7f",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Head.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b55378ba6aed7d70baf51740bd67670d1bf4045e2b7f606b247147a2bd18a580",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Jaw.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "2be1bcc8fa913fd72716aac42c0a51efb54733145f2fb4657b5db5c46ce8fe22",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_F_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "4f1d96c2e3835dcd04a2c5c40d95ca1674c91f51c6f1f85377bbd4ccdcd26505",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_F_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "962bc89476eeb1e14db2210afd30c74f302d766d6f71dac5d0fdc8e600662328",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_H_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "97f7c393efe064c616865f4c472041061255a90a72b0fb32e932d3ae784bb0b8",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_H_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9a003944d972fd87cdf5a59189fd8d2e708f39b918eedfb565a97f1a58326979",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Neck.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "42b0be4ae85a5b3ee60576a3662d6615f0a1c877aa28deb9c7800d65aeec614e",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Tail.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "714d00e79b18e0132b6d8a48b2507699dd72b0534a6fb8be8b783d8572c115ad",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Accessory_Backpack.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "cde7c2f4da378e0d403466a3a935fa7730af1ec5a2e3778a9849eae8b06598e2",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Accessory_Cap.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "546cb9b72f14dcc33d70807d050ed74e2e9b6b90bb7eaefa05997481be3fac33",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Accessory_TacticalVest.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "79d76424fab5ce0a1a864719b9a80b18ca96cd5f1614da2b1ab154ce96039c74",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Boot_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "0bd61a1bb4d403eea22ea608e1e775084a755eee58fc0c74ee9c44bfb2bd5967",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Boot_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "1413dcb71f72d2deee7af7bf4206c178fb53ffd0aa40b15043e01e45fef71cd2",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Face_Alert.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "d5ba2674bc04af08ba7b409a40faef2bed53bba128a93591602294874a6a637b",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Face_Calm.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "5c938609069c6c716b40693a4d3e3d03ae0e5f09e61347d1d49113b696a76ac9",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Glove_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "de43e850d7b9850b69ae41e93c9499586a489d464e3e22dd1a4d52e44095b219",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Glove_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9eed04c21e9373bb5b741924650cb46f40dd3baebba2cacf5c8f5ab7c17763c5",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Hair_Bob.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "a3c6370c1efa62f92b39f1848827c86a56289605dec1d34140e07af04c64c8bf",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Hair_Crop.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "517db7aa67944cf64b91558dba1cc30992ff56e2b09204d5a4bf86f5cf00c88b",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Hair_Tied.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "078caaa58cb2917286c3ed191894e736e86bce1800a65ca6e4fad96bee756d54",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Head_A.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "6245907b80f1966f7859d892b543ac7020f17f0ab1c8f8b820b6b53ff028942e",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Head_B.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "744be3a46447e6032a3f9ca09746488ed725a4636e30028b4644670f6961145e",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Leg_Trousers_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9dec94f0924d0c5fe57f7d5267d927f3e16032406bebe87cadcaadaeb290289a",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Leg_Trousers_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ab53f83ea93f0e41d8adf022ce1d2d932fa677bac66398257e5f4c46bf24697f",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Pelvis_Trousers.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "4cdb0944023cade0d982666cab4bf1a5b4f212d35928d08e824f7703ded47817",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_CivilianShirt_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "a4053dcc1f0c3707e2e01a72d4296cd358895297ef6718766e782aa8a5c19ee7",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_CivilianShirt_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "bdb6d7d1e36986e01954fb72c60ede42c82f1e0bec9639633281cf0946bdadfb",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_FieldJacket_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "5803ec0c55d959cc54a0544e6f34e579da87fd5962e446bb220e8ca1d9d699de",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_FieldJacket_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "903cc1d9705baf18ea61af8e1433695332d75b750a98bee44598b4906125634e",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_WorkerCoat_L.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "06bfb193894ee2b8ca456be7abcdb20923df140d0dd58422a5013dc48a3f0e66",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_WorkerCoat_R.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b02c75fa9803caa653288d7b2af6dd6105ade132711564ae1b518bb961ae6a43",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Torso_CivilianShirt.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "8783f549e8827e7fe94531b528bef36f7c8d7978deb5347e23d312cd87b75763",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Torso_FieldJacket.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "83e42b71aabe8e5c4e8931f667c2e5e65f53a2577b1ae4ef45b7243233d7044e",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Torso_WorkerCoat.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 1,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "81e7aca29e394381682dc3b21702b1273127994f53f4e9f3be1ae3b2c2b5cbce",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/NPC_Resident.glb",
+      "format": "GLB",
+      "meshes": 13,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "5b800b063b6532ad5ebda17dcdbe44ac7f8a78175ef695dce39db450f998219a",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/NPC_Scout.glb",
+      "format": "GLB",
+      "meshes": 14,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "36a01429457724bca7434be66e8dd6efa5bc95361353e053553f448888879151",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/NPC_Worker.glb",
+      "format": "GLB",
+      "meshes": 14,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "b1362a3549e711382f66e2c8166c100037abcfefd74a78c9bc2a95fac0e84c7e",
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/Player_Commander.glb",
+      "format": "GLB",
+      "meshes": 15,
+      "skins": 1,
+      "clips": [
+        "Attack",
+        "Crouch",
+        "Crouch_To_Stand",
+        "Crouch_Walk",
+        "Idle",
+        "Jump",
+        "Jump_Air",
+        "Jump_Land",
+        "Jump_Start",
+        "Pose_Crouch",
+        "Pose_Neutral",
+        "Pose_Turn_L45",
+        "Pose_Turn_R45",
+        "Run",
+        "Stand_To_Crouch",
+        "Turn_L90",
+        "Turn_R90",
+        "Walk",
+        "Walk_Start",
+        "Walk_Stop"
+      ],
+      "loop_endpoints_checked": [
+        "Crouch",
+        "Crouch_Walk",
+        "Idle",
+        "Jump_Air",
+        "Run",
+        "Walk"
+      ],
+      "sha256": "e50eef6336d085722f8c13631faa34d2c89671fd17ef3bd31b0f7e2c70a0cc2c",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Bush_01.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "940692818d54b683a59ed3742bcf07faf35a041e8e30520d6d0dc8d54ea7906b",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Bush_02.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "bfacfffbe9d7137130854f677a758bbe96131d1f37cda419c88b511235d1f188",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Bush_03.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "7fdd9ae307d0465813581edb5ff577199d6735ab66605533db695e68c4455aeb",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Grass_Patch_01.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "fd6b4856f9f880a4a05a97e8db456968790009702ba089d2bdb696f69472bcf5",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Grass_Patch_02.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ad6374e1af5db3c680ce9152136f6ec49342c75e9a7973e5aff0404ff942a357",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Grass_Patch_03.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "5c7ea97059052411b417c05add3373e0f067c2552f94420bfc81b403d6343d64",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Log_Fallen.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "2cb8e4cf0853a02ce1959986c03d6d50c40df6deb703b838503a3d83bd06f479",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Path_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "d720ed9284baab8a55a415d07c25065273785bc81be0f6223c8819ba6ba406eb",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Reed_Patch.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b679f63d0d5fb1f868178b503ea1ea8e2690d08b4bdb0f9fa4193ce223b1b303",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_01.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "f954a029d98404d03270d08acf126d6651baca56f0e29fbb91f34a08981a6bbc",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_02.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "5757460f424d930b1506f47e5b79e95685b70fc0f565efed17dc0d0695d2ffbd",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_03.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "bff0c82d4970224780f5bc6b2c4b078d0f037f0009c4a1a21e9a1b3d2f273639",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_04.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "2a812bc14c6476281e310986ec9df78c676e6ed015c95770f16011b16521b2ba",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Concrete_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "79b05df76d710ea954992f7bd002f3f7752057522eebb8557f165a9d35640e3c",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Grass_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "76a82e090291147865e5d065f3bc6c993bd384860d6962bb42a2b41c19022d14",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Rock_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "8fa49e1fd837ef8c699a562250263e997614e3af07cd78aebf7d64931b80473b",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Soil_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "650251ba7b845eeb5230e2bf19737f9f502179372e07cb9e5e61539654e9acc6",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Broadleaf_01.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "df06664a69ee9a1973f8a460068a6ac9e3adbde5dd091a69cd67ba3990f69fc2",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Broadleaf_02.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "59429ab70641ce7e36e151ec939435b26fb13a3471cd3d3d142426fea992090e",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Broadleaf_03.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "7fa9279a8a7e7f6543d29b9fbc1f5ea6a6f140908b8bd86d33b1f2b6fd6113ae",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Dead.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "4625dea5ef15d47f4055b92c25a3783fa211ce79b696efc05f80bb7e26f43bb0",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Pine_01.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "64289fa285c71ab5bd0c713e4a1060223d400639df7a75748e97303b03b83d2a",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Pine_02.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "a01800c01838c3354b8d44e24ae1fe9eb93c649988d544f398fbc1ab3ba6d209",
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Stump.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "e10a3f97b76d37401dbc62bc31671ef3d0494424b59ab30da8cb02a417ab93f1",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Home_Prefab.glb",
+      "format": "GLB",
+      "meshes": 18,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "1a70580ba02f9cd803e25276d85b1c822ba2872733e6aa70a77d8f71108d6473",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Axe.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "d7c4aedfb97854cd19630cd5575d55f6e62b59c9907022385c32be3a97e4d404",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Barrel_Steel.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "3718bab8fc3274cb0376e1eb15879b33875a307fe73da2f876a283318cf77d68",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Beam_Timber_2m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "12f535ede747b5b4be742a8fc9a5b7016d19bb59c800fadfece0fd279072e686",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Bed_Field.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "1defdb79ae2c0eeb3305d7d249624ead2c8c25482ae99f7b7d97819a185b9d76",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Bucket.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "7755619ac2569b56282aeb8b233e1ffdd3e60e4958a0f14c2606c95af384c150",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Chair.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "457eb787f8c9a2f36adacf7adbcac573eb9d69bb67f61fb41abc2feb4edab4a7",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Concrete_Barrier.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "2f08cca46ea7ea397694516a1d33466d06942ee41cc0208cc886ddcd45b63347",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Cooking_Pot.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ad325061d147b7ce99b908ad50753e2c9cfc25d5871948dd714060e85130edd0",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Door_Timber_0p92x2p05.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9e3ded952d79ef5f3178b85f968c16941a5ef679de44e4d02def8b489a15e51b",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Fence_Timber_2m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "9b02aad60e8f7b767ea948d934e823e262b5ae8d4004ff64fd03aa523d81eb3b",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Floor_Concrete_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "d3b3061dab7ab1348d7187e234861b33b050f5b7bfdfa25cb1ce455df02ae306",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Floor_Timber_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "17bcd050323d273fe1ce26e3608474787e3688774646f6a53d650df1ece1caae",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Jerrycan.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ee5f6c145b23e6857ad7737bc619abbf2f42b2a777a71aa78ef541beaff3a22c",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Lamp_Utility.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "edd7287f5602870183776c461687dfe46b2045184bd1c954e05b5b57263543b8",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Post_Timber_2p6m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "3e70a447eafe9c6cd9af6469224037b5543734c83617d67f53ee2d67d8ac4c67",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Flat_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "c437e2896f1c11a95afecd707d3cd9c001a89e579e11d86523f710c6ebde84e5",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Gable_4m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "16c803e52c58c75d575af5adfc687406e1eb977b5559626ff1fe8cb79e5bc77a",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Slope_L_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "4750866e0089377b58054c6087f3ffedd57c22f88b0138479c1faf3370bf4bb1",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Slope_R_2x2.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "3299c63d4eea8f97ecfbaff7968f7da8cc334df2df39d9e9811b10d453acd658",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Sack.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ae0aa716f7a2e6d0b8f6aa1c80c90dc8a6fd8da285ac9278a6f93f765834d096",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Sandbag_Barrier.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b34e9c623d2ae4040a5cd4e8eb0692f405f204880119d971d71b0910191ca7ae",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Shelf_Metal.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "f4e1ee7d40063034d18c7a725b7f5a6547a71e5fd57ca3587ccb363f28a0525c",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Shovel.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "04fcecc8c27eb11351a3664ba2ed336ef49a8773f748d0dbd79fd152bb5f560b",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Stairs_Concrete_3step.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "aede78d38dcc4a951ad5625c7a437d30ce938deea40278395e02f6fb40069148",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Stool.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "b340b7ad89443526286afcf495148339018b5870aab221a9570eb100eade70e6",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Supply_Crate.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "76eacb2b71329998df9ac2a4d7684f49eccb7e9a16c736adb20d51174c048c97",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Table_Work.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "ecb0d87261372e3c7628cc4a8facf7e2c70f4022a7973423b7ab2823cbd60346",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Concrete_2m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "80cd3d8119b0bd8fa56cd59deede2f42fce00b53b7e1a04c41fb67cca18ec20e",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Doorway_2m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "14f6d56f5a478e4e3db0eea1c233a5542b7fae8561f01be187064f70e28b27f5",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Timber_2m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "7a02675fb9b97533d062792c24e75436c265c7c8620fc5796012628848368b40",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Window_2m.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "95a6cedb06e230ca757c241c468aebacf777c8cc8291782c5ad41cc6ad312118",
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Window_Frame_1x1.glb",
+      "format": "GLB",
+      "meshes": 1,
+      "skins": 0,
+      "clips": [],
+      "loop_endpoints_checked": [],
+      "sha256": "63863988d787d0f3ee3788b484ec2be0d198a4f42e4b2672ecb3d5792d6861b0",
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modular.blend",
+      "format": "BLEND",
+      "rigs": [
+        {
+          "name": "CERVID_DEER_v1",
+          "bones": 31,
+          "clips": 20,
+          "skin_weight_range": [
+            1.0,
+            1.0
+          ],
+          "unweighted_vertices": 0,
+          "bind_signature": "72928efec870597664e20af162ba28f77b32561aa710c9efeb6b963022ae15db"
+        }
+      ],
+      "meshes": 11,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modular.blend",
+      "format": "BLEND",
+      "rigs": [
+        {
+          "name": "CANINE_FOX_v1",
+          "bones": 31,
+          "clips": 20,
+          "skin_weight_range": [
+            1.0,
+            1.0
+          ],
+          "unweighted_vertices": 0,
+          "bind_signature": "f93ab2c0e5a933d9a1cdfd5bc051a88fd5c78beb02405285ace6ed34b94547b1"
+        }
+      ],
+      "meshes": 10,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modular.blend",
+      "format": "BLEND",
+      "rigs": [
+        {
+          "name": "FELINE_TIGER_v1",
+          "bones": 31,
+          "clips": 20,
+          "skin_weight_range": [
+            1.0,
+            1.0
+          ],
+          "unweighted_vertices": 0,
+          "bind_signature": "4c30a6ee544a96462dc46cb4ea2bd0a09d9790ef7043ab8d2f67978af610f676"
+        }
+      ],
+      "meshes": 10,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modular.blend",
+      "format": "BLEND",
+      "rigs": [
+        {
+          "name": "CANINE_WOLF_v1",
+          "bones": 31,
+          "clips": 20,
+          "skin_weight_range": [
+            1.0,
+            1.0
+          ],
+          "unweighted_vertices": 0,
+          "bind_signature": "fd017961a7c07afc6b7dc83c90e363174543205ce4cd16e2e3acccc1f9adfadc"
+        }
+      ],
+      "meshes": 10,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Human_Modular_Library.blend",
+      "format": "BLEND",
+      "rigs": [
+        {
+          "name": "HUM_7H_v1",
+          "bones": 46,
+          "clips": 20,
+          "skin_weight_range": [
+            1.0,
+            1.0
+          ],
+          "unweighted_vertices": 0,
+          "bind_signature": "8696d2b90ccb3893aeb4bc4982114b91f757cb59f1eccdb097de35916e011a3d"
+        }
+      ],
+      "meshes": 26,
+      "result": "pass"
+    },
+    {
+      "file": "Materials/Frontier_Materials.blend",
+      "format": "BLEND",
+      "rigs": [],
+      "meshes": 40,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Nature_Modular_Library.blend",
+      "format": "BLEND",
+      "rigs": [],
+      "meshes": 24,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Home_Prefab.blend",
+      "format": "BLEND",
+      "rigs": [],
+      "meshes": 65,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Settlement_Modular_Library.blend",
+      "format": "BLEND",
+      "rigs": [],
+      "meshes": 32,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 12,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Antlers.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Body.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Ears.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Head.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Jaw.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_F_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_F_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_H_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Leg_H_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Neck.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Deer_Modules/Tail.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 11,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Body.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Ears.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Head.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Jaw.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_F_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_F_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_H_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Leg_H_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Neck.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Fox_Modules/Tail.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 11,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Body.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Ears.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Head.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Jaw.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_F_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_F_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_H_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Leg_H_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Neck.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Tiger_Modules/Tail.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 11,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Body.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Ears.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Head.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Jaw.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_F_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_F_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_H_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Leg_H_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Neck.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Animals/Wolf_Modules/Tail.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Accessory_Backpack.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Accessory_Cap.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Accessory_TacticalVest.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Boot_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Boot_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Face_Alert.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Face_Calm.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Glove_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Glove_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Hair_Bob.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Hair_Crop.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Hair_Tied.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Head_A.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Head_B.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Leg_Trousers_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Leg_Trousers_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Pelvis_Trousers.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_CivilianShirt_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_CivilianShirt_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_FieldJacket_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_FieldJacket_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_WorkerCoat_L.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Sleeve_WorkerCoat_R.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Torso_CivilianShirt.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Torso_FieldJacket.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Modules/Torso_WorkerCoat.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 2,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/NPC_Resident.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 14,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/NPC_Scout.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 15,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/NPC_Worker.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 15,
+      "result": "pass"
+    },
+    {
+      "file": "Characters/Presets/Player_Commander.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 16,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Bush_01.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Bush_02.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Bush_03.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Grass_Patch_01.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Grass_Patch_02.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Grass_Patch_03.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Log_Fallen.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Path_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Reed_Patch.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_01.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_02.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_03.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Rock_04.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Concrete_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Grass_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Rock_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Terrain_Soil_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Broadleaf_01.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Broadleaf_02.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Broadleaf_03.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Dead.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Pine_01.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Pine_02.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Nature/Modules/Tree_Stump.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Home_Prefab.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 33,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Axe.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Barrel_Steel.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Beam_Timber_2m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Bed_Field.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Bucket.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Chair.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Concrete_Barrier.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Cooking_Pot.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Door_Timber_0p92x2p05.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Fence_Timber_2m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Floor_Concrete_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Floor_Timber_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Jerrycan.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Lamp_Utility.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Post_Timber_2p6m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Flat_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Gable_4m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Slope_L_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Roof_Slope_R_2x2.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Sack.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Sandbag_Barrier.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Shelf_Metal.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Shovel.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Stairs_Concrete_3step.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Stool.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Supply_Crate.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Table_Work.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Concrete_2m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Doorway_2m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Timber_2m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Wall_Window_2m.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    },
+    {
+      "file": "Settlement/Modules/Window_Frame_1x1.glb",
+      "format": "BLENDER_GLB_IMPORT",
+      "meshes": 1,
+      "result": "pass"
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "scope": "Local Blender files and GLB structure, weights and animation round-trip only. Game import/playback is not tested.",
+  "stance_contact_checks": [
+    {
+      "rig": "HUM_7H_v1",
+      "stance_contacts": [
+        {
+          "clip": "Walk",
+          "stance_ankle_height_max_error_m": 2.3e-05,
+          "min_error_m": 1.7e-05,
+          "max_error_m": 2.3e-05
+        },
+        {
+          "clip": "Run",
+          "stance_ankle_height_max_error_m": 2.6e-05,
+          "stance_fraction": 0.38
+        }
+      ]
+    },
+    {
+      "rig": "FELINE_TIGER_v1",
+      "stance_contacts": [
+        {
+          "clip": "Walk",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        },
+        {
+          "clip": "Run",
+          "stance_ankle_height_max_error_m": 0.003113,
+          "min_error_m": -0.0,
+          "max_error_m": 0.003113
+        }
+      ]
+    },
+    {
+      "rig": "CANINE_WOLF_v1",
+      "stance_contacts": [
+        {
+          "clip": "Walk",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        },
+        {
+          "clip": "Run",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        }
+      ]
+    },
+    {
+      "rig": "CANINE_FOX_v1",
+      "stance_contacts": [
+        {
+          "clip": "Walk",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        },
+        {
+          "clip": "Run",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        }
+      ]
+    },
+    {
+      "rig": "CERVID_DEER_v1",
+      "stance_contacts": [
+        {
+          "clip": "Walk",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        },
+        {
+          "clip": "Run",
+          "stance_ankle_height_max_error_m": 0.0,
+          "min_error_m": -0.0,
+          "max_error_m": 0.0
+        }
+      ]
+    }
+  ],
+  "status": "passed",
+  "summary": {
+    "glb_files": 132,
+    "blend_files": 9,
+    "checks": 273,
+    "errors": 0,
+    "warnings": 0
+  }
+}

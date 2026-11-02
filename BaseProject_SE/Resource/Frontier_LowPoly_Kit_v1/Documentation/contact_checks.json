@@ -1,0 +1,86 @@
+[
+  {
+    "rig": "HUM_7H_v1",
+    "stance_contacts": [
+      {
+        "clip": "Walk",
+        "stance_ankle_height_max_error_m": 2.3e-05,
+        "min_error_m": 1.7e-05,
+        "max_error_m": 2.3e-05
+      },
+      {
+        "clip": "Run",
+        "stance_ankle_height_max_error_m": 2.6e-05,
+        "stance_fraction": 0.38
+      }
+    ]
+  },
+  {
+    "rig": "FELINE_TIGER_v1",
+    "stance_contacts": [
+      {
+        "clip": "Walk",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      },
+      {
+        "clip": "Run",
+        "stance_ankle_height_max_error_m": 0.003113,
+        "min_error_m": -0.0,
+        "max_error_m": 0.003113
+      }
+    ]
+  },
+  {
+    "rig": "CANINE_WOLF_v1",
+    "stance_contacts": [
+      {
+        "clip": "Walk",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      },
+      {
+        "clip": "Run",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      }
+    ]
+  },
+  {
+    "rig": "CANINE_FOX_v1",
+    "stance_contacts": [
+      {
+        "clip": "Walk",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      },
+      {
+        "clip": "Run",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      }
+    ]
+  },
+  {
+    "rig": "CERVID_DEER_v1",
+    "stance_contacts": [
+      {
+        "clip": "Walk",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      },
+      {
+        "clip": "Run",
+        "stance_ankle_height_max_error_m": 0.0,
+        "min_error_m": -0.0,
+        "max_error_m": 0.0
+      }
+    ]
+  }
+]

@@ -15,13 +15,13 @@ void Isolate(RpgGame &game)
     game.worldBodies.clear();
 }
 
-TownNpc Resident(int id, NpcRole role, float x, float z, int scrap)
+TownNpc Resident(int id, NpcRole role, float x, float z, int silver)
 {
     TownNpc npc;
     npc.id = id;
     npc.role = role;
     npc.position = npc.home = {x, z};
-    npc.scrap = scrap;
+    npc.silver = silver;
     return npc;
 }
 
@@ -36,12 +36,12 @@ int main()
 {
     RpgGame game;
     int from = 4, to = 1;
-    assert(game.TransferScrap(from, to, 3) && from == 1 && to == 4);
-    assert(!game.TransferScrap(from, to, 2));
-    assert(!game.TransferScrap(from, to, -1));
-    assert(!game.TransferScrap(from, from, 1));
+    assert(game.TransferSilver(from, to, 3) && from == 1 && to == 4);
+    assert(!game.TransferSilver(from, to, 2));
+    assert(!game.TransferSilver(from, to, -1));
+    assert(!game.TransferSilver(from, from, 1));
     to = std::numeric_limits<int>::max();
-    assert(!game.TransferScrap(from, to, 1));
+    assert(!game.TransferSilver(from, to, 1));
 
     Isolate(game);
     auto merchant = Resident(0, NpcRole::Merchant, 3, 3, 5);
@@ -49,14 +49,14 @@ int main()
     game.npcs.push_back(merchant);
     game.talkingNpc = 0;
     game.NpcChoice(1);
-    assert(game.scrap == 7 && game.npcs[0].scrap == 8);
+    assert(game.silver == 7 && game.npcs[0].silver == 8);
     assert(game.potions == 4 && game.npcs[0].potionStock == 0);
     game.NpcChoice(1);
-    assert(game.scrap == 7 && game.potions == 4);
+    assert(game.silver == 7 && game.potions == 4);
     game.NpcChoice(2);
-    assert(game.scrap + game.npcs[0].scrap == 15);
+    assert(game.silver + game.npcs[0].silver == 15);
     assert(game.potions == 3 && game.npcs[0].potionStock == 1);
-    game.npcs[0].scrap = 0;
+    game.npcs[0].silver = 0;
     game.NpcChoice(2);
     assert(game.potions == 3); // An insolvent merchant cannot create sale proceeds.
 
@@ -65,22 +65,22 @@ int main()
                  Resident(1, NpcRole::Merchant, 4, 3, 8),
                  Resident(2, NpcRole::Guard, 3, 4, 8)};
     assert(game.ResolveRobbery(0, 1));
-    assert(game.npcs[0].scrap == 5 && game.npcs[1].scrap == 5);
+    assert(game.npcs[0].silver == 5 && game.npcs[1].silver == 5);
     assert(!game.ResolveRobbery(0, 1)); // Cooldown prevents repeated transfers.
     Advance(game, 1);
     assert(game.npcs[2].criminalTarget == 0);
     assert(game.npcs[2].action == NpcAction::Attack);
     game.npcs[0].hp = 0;
     Advance(game, 1);
-    assert(game.npcs[0].scrap == 2 && game.npcs[1].scrap == 8);
+    assert(game.npcs[0].silver == 2 && game.npcs[1].silver == 8);
     game.RecoverStolenGoods(game.npcs[0]);
-    assert(game.npcs[1].scrap == 8); // Recovery is idempotent.
+    assert(game.npcs[1].silver == 8); // Recovery is idempotent.
 
     Isolate(game);
     game.npcs = {Resident(0, NpcRole::Outlaw, 3, 3, 2), Resident(1, NpcRole::Merchant, 4, 3, 8)};
     game.npcs[0].traits.aggression = .9f;
     Advance(game, 145);
-    assert(game.npcs[1].scrap == 5); // Autonomous selection, approach and robbery channel.
+    assert(game.npcs[1].silver == 5); // Autonomous selection, approach and robbery channel.
 
     Isolate(game);
     game.npcs.push_back(Resident(0, NpcRole::Guard, 3, 3, 8));
