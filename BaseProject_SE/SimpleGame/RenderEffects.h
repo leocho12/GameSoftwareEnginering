@@ -1,14 +1,17 @@
 #pragma once
-#include "Dependencies/glew.h"
+#include "Dependencies/stb/stb_truetype.h"
+#include <GL/glew.h>
 #include <array>
+#include <filesystem>
 #include <map>
 #include <string>
+#include <vector>
 
 // Compatibility-profile shader passes, Korean UI text and temporary sprite sheets.
 class RenderEffects
 {
   public:
-    void Initialize();
+    void Initialize(const std::filesystem::path &fontPath);
     void Resize(int w, int h);
     void Shutdown();
     bool BeginShadow(float centerX = 13, float centerZ = 12, float extent = 28);
@@ -41,12 +44,15 @@ class RenderEffects
     };
 
     std::map<std::string, Label> labels;
+    std::vector<unsigned char> fontBytes;
+    stbtt_fontinfo font{};
     std::array<std::array<GLuint, 8>, 4> sprites{};
     std::array<GLuint, 3> terrainMaterials{};
     GLuint sceneFbo = 0, sceneColor = 0, sceneDepth = 0, shadowFbo = 0, shadowDepth = 0;
     GLuint litProgram = 0, postProgram = 0, fireProgram = 0;
     GLuint contactProgram = 0;
     int width = 0, height = 0;
+    bool fontReady = false;
     GLdouble lightMatrix[16]{};
     Label &MakeLabel(const std::string &text, int pixels = 64);
     void CreateSprites();

@@ -47,7 +47,10 @@
 
 ## 기술·검증
 
-- BaseProject_SE/SimpleGame.sln, C++17/OpenGL/GLEW/FreeGLUT/Visual Studio v145, x64 중심.
+- BaseProject_SE/SimpleGame.sln, C++17/OpenGL/GLEW/GLFW. GLFW 3.5.1, GLEW 2.3.1, stb와 Noto Sans KR을 저장소에 포함하며, GLFW/GLEW는 정적으로 빌드한다.
+- Visual Studio 솔루션은 Windows Win32/x64용이다. 루트 CMake 프로젝트는 Windows와 X11 기반 Linux용 소스 빌드 경로를 제공한다.
+- 렌더러는 OpenGL 3.0 호환 프로필과 GLU, 고정 기능 호출을 사용한다. macOS OpenGL Core Profile 지원은 별도 렌더러 이행 전까지 대상이 아니다.
+- Windows GDI/GDI+/WIC 의존은 제거했다. 한글 UI 글꼴과 PNG 디코더는 포함된 Noto Sans KR/stb를 사용한다.
 - 활성: SimpleGame/RpgGame/RpgWorld/RpgBandits/RpgEconomy/RpgExpedition/ExpeditionRules/TownNpc/TownKnowledge/Renderer/RenderEffects/WorldResources/GameMonitor.
 - 옛 TutorialGame·TowerDefense·WorldSimulation/DollBehavior 스토리는 현행 기준이 아니다. 호환 소스가 남아도 활성 진입·옛 자료 로드는 막아 둔다.
 - NPC·마수·소문·월드·스키닝·정적 캐시·메시 draw call은 Profiles JSONL로 기록하고 파일을 회전한다.

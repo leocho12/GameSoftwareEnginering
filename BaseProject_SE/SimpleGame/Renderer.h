@@ -3,8 +3,9 @@
 #include "RenderEffects.h"
 #include "CharacterAnimation.h"
 #include "WorldResources.h"
-#include "Dependencies/glew.h"
+#include <GL/glew.h>
 #include <array>
+#include <filesystem>
 #include <string>
 
 class Renderer
@@ -81,5 +82,5 @@ class Renderer
               float r = .85f,
               float g = .89f,
               float b = .9f);
-    GLuint LoadPng(const std::wstring &path, float &aspect);
+    GLuint LoadPng(const std::filesystem::path &path, float &aspect);
 };

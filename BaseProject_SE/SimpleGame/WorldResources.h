@@ -1,5 +1,5 @@
 #pragma once
-#include "Dependencies/glew.h"
+#include <GL/glew.h>
 #include <array>
 #include <cstdint>
 #include <filesystem>

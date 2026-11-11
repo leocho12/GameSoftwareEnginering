@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RpgGame.h"
-#include <Windows.h>
+#include "Platform.h"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -189,9 +189,7 @@ void RpgGame::RecordEconomy(const char *kind, int from, int to, int amount)
     economyEvents.push_back({time, kind, from, to, amount});
     if (economyEvents.size() > 128)
         economyEvents.erase(economyEvents.begin());
-    wchar_t executable[MAX_PATH]{};
-    GetModuleFileNameW(nullptr, executable, MAX_PATH);
-    auto directory = std::filesystem::path(executable).parent_path() / "Profiles";
+    auto directory = Platform::ExecutableDirectory() / "Profiles";
     std::error_code error;
     std::filesystem::create_directories(directory, error);
     auto path = directory / "economy.jsonl";

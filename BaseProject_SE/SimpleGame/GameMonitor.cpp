@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GameMonitor.h"
 #include "RpgGame.h"
-#include <Windows.h>
+#include "Platform.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -152,7 +152,7 @@ void GameMonitor::Publish(const RpgGame &game)
     out.imbue(std::locale::classic());
     out << std::setprecision(7)
         << "{\"schema_version\":1,\"world_schema_version\":2,\"type\":\"snapshot\",\"session_id\":"
-        << GetCurrentProcessId() << ",\"sequence\":" << ++sequence
+        << Platform::ProcessId() << ",\"sequence\":" << ++sequence
         << ",\"sent_at_ms\":" << timestamp << ",\"game\":{\"seed\":" << game.seed
         << ",\"paused\":" << (game.paused ? "true" : "false")
         << ",\"player_down\":" << (game.hp <= 0 ? "true" : "false")

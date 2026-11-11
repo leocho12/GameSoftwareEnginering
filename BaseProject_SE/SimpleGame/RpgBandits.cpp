@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RpgGame.h"
-#include <Windows.h>
+#include "Platform.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -364,9 +364,7 @@ void RpgGame::UpdateBandits(float dt)
 
 void RpgGame::LogBandits()
 {
-    wchar_t executable[MAX_PATH]{};
-    GetModuleFileNameW(nullptr, executable, MAX_PATH);
-    auto directory = std::filesystem::path(executable).parent_path() / "Profiles";
+    auto directory = Platform::ExecutableDirectory() / "Profiles";
     std::error_code error;
     std::filesystem::create_directories(directory, error);
     auto path = directory / "monster_ai.jsonl";

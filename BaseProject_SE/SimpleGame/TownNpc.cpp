@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "RpgGame.h"
+#include "Platform.h"
 #include <algorithm>
 #include <cmath>
 #include <chrono>
 #include <fstream>
 #include <locale>
 #include <queue>
-#include <Windows.h>
 
 namespace
 {
@@ -913,9 +913,7 @@ void RpgGame::LogNpc(const TownNpc &npc, const char *event) const
     if (!attempted)
     {
         attempted = true;
-        wchar_t path[MAX_PATH]{};
-        GetModuleFileNameW(nullptr, path, MAX_PATH);
-        directory = std::filesystem::path(path).parent_path() / "Profiles";
+        directory = Platform::ExecutableDirectory() / "Profiles";
         std::error_code error;
         std::filesystem::create_directories(directory, error);
         stream.open(directory / "npc_ai.jsonl", std::ios::app);

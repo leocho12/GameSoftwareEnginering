@@ -1,25 +1,53 @@
 #include "stdafx.h"
 #include "RenderEffects.h"
-#include <Windows.h>
+#include "SpriteRasterizer.h"
 #include <algorithm>
-
-namespace Gdiplus
-{
-using std::min;
-using std::max;
-}
-
-#include <gdiplus.h>
 #include <cmath>
 #include <cstdio>
-#include <vector>
-#include <chrono>
 #include <cstdint>
-#pragma comment(lib, "gdiplus.lib")
+#include <fstream>
+#include <iterator>
 
 namespace
 {
 constexpr int MaterialTextureSize = 1024;
+
+std::vector<int> DecodeUtf8(const std::string &text)
+{
+    std::vector<int> codepoints;
+    for (std::size_t index = 0; index < text.size();)
+    {
+        const auto first = static_cast<unsigned char>(text[index]);
+        int codepoint = 0xfffd;
+        std::size_t length = 1;
+        if (first < 0x80)
+            codepoint = first;
+        else if ((first & 0xe0) == 0xc0 && index + 1 < text.size())
+        {
+            codepoint = ((first & 0x1f) << 6) |
+                        (static_cast<unsigned char>(text[index + 1]) & 0x3f);
+            length = 2;
+        }
+        else if ((first & 0xf0) == 0xe0 && index + 2 < text.size())
+        {
+            codepoint = ((first & 0x0f) << 12) |
+                        ((static_cast<unsigned char>(text[index + 1]) & 0x3f) << 6) |
+                        (static_cast<unsigned char>(text[index + 2]) & 0x3f);
+            length = 3;
+        }
+        else if ((first & 0xf8) == 0xf0 && index + 3 < text.size())
+        {
+            codepoint = ((first & 0x07) << 18) |
+                        ((static_cast<unsigned char>(text[index + 1]) & 0x3f) << 12) |
+                        ((static_cast<unsigned char>(text[index + 2]) & 0x3f) << 6) |
+                        (static_cast<unsigned char>(text[index + 3]) & 0x3f);
+            length = 4;
+        }
+        codepoints.push_back(codepoint);
+        index += length;
+    }
+    return codepoints;
+}
 
 float MaterialHash(int x, int y)
 {
@@ -313,8 +341,29 @@ void main()
 )GLSL";
 }
 
-void RenderEffects::Initialize()
+void RenderEffects::Initialize(const std::filesystem::path &fontPath)
 {
+    std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
+    if (fontFile)
+    {
+        const auto size = fontFile.tellg();
+        if (size > 0)
+        {
+            fontBytes.resize(std::size_t(size));
+            fontFile.seekg(0, std::ios::beg);
+            fontFile.read(reinterpret_cast<char *>(fontBytes.data()),
+                          static_cast<std::streamsize>(fontBytes.size()));
+            fontReady = fontFile.good() || fontFile.eof();
+            fontReady = fontReady &&
+                        stbtt_InitFont(&font, fontBytes.data(),
+                                       stbtt_GetFontOffsetForIndex(fontBytes.data(), 0)) != 0;
+        }
+    }
+    if (!fontReady)
+        std::fprintf(stderr,
+                     "Could not load bundled UI font: %s\n",
+                     fontPath.filename().string().c_str());
+
     litProgram = Program(litVs, litFs);
     postProgram = Program(postVs, postFs);
     fireProgram = Program(fireVs, fireFs);
@@ -582,66 +631,105 @@ RenderEffects::Label &RenderEffects::MakeLabel(const std::string &text, int pixe
             glDeleteTextures(1, &p.second.texture);
         labels.clear();
     }
-    int count = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, nullptr, 0);
-    std::wstring wide(size_t(std::max(1, count)), L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, &wide[0], count);
-    HDC dc = CreateCompatibleDC(nullptr);
-    HFONT font = CreateFontW(-pixels,
-                             0,
-                             0,
-                             0,
-                             FW_MEDIUM,
-                             FALSE,
-                             FALSE,
-                             FALSE,
-                             DEFAULT_CHARSET,
-                             OUT_DEFAULT_PRECIS,
-                             CLIP_DEFAULT_PRECIS,
-                             ANTIALIASED_QUALITY,
-                             DEFAULT_PITCH,
-                             L"Malgun Gothic");
-    HGDIOBJ oldFont = SelectObject(dc, font);
-    SIZE size{};
-    GetTextExtentPoint32W(dc, wide.c_str(), int(wide.size()) - 1, &size);
     Label label;
-    label.w = std::max(1, int(size.cx) + 4);
     label.h = pixels + 12;
-    BITMAPINFO info{};
-    info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    info.bmiHeader.biWidth = label.w;
-    info.bmiHeader.biHeight = -label.h;
-    info.bmiHeader.biPlanes = 1;
-    info.bmiHeader.biBitCount = 32;
-    info.bmiHeader.biCompression = BI_RGB;
-    void *bits = nullptr;
-    HBITMAP bitmap = CreateDIBSection(dc, &info, DIB_RGB_COLORS, &bits, nullptr, 0);
-    if (bitmap && bits)
+    const auto codepoints = DecodeUtf8(text);
+    float scale = 1;
+    int ascent = pixels;
+    int descent = 0;
+    [[maybe_unused]] int lineGap = 0;
+    if (fontReady)
     {
-        HGDIOBJ oldBitmap = SelectObject(dc, bitmap);
-        std::fill_n(static_cast<unsigned char *>(bits), label.w * label.h * 4, 0);
-        SetBkMode(dc, TRANSPARENT);
-        SetTextColor(dc, RGB(255, 255, 255));
-        TextOutW(dc, 2, 2, wide.c_str(), int(wide.size()) - 1);
-        GdiFlush();
-        auto *p = static_cast<unsigned char *>(bits);
-        for (int i = 0; i < label.w * label.h; ++i)
-        {
-            unsigned char a = p[i * 4];
-            p[i * 4] = p[i * 4 + 1] = p[i * 4 + 2] = 255;
-            p[i * 4 + 3] = a;
-        }
-        glGenTextures(1, &label.texture);
-        glBindTexture(GL_TEXTURE_2D, label.texture);
-        glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA, label.w, label.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        SelectObject(dc, oldBitmap);
-        DeleteObject(bitmap);
+        scale = stbtt_ScaleForPixelHeight(&font, float(pixels));
+        stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     }
-    SelectObject(dc, oldFont);
-    DeleteObject(font);
-    DeleteDC(dc);
+
+    float textAdvance = 0;
+    int previousCodepoint = 0;
+    for (int codepoint : codepoints)
+    {
+        int advance = pixels;
+        [[maybe_unused]] int leftBearing = 0;
+        if (fontReady)
+        {
+            if (stbtt_FindGlyphIndex(&font, codepoint) == 0 && codepoint != '?')
+                codepoint = '?';
+            stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &leftBearing);
+            if (previousCodepoint)
+                textAdvance += scale * stbtt_GetCodepointKernAdvance(
+                                         &font, previousCodepoint, codepoint);
+        }
+        textAdvance += scale * advance;
+        previousCodepoint = codepoint;
+    }
+    label.w = std::max(1, int(std::ceil(textAdvance)) + 4);
+
+    std::vector<unsigned char> rgba(std::size_t(label.w) * label.h * 4, 0);
+    if (fontReady && !codepoints.empty())
+    {
+        const int baseline = 4 + int(std::round(ascent * scale));
+        float penX = 2;
+        previousCodepoint = 0;
+        for (int codepoint : codepoints)
+        {
+            if (stbtt_FindGlyphIndex(&font, codepoint) == 0 && codepoint != '?')
+                codepoint = '?';
+            if (previousCodepoint)
+                penX += scale * stbtt_GetCodepointKernAdvance(&font, previousCodepoint, codepoint);
+
+            int advance = 0;
+            [[maybe_unused]] int leftBearing = 0;
+            stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &leftBearing);
+            int x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+            stbtt_GetCodepointBitmapBox(&font, codepoint, scale, scale, &x0, &y0, &x1, &y1);
+            const int glyphWidth = x1 - x0;
+            const int glyphHeight = y1 - y0;
+            if (glyphWidth > 0 && glyphHeight > 0)
+            {
+                std::vector<unsigned char> bitmap(std::size_t(glyphWidth) * glyphHeight, 0);
+                stbtt_MakeCodepointBitmap(&font,
+                                          bitmap.data(),
+                                          glyphWidth,
+                                          glyphHeight,
+                                          glyphWidth,
+                                          scale,
+                                          scale,
+                                          codepoint);
+                const int glyphX = int(std::round(penX)) + x0;
+                const int glyphY = baseline + y0;
+                for (int y = 0; y < glyphHeight; ++y)
+                    for (int x = 0; x < glyphWidth; ++x)
+                    {
+                        const int destX = glyphX + x;
+                        const int destY = glyphY + y;
+                        if (destX < 0 || destX >= label.w || destY < 0 || destY >= label.h)
+                            continue;
+                        const std::size_t dest = (std::size_t(destY) * label.w + destX) * 4;
+                        rgba[dest] = rgba[dest + 1] = rgba[dest + 2] = 255;
+                        const auto source = bitmap[std::size_t(y) * glyphWidth + x];
+                        rgba[dest + 3] = std::max(rgba[dest + 3], source);
+                    }
+            }
+            penX += scale * advance;
+            previousCodepoint = codepoint;
+        }
+    }
+
+    glGenTextures(1, &label.texture);
+    glBindTexture(GL_TEXTURE_2D, label.texture);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 label.w,
+                 label.h,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 rgba.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     return labels.emplace(cacheKey, label).first->second;
 }
 
@@ -677,88 +765,24 @@ void RenderEffects::Text(
 
 void RenderEffects::CreateSprites()
 {
-    using namespace Gdiplus;
-    GdiplusStartupInput input;
-    ULONG_PTR token = 0;
-    if (GdiplusStartup(&token, &input, nullptr) != Ok)
-        return;
     for (int kind = 0; kind < 4; ++kind)
         for (int frame = 0; frame < 8; ++frame)
         {
-            Bitmap bitmap(512, 640, PixelFormat32bppARGB);
-            {
-                Graphics g(&bitmap);
-                g.ScaleTransform(4.0f, 4.0f);
-                g.SetSmoothingMode(SmoothingModeAntiAlias);
-                g.Clear(Color(0, 0, 0, 0));
-                float swing = std::sin(frame * 6.2831853f / 8) * 7;
-                SolidBrush outline(Color(255, 24, 35, 39)),
-                    coat(kind == 2   ? Color(255, 121, 58, 50)
-                         : kind == 3 ? Color(255, 120, 116, 87)
-                                     : Color(255, 67, 89, 83));
-                SolidBrush hair(kind == 1 ? Color(255, 182, 174, 146) : Color(255, 65, 73, 72)),
-                    skin(Color(255, 223, 196, 162));
-                SolidBrush accent(kind == 2 ? Color(255, 240, 104, 73) : Color(255, 91, 209, 194));
-                if (kind == 3)
-                {
-                    g.FillEllipse(&outline, 24, 65, 78, 54);
-                    g.FillEllipse(&coat, 29, 62, 70, 49);
-                    g.FillEllipse(&coat, 76, 50, 39, 34);
-                    g.FillRectangle(&outline, 34, 105, 13, 30 + int(swing));
-                    g.FillRectangle(&outline, 81, 105, 13, 30 - int(swing));
-                    g.FillEllipse(&accent, 98, 59, 7, 5);
-                    Point ear[] = {Point(83, 54), Point(82, 32), Point(96, 51)};
-                    g.FillPolygon(&coat, ear, 3);
-                }
-                else
-                {
-                    g.FillRectangle(&outline, 43, 107, 17, 35 + int(swing));
-                    g.FillRectangle(&outline, 69, 107, 17, 35 - int(swing));
-                    g.FillEllipse(&outline, 31, 66, 67, 58);
-                    g.FillEllipse(&coat, 35, 65, 58, 55);
-                    g.FillEllipse(&hair, 28, 17, 75, 68);
-                    g.FillEllipse(&skin, 39, 33, 53, 43);
-                    g.FillEllipse(&hair, 29, 17, 73, 30);
-                    g.FillRectangle(&hair, 28, 34, 13, 49);
-                    g.FillRectangle(&hair, 91, 35, 12, 45);
-                    g.FillEllipse(&outline, 49, 51, 5, 7);
-                    g.FillEllipse(&outline, 76, 51, 5, 7);
-                    g.FillRectangle(&coat, 23, 77 + int(swing * .4f), 19, 37);
-                    g.FillRectangle(&outline, 103, 54, 5, 87);
-                    g.FillEllipse(&accent, 98, 43, 15, 20);
-                    g.FillRectangle(&accent, 47, 84, 12, 14);
-                    g.FillRectangle(&outline, 55, 99, 10, 20);
-                    Point robe[] = {Point(42, 83), Point(85, 83), Point(96, 126), Point(31, 126)};
-                    g.FillPolygon(&coat, robe, 4);
-                    g.FillRectangle(&accent, 40, 99, 47, 5);
-                }
-            }
-            Rect rect(0, 0, 512, 640);
-            BitmapData data{};
-            if (bitmap.LockBits(&rect, ImageLockModeRead, PixelFormat32bppARGB, &data) == Ok)
-            {
-                std::vector<unsigned char> rgba(512 * 640 * 4);
-                for (int y = 0; y < 640; ++y)
-                    for (int x = 0; x < 512; ++x)
-                    {
-                        auto *src =
-                            static_cast<unsigned char *>(data.Scan0) + y * data.Stride + x * 4;
-                        auto *dst = &rgba[(y * 512 + x) * 4];
-                        dst[0] = src[2];
-                        dst[1] = src[1];
-                        dst[2] = src[0];
-                        dst[3] = src[3];
-                    }
-                glGenTextures(1, &sprites[kind][frame]);
-                glBindTexture(GL_TEXTURE_2D, sprites[kind][frame]);
-                glTexImage2D(
-                    GL_TEXTURE_2D, 0, GL_RGBA, 512, 640, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                bitmap.UnlockBits(&data);
-            }
+            const auto rgba = SpriteRasterizer::Build(kind, frame);
+            glGenTextures(1, &sprites[kind][frame]);
+            glBindTexture(GL_TEXTURE_2D, sprites[kind][frame]);
+            glTexImage2D(GL_TEXTURE_2D,
+                         0,
+                         GL_RGBA,
+                         512,
+                         640,
+                         0,
+                         GL_RGBA,
+                         GL_UNSIGNED_BYTE,
+                         rgba.data());
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
-    GdiplusShutdown(token);
 }
 
 void RenderEffects::Shutdown()

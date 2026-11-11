@@ -16,9 +16,18 @@
     <Filter Include="소스 파일\Shaders">
       <UniqueIdentifier>{aa86e47f-445f-4440-9a76-173363b46c4e}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <Filter Include="외부 라이브러리">
+      <UniqueIdentifier>{6d901b7d-6f51-4bfa-b994-30291dd69117}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="외부 라이브러리\GLFW">
+      <UniqueIdentifier>{9968d59f-6e5d-49b5-91d0-b966b22d5cb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="외부 라이브러리\GLEW">
+      <UniqueIdentifier>{8af460f4-c142-47dc-bba7-f151ee6de206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="외부 라이브러리\stb">
+      <UniqueIdentifier>{704f4a6b-3a39-43c1-88b6-111f7109f95a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -30,6 +39,9 @@
     <ClInclude Include="Renderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Platform.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="RenderGeometry.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="SpriteRasterizer.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="CharacterAnimation.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="GridTypes.h"><Filter>헤더 파일</Filter></ClInclude><ClInclude Include="DollBehavior.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="WorldResources.h"><Filter>헤더 파일</Filter></ClInclude>
@@ -72,6 +84,32 @@
     <ClCompile Include="RpgGame.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RpgExpedition.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RenderEffects.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="Platform.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="RenderGeometry.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="SpriteRasterizer.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="ThirdPartyStb.cpp"><Filter>외부 라이브러리\stb</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glew\src\glew.c"><Filter>외부 라이브러리\GLEW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\context.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\egl_context.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\init.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\input.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\monitor.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\platform.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\vulkan.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\window.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\osmesa_context.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\null_init.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\null_joystick.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\null_monitor.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\null_window.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_init.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_joystick.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_module.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_monitor.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_thread.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_time.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\win32_window.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
+    <ClCompile Include="Dependencies\glfw\src\wgl_context.c"><Filter>외부 라이브러리\GLFW</Filter></ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\SolidRect.fs">

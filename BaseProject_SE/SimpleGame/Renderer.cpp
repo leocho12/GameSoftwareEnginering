@@ -1,14 +1,16 @@
 #include "stdafx.h"
 #include "Renderer.h"
-#include "Dependencies/freeglut.h"
-#include <Windows.h>
-#include <wincodec.h>
+#include "Platform.h"
+#include "RenderGeometry.h"
+#include "Dependencies/stb/stb_image.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <fstream>
+#include <iterator>
+#include <limits>
 #include <vector>
-#pragma comment(lib, "windowscodecs.lib")
-#pragma comment(lib, "ole32.lib")
+#include <GL/glu.h>
 
 namespace
 {
@@ -29,24 +31,14 @@ bool In(float x, float y, float l, float t, float w, float h)
     return x >= l && x <= l + w && y >= t && y <= t + h;
 }
 
-template <class T> void Release(T *&p)
-{
-    if (p)
-    {
-        p->Release();
-        p = nullptr;
-    }
-}
 }
 
 Renderer::Renderer(int w, int h)
 {
-    effects.Initialize();
+    const auto executableDirectory = Platform::ExecutableDirectory();
+    effects.Initialize(executableDirectory / "Assets" / "Fonts" / "NotoSansKR.ttf");
     Resize(w, h);
-    wchar_t path[MAX_PATH]{};
-    GetModuleFileNameW(nullptr, path, MAX_PATH);
-    resources.Load(std::filesystem::path(path).parent_path() / "Assets" / "World" /
-                   "kingdom.rpack");
+    resources.Load(executableDirectory / "Assets" / "World" / "kingdom.rpack");
 }
 
 Renderer::~Renderer()
@@ -88,66 +80,48 @@ void Renderer::Zoom(int direction)
     cameraReady = false;
 }
 
-GLuint Renderer::LoadPng(const std::wstring &path, float &aspect)
+GLuint Renderer::LoadPng(const std::filesystem::path &path, float &aspect)
 {
-    if (GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES)
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    if (!file)
         return 0;
-    IWICImagingFactory *factory = nullptr;
-    IWICBitmapDecoder *decoder = nullptr;
-    IWICBitmapFrameDecode *frame = nullptr;
-    IWICFormatConverter *converter = nullptr;
+
+    const auto fileSize = file.tellg();
+    if (fileSize <= 0 || fileSize > std::numeric_limits<int>::max())
+        return 0;
+    const auto encodedSize = static_cast<std::size_t>(static_cast<std::streamoff>(fileSize));
+    std::vector<unsigned char> encoded(encodedSize, 0);
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char *>(encoded.data()), std::streamsize(encoded.size()));
+    if (!file)
+        return 0;
+
     GLuint texture = 0;
-    HRESULT hr = CoCreateInstance(
-        CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory));
-    if (SUCCEEDED(hr))
-        hr = factory->CreateDecoderFromFilename(
-            path.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &decoder);
-    if (SUCCEEDED(hr))
-        hr = decoder->GetFrame(0, &frame);
-    if (SUCCEEDED(hr))
-        hr = factory->CreateFormatConverter(&converter);
-    if (SUCCEEDED(hr))
-        hr = converter->Initialize(frame,
-                                   GUID_WICPixelFormat32bppRGBA,
-                                   WICBitmapDitherTypeNone,
-                                   nullptr,
-                                   0,
-                                   WICBitmapPaletteTypeCustom);
-    UINT w = 0, h = 0;
-    if (SUCCEEDED(hr))
-        hr = converter->GetSize(&w, &h);
-    if (SUCCEEDED(hr) && w > 0 && h > 0 && w <= 4096 && h <= 4096)
+    int w = 0, h = 0;
+    unsigned char *pixels = stbi_load_from_memory(
+        encoded.data(), int(encoded.size()), &w, &h, nullptr, STBI_rgb_alpha);
+    if (pixels && w > 0 && h > 0 && w <= 4096 && h <= 4096)
     {
-        std::vector<unsigned char> pixels(size_t(w) * h * 4);
-        hr = converter->CopyPixels(nullptr, w * 4, UINT(pixels.size()), pixels.data());
-        if (SUCCEEDED(hr))
-        {
-            aspect = float(w) / h;
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D,
-                         0,
-                         GL_RGBA,
-                         GLsizei(w),
-                         GLsizei(h),
-                         0,
-                         GL_RGBA,
-                         GL_UNSIGNED_BYTE,
-                         pixels.data());
-        }
+        aspect = float(w) / h;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D,
+                     0,
+                     GL_RGBA,
+                     GLsizei(w),
+                     GLsizei(h),
+                     0,
+                     GL_RGBA,
+                     GL_UNSIGNED_BYTE,
+                     pixels);
     }
-    if (FAILED(hr))
-        std::fprintf(stderr,
-                     "Could not decode optional PNG (HRESULT %lx).\n",
-                     static_cast<unsigned long>(hr));
-    Release(converter);
-    Release(frame);
-    Release(decoder);
-    Release(factory);
+    else if (!pixels)
+        std::fprintf(stderr, "Could not decode optional PNG: %s\n", stbi_failure_reason());
+    stbi_image_free(pixels);
     return texture;
 }
 
@@ -158,7 +132,7 @@ void Renderer::Cube(
     glPushMatrix();
     glTranslatef(x, y, z);
     glScalef(sx, sy, sz);
-    glutSolidCube(1);
+    RenderGeometry::SolidCube(1);
     glPopMatrix();
 }
 
@@ -357,7 +331,7 @@ void Renderer::Environment(const RpgGame &game)
                 glColor3f(.24f, .15f, .08f);
                 glPushMatrix();
                 glRotatef(-90, 1, 0, 0);
-                glutSolidCylinder(.16, .95, 8, 1);
+                RenderGeometry::SolidCylinder(.16f, .95f, 8, 1);
                 glPopMatrix();
                 for (int layer = 0; layer < 3; ++layer)
                 {
@@ -366,7 +340,8 @@ void Renderer::Environment(const RpgGame &game)
                     glRotatef(-90, 1, 0, 0);
                     glColor3f(
                         .10f + variation * .035f, .24f + layer * .025f + variation * .06f, .12f);
-                    glutSolidCone(.72f - layer * .14f, 1.1f + variation * .25f, 9, 1);
+                    RenderGeometry::SolidCone(
+                        .72f - layer * .14f, 1.1f + variation * .25f, 9, 1);
                     glPopMatrix();
                 }
             }
@@ -376,7 +351,7 @@ void Renderer::Environment(const RpgGame &game)
                 glTranslatef(0, .28f, 0);
                 glRotatef(variation * 180, 0, 1, 0);
                 glScalef(.42f, .4f + variation * .22f, .42f);
-                glutSolidIcosahedron();
+                RenderGeometry::SolidIcosahedron();
             }
             glPopMatrix();
         }
