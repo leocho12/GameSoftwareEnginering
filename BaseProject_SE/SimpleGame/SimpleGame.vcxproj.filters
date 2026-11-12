@@ -40,6 +40,7 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Platform.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="OpenGL.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="RenderGeometry.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="SpriteRasterizer.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="CharacterAnimation.h"><Filter>헤더 파일</Filter></ClInclude>
@@ -84,7 +85,7 @@
     <ClCompile Include="RpgGame.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RpgExpedition.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RenderEffects.cpp"><Filter>소스 파일</Filter></ClCompile>
-    <ClCompile Include="Platform.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="GamePlatform.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="RenderGeometry.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="SpriteRasterizer.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="ThirdPartyStb.cpp"><Filter>외부 라이브러리\stb</Filter></ClCompile>

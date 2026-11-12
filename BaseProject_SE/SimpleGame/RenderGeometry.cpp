@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RenderGeometry.h"
-#include <GL/glew.h>
+#include "OpenGL.h"
 
 #include <algorithm>
 #include <cmath>

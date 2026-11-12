@@ -625,16 +625,18 @@ void WorldResources::AddActor(const RpgGame &game,
         state.initialized = true;
         dx = dz = 0;
     }
+    const bool actorMoving = moving || std::hypot(dx, dz) > .00001f;
     float desired = state.yaw;
     if (attacking)
         desired = std::atan2(targetX - x, targetZ - z);
-    else if (moving && std::hypot(dx, dz) > .00001f)
+    else if (actorMoving)
         desired = std::atan2(dx, dz);
     float angle = std::remainder(desired - state.yaw, 2 * Pi);
     state.yaw += std::clamp(angle, -.22f, .22f);
     state.x = x;
     state.z = z;
-    const std::string clip = attacking ? "Attack" : moving ? (id == -1 ? "Run" : "Walk") : "Idle";
+    const std::string clip =
+        attacking ? "Attack" : actorMoving ? (id == -1 ? "Run" : "Walk") : "Idle";
     float clock = attacking ? game.time - attackStarted : game.time * speed;
     if (state.clip != clip)
     {
@@ -690,7 +692,8 @@ void WorldResources::BuildActors(const RpgGame &game, int radius)
                  game.aim.x,
                  game.aim.z);
     for (const auto &n : game.npcs)
-        if (n.hp > 0 && Visible(n.position.x, n.position.z, game, float(radius + 2)))
+        if ((n.id & 1) != 0 && n.hp > 0 &&
+            Visible(n.position.x, n.position.z, game, float(radius + 2)))
         {
             const char *asset = n.role == NpcRole::Guard || n.role == NpcRole::Hunter ? "NPC_Scout"
                                 : n.role == NpcRole::Merchant || n.role == NpcRole::Medic
@@ -750,7 +753,8 @@ void WorldResources::Actors(const RpgGame &game, int radius)
 {
     if (!Ready())
         return;
-    if (actorTime != game.time || actorRadius != radius)
+    constexpr float ActorBuildInterval = 1.0f / 30.0f;
+    if (actorTime < 0 || game.time - actorTime >= ActorBuildInterval || actorRadius != radius)
         BuildActors(game, radius);
     Draw(actors);
 }

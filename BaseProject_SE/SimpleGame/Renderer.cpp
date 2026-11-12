@@ -74,6 +74,11 @@ void Renderer::Resize(int w, int h)
     effects.Resize(width, height);
 }
 
+void Renderer::SetFrameRate(float value)
+{
+    framesPerSecond = std::max(0.0f, value);
+}
+
 void Renderer::Zoom(int direction)
 {
     zoom = std::clamp(zoom - direction * .7f, 5.0f, 19.0f);
@@ -230,7 +235,7 @@ bool Renderer::Character(int index,
 
 void Renderer::Camera(const RpgGame &game)
 {
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, effects.SceneWidth(), effects.SceneHeight());
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     auto target = game.dollTraining.active ? WorldPoint{3, 3} : game.player;
@@ -243,6 +248,8 @@ void Renderer::Camera(const RpgGame &game)
     glGetDoublev(GL_MODELVIEW_MATRIX, model);
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetIntegerv(GL_VIEWPORT, viewport);
+    viewport[2] = width;
+    viewport[3] = height;
     cameraReady = true;
     const GLfloat light[] = {-10, 25, -8, 0};
     glLightfv(GL_LIGHT0, GL_POSITION, light);
@@ -272,8 +279,8 @@ bool Renderer::IsUi(int x, int y, const RpgGame &game) const
 
 int Renderer::ViewRadius() const
 {
-    // Cover the ground footprint at the current zoom and window aspect ratio.
-    return int(std::ceil(zoom * (float(width) / height + 1.8f))) + 5;
+    // Keep a small safety margin beyond the camera footprint to limit heavy distant geometry.
+    return std::min(24, int(std::ceil(zoom * (float(width) / height + 1.4f))) + 2);
 }
 
 void Renderer::Environment(const RpgGame &game)
@@ -549,6 +556,13 @@ void Renderer::Hud(const RpgGame &game)
          "식량 " + std::to_string(state.rations) + " · 식수 " + std::to_string(state.water) +
              " · 은화 " + std::to_string(game.silver),
          13);
+    Text(1120,
+         12,
+         "FPS " + std::to_string(int(std::round(framesPerSecond))),
+         16,
+         .75f,
+         .88f,
+         .9f);
     Panel(24, 120, 710, 107, .04f, .08f, .09f, .92f);
     Text(38, 128, "첫 의뢰 | 실종 사냥꾼 수색", 18, .95f, .85f, .55f);
     Text(38, 157, game.QuestObjective(), 15, .9f, .88f, .75f);
@@ -614,22 +628,16 @@ void Renderer::Draw(const RpgGame &game, int, int)
     glActiveTexture(GL_TEXTURE0);
     glDisable(GL_TEXTURE_2D);
     glDepthMask(GL_TRUE);
-    auto focus = game.dollTraining.active ? WorldPoint{3, 3} : game.player;
-    if (effects.BeginShadow(
-            focus.x, focus.z, game.dollTraining.active ? 8.0f : float(ViewRadius() + 4)))
-    {
-        shadowPass = true;
-        Environment(game);
-        Actors(game);
-        shadowPass = false;
-    }
+    shadowPass = false;
     effects.BeginScene();
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
     Camera(game);
     Environment(game);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     ContactShadows(game);
+    glDisable(GL_BLEND);
     Actors(game);
     effects.Composite();
     glDisable(GL_DEPTH_TEST);

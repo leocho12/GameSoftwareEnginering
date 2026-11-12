@@ -1,5 +1,5 @@
 #pragma once
-#include <GL/glew.h>
+#include "OpenGL.h"
 #include <map>
 #include <string>
 #include <vector>

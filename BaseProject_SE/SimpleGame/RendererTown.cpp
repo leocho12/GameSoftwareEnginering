@@ -135,9 +135,15 @@ void Renderer::TownHud(const RpgGame &game)
                  .85f,
                  .5f);
     }
-    int near = game.NearestNpc();
-    if (near >= 0 && game.talkingNpc < 0)
-        Text(455, 658, "F: " + game.npcs[near].name + " 대화", 18, .95f, .85f, .5f);
+    int nearestNpc = game.NearestNpc();
+    if (nearestNpc >= 0 && game.talkingNpc < 0)
+        Text(455,
+             658,
+             "F: " + game.npcs[nearestNpc].name + " 대화",
+             18,
+             .95f,
+             .85f,
+             .5f);
     if (game.talkingNpc < 0)
         return;
     const auto &npc = game.npcs[game.talkingNpc];

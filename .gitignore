@@ -35,6 +35,7 @@
 .asset-tools/
 __pycache__/
 BaseProject_SE/SimpleGame/.build/
+BaseProject_SE/SimpleGame/SimpleGame/.build/
 
 # Runtime AI prototype logs
 **/Profiles/adbs*.jsonl

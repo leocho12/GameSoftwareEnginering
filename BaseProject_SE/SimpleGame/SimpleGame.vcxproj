@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Platform.h" />
+    <ClInclude Include="OpenGL.h" />
     <ClInclude Include="RenderGeometry.h" />
     <ClInclude Include="SpriteRasterizer.h" />
     <ClInclude Include="CharacterAnimation.h" />
@@ -184,7 +185,7 @@
     <ClCompile Include="RpgGame.cpp" />
     <ClCompile Include="RpgExpedition.cpp" />
     <ClCompile Include="RenderEffects.cpp" />
-    <ClCompile Include="Platform.cpp" />
+    <ClCompile Include="GamePlatform.cpp" />
     <ClCompile Include="RenderGeometry.cpp" />
     <ClCompile Include="SpriteRasterizer.cpp" />
     <ClCompile Include="ThirdPartyStb.cpp" />
@@ -270,7 +271,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glfw\src;$(ProjectDir)Dependencies\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLEW_STATIC;GLEW_NO_GLU;_GLFW_WIN32;UNICODE;_UNICODE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;GLEW_NO_GLU;_GLFW_WIN32;UNICODE;_UNICODE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -278,6 +279,7 @@
   </ItemDefinitionGroup>
   <PropertyGroup>
     <!-- Keep compiler and tracking files separate from legacy tracked build caches. -->
+    <OutDir>$(ProjectDir).build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir).build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

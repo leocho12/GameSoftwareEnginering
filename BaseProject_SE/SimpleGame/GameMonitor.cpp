@@ -306,7 +306,7 @@ void GameMonitor::Publish(const RpgGame &game)
         ok = bool(file);
     }
     if (ok)
-        ok = MoveFileExW(temporary.c_str(), destination.c_str(), MOVEFILE_REPLACE_EXISTING) != 0;
+        ok = Platform::ReplaceFileAtomically(temporary, destination);
     if (!ok && !failureReported)
         std::fprintf(stderr, "Monitor snapshot write failed; check Profiles directory.\n");
     failureReported = !ok;

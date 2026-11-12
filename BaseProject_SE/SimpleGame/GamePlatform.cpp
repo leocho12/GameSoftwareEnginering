@@ -62,4 +62,16 @@ std::uint64_t ProcessId()
     return static_cast<std::uint64_t>(getpid());
 #endif
 }
+
+bool ReplaceFileAtomically(const std::filesystem::path &source,
+                           const std::filesystem::path &destination)
+{
+#ifdef _WIN32
+    return MoveFileExW(source.c_str(), destination.c_str(), MOVEFILE_REPLACE_EXISTING) != 0;
+#else
+    std::error_code error;
+    std::filesystem::rename(source, destination, error);
+    return !error;
+#endif
+}
 }

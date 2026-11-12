@@ -233,8 +233,7 @@ void main(){
  vec3 sc=shadowPos.xyz/shadowPos.w*0.5+0.5;
  if(useShadow==1 && sc.x>0.0&&sc.x<1.0&&sc.y>0.0&&sc.y<1.0&&sc.z<1.0){
   shadow=0.0;float bias=max(0.000025,0.00015*(1.0-nd));
-  for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++)shadow+=sc.z-bias<=texture2D(shadowMap,sc.xy+vec2(x,y)/2048.0).r?1.0:0.0;
-  shadow/=9.0;
+  shadow=sc.z-bias<=texture2D(shadowMap,sc.xy).r?1.0:0.0;
  }
  vec3 base=tint.rgb;float grain=noise(world.xz*15.0+world.y*7.0);
  if(material==1){
@@ -311,20 +310,10 @@ const char *postVs = R"GLSL(#version 130
 out vec2 uv;
 void main(){gl_Position=gl_Vertex;uv=gl_MultiTexCoord0.xy;})GLSL";
 const char *postFs = R"GLSL(#version 130
-uniform sampler2D scene;uniform sampler2D depthTex;uniform vec2 texel;
+uniform sampler2D scene;uniform vec2 texel;
 in vec2 uv;
 void main(){
- vec3 c=texture2D(scene,uv).rgb,bloom=vec3(0);float d=texture2D(depthTex,uv).r,occ=0.0;
- for(int y=-2;y<=2;y++)for(int x=-2;x<=2;x++){
-  vec2 o=vec2(x,y);vec3 s=texture2D(scene,uv+o*texel*3.0).rgb;
-  bloom+=max(s-vec3(0.62),vec3(0));
-  float other=texture2D(depthTex,uv+o*texel*2.0).r;
-  float delta=d-other;occ+=step(0.0007,delta)*(1.0-smoothstep(0.006,0.020,delta));
- }
- c*=1.0-min(0.18,occ/25.0*0.35);c+=bloom/25.0*0.40;
- vec3 near=(texture2D(scene,uv+vec2(texel.x,0)).rgb+texture2D(scene,uv-vec2(texel.x,0)).rgb+texture2D(scene,uv+vec2(0,texel.y)).rgb+texture2D(scene,uv-vec2(0,texel.y)).rgb)*0.25;
- // Preserve sprite detail; only a small edge blend is needed at native resolution.
- float edge=length(c-near);c=mix(c,near,clamp(edge*0.15,0.0,0.05));
+ vec3 c=texture2D(scene,uv).rgb;
  c=pow(max(c,vec3(0)),vec3(0.94));c*=vec3(1.045,1.01,0.96);
  float vignette=1.0-0.20*dot(uv-0.5,uv-0.5)*2.0;
  gl_FragColor=vec4(c*vignette,1);
@@ -376,8 +365,8 @@ void RenderEffects::Initialize(const std::filesystem::path &fontPath)
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_DEPTH_COMPONENT24,
-                 2048,
-                 2048,
+                 1024,
+                 1024,
                  0,
                  GL_DEPTH_COMPONENT,
                  GL_UNSIGNED_INT,
@@ -463,16 +452,29 @@ void RenderEffects::FreeScene()
 
 void RenderEffects::Resize(int w, int h)
 {
+    constexpr float SceneScale = .35f;
+    const int targetWidth = std::max(1, int(std::lround(w * SceneScale)));
+    const int targetHeight = std::max(1, int(std::lround(h * SceneScale)));
     if (width == w && height == h && sceneFbo)
         return;
     FreeScene();
     width = w;
     height = h;
+    sceneWidth = targetWidth;
+    sceneHeight = targetHeight;
     glGenFramebuffers(1, &sceneFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, sceneFbo);
     glGenTextures(1, &sceneColor);
     glBindTexture(GL_TEXTURE_2D, sceneColor);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA8,
+                 sceneWidth,
+                 sceneHeight,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -483,8 +485,8 @@ void RenderEffects::Resize(int w, int h)
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_DEPTH_COMPONENT24,
-                 w,
-                 h,
+                 sceneWidth,
+                 sceneHeight,
                  0,
                  GL_DEPTH_COMPONENT,
                  GL_UNSIGNED_INT,
@@ -504,13 +506,23 @@ void RenderEffects::Resize(int w, int h)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+int RenderEffects::SceneWidth() const
+{
+    return sceneWidth;
+}
+
+int RenderEffects::SceneHeight() const
+{
+    return sceneHeight;
+}
+
 bool RenderEffects::BeginShadow(float centerX, float centerZ, float extent)
 {
     if (!shadowFbo || !litProgram)
         return false;
     glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFbo);
-    glViewport(0, 0, 2048, 2048);
+    glViewport(0, 0, 1024, 1024);
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -536,7 +548,7 @@ void RenderEffects::BeginScene()
     glDisable(GL_POLYGON_OFFSET_FILL);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, Ready() ? sceneFbo : 0);
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, sceneWidth, sceneHeight);
     glClearColor(.16f, .22f, .24f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -561,11 +573,7 @@ void RenderEffects::Lit(const GLdouble *view, float time, int material)
     glUniformMatrix4fv(glGetUniformLocation(litProgram, "shadowFromEye"), 1, GL_FALSE, a);
     glUniformMatrix4fv(glGetUniformLocation(litProgram, "worldFromEye"), 1, GL_FALSE, b);
     glUniform1f(glGetUniformLocation(litProgram, "clockTime"), time);
-    glUniform1i(glGetUniformLocation(litProgram, "useShadow"), shadowFbo ? 1 : 0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, shadowDepth);
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(glGetUniformLocation(litProgram, "shadowMap"), 1);
+    glUniform1i(glGetUniformLocation(litProgram, "useShadow"), 0);
     glUniform1i(glGetUniformLocation(litProgram, "resourceAtlas"), 0);
     const char *samplers[] = {"grassMaterial", "roadMaterial", "metalMaterial"};
     for (int i = 0; i < int(terrainMaterials.size()); ++i)
@@ -598,12 +606,10 @@ void RenderEffects::Composite()
     glUseProgram(postProgram);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sceneColor);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, sceneDepth);
-    glActiveTexture(GL_TEXTURE0);
     glUniform1i(glGetUniformLocation(postProgram, "scene"), 0);
-    glUniform1i(glGetUniformLocation(postProgram, "depthTex"), 1);
-    glUniform2f(glGetUniformLocation(postProgram, "texel"), 1.0f / width, 1.0f / height);
+    glUniform2f(glGetUniformLocation(postProgram, "texel"),
+                1.0f / sceneWidth,
+                1.0f / sceneHeight);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0);
     glVertex2f(-1, -1);

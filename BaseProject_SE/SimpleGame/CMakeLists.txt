@@ -33,7 +33,7 @@ set(SIMPLE_GAME_SOURCES
     CharacterAnimation.cpp
     DollBehavior.cpp
     GameMonitor.cpp
-    Platform.cpp
+    GamePlatform.cpp
     RenderEffects.cpp
     RenderGeometry.cpp
     Renderer.cpp

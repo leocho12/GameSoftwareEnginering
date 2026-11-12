@@ -1,6 +1,6 @@
 #pragma once
 #include "Dependencies/stb/stb_truetype.h"
-#include <GL/glew.h>
+#include "OpenGL.h"
 #include <array>
 #include <filesystem>
 #include <map>
@@ -13,6 +13,8 @@ class RenderEffects
   public:
     void Initialize(const std::filesystem::path &fontPath);
     void Resize(int w, int h);
+    int SceneWidth() const;
+    int SceneHeight() const;
     void Shutdown();
     bool BeginShadow(float centerX = 13, float centerZ = 12, float extent = 28);
     void BeginScene();
@@ -51,7 +53,7 @@ class RenderEffects
     GLuint sceneFbo = 0, sceneColor = 0, sceneDepth = 0, shadowFbo = 0, shadowDepth = 0;
     GLuint litProgram = 0, postProgram = 0, fireProgram = 0;
     GLuint contactProgram = 0;
-    int width = 0, height = 0;
+    int width = 0, height = 0, sceneWidth = 0, sceneHeight = 0;
     bool fontReady = false;
     GLdouble lightMatrix[16]{};
     Label &MakeLabel(const std::string &text, int pixels = 64);

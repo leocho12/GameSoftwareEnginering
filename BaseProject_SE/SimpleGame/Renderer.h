@@ -3,7 +3,7 @@
 #include "RenderEffects.h"
 #include "CharacterAnimation.h"
 #include "WorldResources.h"
-#include <GL/glew.h>
+#include "OpenGL.h"
 #include <array>
 #include <filesystem>
 #include <string>
@@ -16,6 +16,7 @@ class Renderer
     Renderer(const Renderer &) = delete;
     Renderer &operator=(const Renderer &) = delete;
     void Resize(int width, int height);
+    void SetFrameRate(float framesPerSecond);
     void Draw(const RpgGame &game, int mouseX, int mouseY);
     WorldPoint Pick(int x, int y) const;
     bool IsUi(int x, int y, const RpgGame &game) const;
@@ -28,6 +29,7 @@ class Renderer
     GLint viewport[4]{};
     bool cameraReady = false, shadowPass = false;
     float zoom = 9;
+    float framesPerSecond = 0;
     RenderEffects effects;
     WorldResources resources;
     std::array<CharacterAnimation, 8> characters;

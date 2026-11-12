@@ -3,7 +3,7 @@
 #include "RpgGame.h"
 #include "GameMonitor.h"
 #include "Platform.h"
-#include <GL/glew.h>
+#include "OpenGL.h"
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -280,7 +280,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_SAMPLES, 0);
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
     GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
@@ -333,6 +333,9 @@ int main()
     glfwSetKeyCallback(window, Key);
 
     double previousTick = glfwGetTime();
+    double fpsWindowStart = previousTick;
+    unsigned fpsWindowFrames = 0;
+    float currentFps = 0;
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -355,6 +358,15 @@ int main()
         game.Update(deltaTime);
         if (monitor)
             monitor->Publish(game);
+        ++fpsWindowFrames;
+        const double fpsWindowElapsed = now - fpsWindowStart;
+        if (fpsWindowElapsed >= 1.0)
+        {
+            currentFps = float(fpsWindowFrames / fpsWindowElapsed);
+            fpsWindowFrames = 0;
+            fpsWindowStart = now;
+        }
+        renderer->SetFrameRate(currentFps);
         renderer->Draw(game, mouseX, mouseY);
         glfwSwapBuffers(window);
     }
