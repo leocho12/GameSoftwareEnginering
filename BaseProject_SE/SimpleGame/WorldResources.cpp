@@ -59,6 +59,46 @@ bool Visible(float x, float z, const RpgGame &game, float radius)
 {
     return std::abs(x - game.player.x) <= radius && std::abs(z - game.player.z) <= radius;
 }
+
+constexpr std::array<float, 3> PlayerOutfit{.032f, .032f, .038f};
+
+const std::array<float, 3> &NpcOutfit(NpcRole role)
+{
+    static constexpr std::array<float, 3> blue{.18f, .38f, .85f};
+    static constexpr std::array<float, 3> red{.84f, .17f, .19f};
+    static constexpr std::array<float, 3> white{.89f, .90f, .92f};
+    switch (role)
+    {
+    case NpcRole::Outlaw:
+    case NpcRole::Bully:
+    case NpcRole::Swindler:
+        return red;
+    case NpcRole::Medic:
+    case NpcRole::Helper:
+        return white;
+    default:
+        return blue;
+    }
+}
+
+float ClothingShade(const float *color)
+{
+    // RPK1 stores untextured GLB materials as display-space RGB without material names.
+    const auto matches = [color](int r, int g, int b)
+    {
+        constexpr float tolerance = .5f / 255.0f;
+        return std::abs(color[0] - r / 255.0f) <= tolerance &&
+               std::abs(color[1] - g / 255.0f) <= tolerance &&
+               std::abs(color[2] - b / 255.0f) <= tolerance;
+    };
+    // Canvas, olive and gray cloth cover tops, sleeves and matching canvas gear.
+    if (matches(140, 137, 112) || matches(89, 96, 75) || matches(112, 120, 117))
+        return 1.0f;
+    // Charcoal and dark olive cover trousers and cloth trim.
+    if (matches(49, 58, 62) || matches(55, 62, 52))
+        return .72f;
+    return 0.0f;
+}
 }
 
 bool ActorView::Contains(float dx, float dz) const
@@ -328,7 +368,8 @@ void WorldResources::Append(Batch &batch,
                             const std::string &previous,
                             float previousTime,
                             float blend,
-                            bool flatten)
+                            bool flatten,
+                            const std::array<float, 3> *outfitColor)
 {
     auto found = assets.find(name);
     if (found == assets.end() || found->second.vertices.empty())
@@ -363,11 +404,16 @@ void WorldResources::Append(Batch &batch,
             vertex.normal[0] = vertex.normal[2] = 0;
             vertex.normal[1] = 1;
         }
-        for (int component = 0; component < 3; ++component)
+        std::copy_n(source.color, 3, vertex.color);
+        if (outfitColor && source.uv[2] == 0.0f)
         {
-            vertex.color[component] = source.color[component];
-            vertex.uv[component] = source.uv[component];
+            const float shade = ClothingShade(source.color);
+            if (shade > 0.0f)
+                for (int channel = 0; channel < 3; ++channel)
+                    vertex.color[channel] = (*outfitColor)[channel] * shade;
         }
+        std::copy_n(source.uv, 3, vertex.uv);
+        batch.vertices.push_back(vertex);
     }
     if (asset.indices.empty())
         return;
@@ -633,7 +679,8 @@ void WorldResources::AddActor(const RpgGame &game,
                               float attackStarted,
                               float speed,
                               float targetX,
-                              float targetZ)
+                              float targetZ,
+                              const std::array<float, 3> *outfitColor)
 {
     auto &state = poses[id];
     float dx = x - state.x, dz = z - state.z;
@@ -679,7 +726,9 @@ void WorldResources::AddActor(const RpgGame &game,
            clock,
            state.previous,
            state.previousTime,
-           std::clamp((game.time - state.changedAt) / .16f, 0.0f, 1.0f));
+           std::clamp((game.time - state.changedAt) / .16f, 0.0f, 1.0f),
+           false,
+           outfitColor);
 }
 
 void WorldResources::BuildActors(const RpgGame &game, const ActorView &view)
@@ -699,7 +748,12 @@ void WorldResources::BuildActors(const RpgGame &game, const ActorView &view)
                1,
                0,
                "Pose_Crouch",
-               0);
+               0,
+               "",
+               0,
+               1,
+               false,
+               &PlayerOutfit);
     if (game.hp > 0)
         AddActor(game,
                  -1,
@@ -710,7 +764,8 @@ void WorldResources::BuildActors(const RpgGame &game, const ActorView &view)
                  game.attackStarted,
                  game.playerMoveSpeed / 2.303f,
                  game.aim.x,
-                 game.aim.z);
+                 game.aim.z,
+                 &PlayerOutfit);
     const auto visible = [&](float x, float z)
     {
         return view.Contains(x - game.player.x, z - game.player.z);
@@ -731,7 +786,8 @@ void WorldResources::BuildActors(const RpgGame &game, const ActorView &view)
                      n.attackStarted,
                      n.walkSpeed / .968f,
                      n.goal.x,
-                     n.goal.z);
+                     n.goal.z,
+                     &NpcOutfit(n.role));
         }
     const char *species[] = {"Tiger", "Wolf", "Fox", "Deer"};
     const float stride[] = {.738f, .601f, .389f, .581f};
