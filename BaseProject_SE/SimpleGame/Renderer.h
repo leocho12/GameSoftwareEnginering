@@ -43,6 +43,7 @@ class Renderer
     void ContactShadows(const RpgGame &game);
     void StoryHud(const RpgGame &game);
     void Hud(const RpgGame &game);
+    void Minimap(const RpgGame &game);
     void TownBuildings(const RpgGame &game);
     void TownHud(const RpgGame &game);
     void WorldHud(const RpgGame &game);
