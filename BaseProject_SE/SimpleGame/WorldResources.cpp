@@ -413,7 +413,6 @@ void WorldResources::Append(Batch &batch,
                     vertex.color[channel] = (*outfitColor)[channel] * shade;
         }
         std::copy_n(source.uv, 3, vertex.uv);
-        batch.vertices.push_back(vertex);
     }
     if (asset.indices.empty())
         return;
