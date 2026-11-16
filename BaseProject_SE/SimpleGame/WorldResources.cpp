@@ -61,6 +61,14 @@ bool Visible(float x, float z, const RpgGame &game, float radius)
 }
 }
 
+bool ActorView::Contains(float dx, float dz) const
+{
+    // Account for mesh height and width when the actor's ground anchor is just off screen.
+    constexpr float margin = 2.5f;
+    return std::abs(rightX * dx + rightZ * dz) <= halfWidth + margin &&
+           std::abs(upX * dx + upZ * dz) <= halfHeight + margin;
+}
+
 bool WorldResources::Load(const std::filesystem::path &path)
 {
     Shutdown();
@@ -269,10 +277,12 @@ const std::vector<WorldResources::SkinVertex> &WorldResources::Skin(const Asset 
                 pose[i] = old[i] * (1 - mix) + pose[i] * mix;
     }
     entry.vertices.resize(asset.vertices.size());
+    const auto *sourceVertices = asset.vertices.data();
+    auto *skinVertices = entry.vertices.data();
     for (std::size_t index = 0; index < asset.vertices.size(); ++index)
     {
-        const auto &source = asset.vertices[index];
-        auto &vertex = entry.vertices[index];
+        const auto &source = sourceVertices[index];
+        auto &vertex = skinVertices[index];
         if (pose.empty())
         {
             std::copy_n(source.position, 3, vertex.position);
@@ -286,7 +296,7 @@ const std::vector<WorldResources::SkinVertex> &WorldResources::Skin(const Asset 
             float weight = source.weights[influence];
             if (weight <= 0)
                 continue;
-            const auto *m = &pose[source.joints[influence] * 16];
+            const auto *m = pose.data() + source.joints[influence] * 16;
             for (int axis = 0; axis < 3; ++axis)
             {
                 vertex.position[axis] +=
@@ -321,7 +331,7 @@ void WorldResources::Append(Batch &batch,
                             bool flatten)
 {
     auto found = assets.find(name);
-    if (found == assets.end())
+    if (found == assets.end() || found->second.vertices.empty())
         return;
     const auto &asset = found->second;
     const std::vector<SkinVertex> *skin = nullptr;
@@ -329,35 +339,45 @@ void WorldResources::Append(Batch &batch,
         skin = &Skin(asset, clip, clock, previous, previousTime, blend);
     std::uint32_t base = std::uint32_t(batch.vertices.size());
     ReserveAdditional(batch.vertices, asset.vertices.size());
+    batch.vertices.resize(base + asset.vertices.size());
+    auto *output = batch.vertices.data() + base;
+    const auto *sourceVertices = asset.vertices.data();
+    const auto *skinVertices = skin ? skin->data() : nullptr;
     float c = std::cos(yaw), s = std::sin(yaw);
+    const float inverseX = 1 / sx, inverseY = 1 / sy, inverseZ = 1 / sz;
     for (std::size_t index = 0; index < asset.vertices.size(); ++index)
     {
-        const auto &source = asset.vertices[index];
-        Vertex vertex{};
-        const float *p = skin ? (*skin)[index].position : source.position;
-        float n[3];
-        std::copy_n(skin ? (*skin)[index].normal : source.normal, 3, n);
+        const auto &source = sourceVertices[index];
+        auto &vertex = output[index];
+        const float *p = skinVertices ? skinVertices[index].position : source.position;
+        const float *n = skinVertices ? skinVertices[index].normal : source.normal;
         vertex.position[0] = x + p[0] * sx * c + p[2] * sz * s;
         vertex.position[1] = flatten ? y : y + p[1] * sy;
         vertex.position[2] = z - p[0] * sx * s + p[2] * sz * c;
-        n[0] /= sx;
-        n[1] /= sy;
-        n[2] /= sz;
-        vertex.normal[0] = n[0] * c + n[2] * s;
-        vertex.normal[1] = n[1];
-        vertex.normal[2] = -n[0] * s + n[2] * c;
+        const float nx = n[0] * inverseX, nz = n[2] * inverseZ;
+        vertex.normal[0] = nx * c + nz * s;
+        vertex.normal[1] = n[1] * inverseY;
+        vertex.normal[2] = -nx * s + nz * c;
         if (flatten)
         {
             vertex.normal[0] = vertex.normal[2] = 0;
             vertex.normal[1] = 1;
         }
-        std::copy_n(source.color, 3, vertex.color);
-        std::copy_n(source.uv, 3, vertex.uv);
-        batch.vertices.push_back(vertex);
+        for (int component = 0; component < 3; ++component)
+        {
+            vertex.color[component] = source.color[component];
+            vertex.uv[component] = source.uv[component];
+        }
     }
+    if (asset.indices.empty())
+        return;
+    const auto indexOffset = batch.indices.size();
     ReserveAdditional(batch.indices, asset.indices.size());
-    for (auto index : asset.indices)
-        batch.indices.push_back(base + index);
+    batch.indices.resize(indexOffset + asset.indices.size());
+    const auto *sourceIndices = asset.indices.data();
+    auto *indices = batch.indices.data() + indexOffset;
+    for (std::size_t i = 0; i < asset.indices.size(); ++i)
+        indices[i] = base + sourceIndices[i];
 }
 
 void WorldResources::Fit(
@@ -662,7 +682,7 @@ void WorldResources::AddActor(const RpgGame &game,
            std::clamp((game.time - state.changedAt) / .16f, 0.0f, 1.0f));
 }
 
-void WorldResources::BuildActors(const RpgGame &game, int radius)
+void WorldResources::BuildActors(const RpgGame &game, const ActorView &view)
 {
     auto started = std::chrono::steady_clock::now();
     actors.vertices.clear();
@@ -691,9 +711,12 @@ void WorldResources::BuildActors(const RpgGame &game, int radius)
                  game.playerMoveSpeed / 2.303f,
                  game.aim.x,
                  game.aim.z);
+    const auto visible = [&](float x, float z)
+    {
+        return view.Contains(x - game.player.x, z - game.player.z);
+    };
     for (const auto &n : game.npcs)
-        if ((n.id & 1) != 0 && n.hp > 0 &&
-            Visible(n.position.x, n.position.z, game, float(radius + 2)))
+        if (n.hp > 0 && visible(n.position.x, n.position.z))
         {
             const char *asset = n.role == NpcRole::Guard || n.role == NpcRole::Hunter ? "NPC_Scout"
                                 : n.role == NpcRole::Merchant || n.role == NpcRole::Medic
@@ -715,7 +738,7 @@ void WorldResources::BuildActors(const RpgGame &game, int radius)
     for (int i = 0; i < int(game.enemies.size()); ++i)
     {
         const auto &e = game.enemies[i];
-        if (e.hp <= 0 || !Visible(e.position.x, e.position.z, game, float(radius + 2)))
+        if (e.hp <= 0 || !visible(e.position.x, e.position.z))
             continue;
         int kind = std::clamp(e.appearance, 0, 3);
         AddActor(game,
@@ -730,7 +753,7 @@ void WorldResources::BuildActors(const RpgGame &game, int radius)
                  game.player.z);
     }
     for (const auto &drop : game.drops)
-        if (Visible(drop.position.x, drop.position.z, game, float(radius)))
+        if (visible(drop.position.x, drop.position.z))
             Append(actors,
                    drop.potion ? "Bucket" : "Sack",
                    drop.position.x,
@@ -746,16 +769,18 @@ void WorldResources::BuildActors(const RpgGame &game, int radius)
     // Reuse the evaluated geometry in both shadow and color passes.
     poseMs += Milliseconds(started);
     actorTime = game.time;
-    actorRadius = radius;
+    actorViewWidth = view.halfWidth;
+    actorViewHeight = view.halfHeight;
 }
 
-void WorldResources::Actors(const RpgGame &game, int radius)
+void WorldResources::Actors(const RpgGame &game, const ActorView &view)
 {
     if (!Ready())
         return;
     constexpr float ActorBuildInterval = 1.0f / 30.0f;
-    if (actorTime < 0 || game.time - actorTime >= ActorBuildInterval || actorRadius != radius)
-        BuildActors(game, radius);
+    if (actorTime < 0 || game.time - actorTime >= ActorBuildInterval ||
+        actorViewWidth != view.halfWidth || actorViewHeight != view.halfHeight)
+        BuildActors(game, view);
     Draw(actors);
 }
 

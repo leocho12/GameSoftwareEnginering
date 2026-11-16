@@ -9,6 +9,14 @@
 
 class RpgGame;
 
+struct ActorView
+{
+    float halfWidth, halfHeight;
+    float rightX, rightZ, upX, upZ;
+
+    bool Contains(float dx, float dz) const;
+};
+
 // Runtime representation of the delivered Resource GLBs. One indexed draw per batch.
 class WorldResources
 {
@@ -17,7 +25,7 @@ class WorldResources
     void Shutdown();
     void BeginFrame();
     void Environment(const RpgGame &game, int radius, bool shadow);
-    void Actors(const RpgGame &game, int radius);
+    void Actors(const RpgGame &game, const ActorView &view);
     void Profile(float gameTime);
 
     bool Ready() const
@@ -106,7 +114,7 @@ class WorldResources
     std::uint32_t seed = 0;
     bool seeded = false;
     float actorTime = -1, lastProfileTime = -100;
-    int actorRadius = 0;
+    float actorViewWidth = 0, actorViewHeight = 0;
     std::uint64_t frame = 0;
     unsigned drawCalls = 0, triangles = 0, cacheBuilds = 0;
     float preparationMs = 0, poseMs = 0;
@@ -142,7 +150,7 @@ class WorldResources
     void ClearScene();
     void BuildChunk(Chunk &chunk, const RpgGame &game, int x, int z);
     void BuildTown(Batch &batch, int village);
-    void BuildActors(const RpgGame &game, int radius);
+    void BuildActors(const RpgGame &game, const ActorView &view);
     void AddActor(const RpgGame &game,
                   int id,
                   const std::string &asset,

@@ -15,6 +15,13 @@
 namespace
 {
 constexpr float Pi = 3.14159265f;
+constexpr float MinimapX = 1036, MinimapY = 120, MinimapWidth = 224, MinimapHeight = 168;
+
+bool ShowMinimap(const RpgGame &game)
+{
+    return !game.inventory && !game.talkingActor && game.talkingNpc < 0 &&
+           !game.storyJournalOpen;
+}
 
 float UIX(int x, int w)
 {
@@ -155,11 +162,18 @@ void Renderer::Ring(float x, float y, float z, float radius, float r, float g, f
 {
     glColor4f(r, g, b, a);
     glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 40; ++i)
+    static const auto unitCircle = []
     {
-        float t = 2 * Pi * i / 40;
-        glVertex3f(x + std::cos(t) * radius, y, z + std::sin(t) * radius);
-    }
+        std::array<WorldPoint, 40> points{};
+        for (int i = 0; i < int(points.size()); ++i)
+        {
+            float t = 2 * Pi * i / points.size();
+            points[i] = {std::cos(t), std::sin(t)};
+        }
+        return points;
+    }();
+    for (const auto &point : unitCircle)
+        glVertex3f(x + point.x * radius, y, z + point.z * radius);
     glEnd();
 }
 
@@ -274,7 +288,8 @@ bool Renderer::IsUi(int x, int y, const RpgGame &game) const
     return py < 110 || py > 700 || (game.storyJournalOpen && In(px, py, 120, 110, 1040, 575)) ||
            ((game.talkingActor || game.talkingNpc >= 0) && In(px, py, 745, 185, 520, 470)) ||
            (game.worldDebug && In(px, py, 15, 180, 710, 495)) ||
-           (game.inventory && In(px, py, 950, 120, 310, 480));
+           (game.inventory && In(px, py, 950, 120, 310, 480)) ||
+           (ShowMinimap(game) && In(px, py, MinimapX, MinimapY, MinimapWidth, MinimapHeight));
 }
 
 int Renderer::ViewRadius() const
@@ -376,11 +391,22 @@ void Renderer::Environment(const RpgGame &game)
 
 void Renderer::Actors(const RpgGame &game)
 {
-    if (resources.Ready())
+    const ActorView view{zoom * float(width) / height,
+                         zoom,
+                         float(model[0]),
+                         float(model[8]),
+                         float(model[1]),
+                         float(model[9])};
+    const auto visible = [&](float x, float z)
+    {
+        return view.Contains(x - game.player.x, z - game.player.z);
+    };
+    const bool hasMeshes = resources.Ready();
+    if (hasMeshes)
     {
         if (!shadowPass)
             effects.Lit(model, game.time, 8);
-        resources.Actors(game, ViewRadius());
+        resources.Actors(game, view);
         glUseProgram(0);
         if (shadowPass)
             return;
@@ -391,15 +417,12 @@ void Renderer::Actors(const RpgGame &game)
     glDisable(GL_FOG);
     glActiveTexture(GL_TEXTURE0);
     std::vector<int> order{-1};
-    const float radius = float(ViewRadius() + 2);
     for (int i = 0; i < int(game.npcs.size()); ++i)
-        if (std::abs(game.npcs[i].position.x - game.player.x) < radius &&
-            std::abs(game.npcs[i].position.z - game.player.z) < radius)
+        if (game.npcs[i].hp > 0 && visible(game.npcs[i].position.x, game.npcs[i].position.z))
             order.push_back(-2 - i);
     for (int i = 0; i < int(game.enemies.size()); ++i)
         if (game.enemies[i].hp > 0 &&
-            std::abs(game.enemies[i].position.x - game.player.x) < radius &&
-            std::abs(game.enemies[i].position.z - game.player.z) < radius)
+            visible(game.enemies[i].position.x, game.enemies[i].position.z))
             order.push_back(i);
     auto position = [&](int index)
     {
@@ -443,7 +466,7 @@ void Renderer::Actors(const RpgGame &game)
             moving = game.moving;
             mirror = game.aim.x < game.player.x;
         }
-        if (!resources.Ready())
+        if (!hasMeshes)
             Sprite(point.x,
                    health <= 0 ? -.35f : 0,
                    point.z,
@@ -486,9 +509,9 @@ void Renderer::Actors(const RpgGame &game)
     for (const auto &drop : game.drops)
     {
         auto p = drop.position;
-        if (std::hypot(p.x - game.player.x, p.z - game.player.z) > ViewRadius())
+        if (!visible(p.x, p.z))
             continue;
-        if (!resources.Ready())
+        if (!hasMeshes)
             Cube(p.x,
                  .22f,
                  p.z,
@@ -521,6 +544,47 @@ void Renderer::Actors(const RpgGame &game)
     }
     glUseProgram(0);
     glDepthMask(GL_TRUE);
+}
+
+void Renderer::Minimap(const RpgGame &game)
+{
+    constexpr float left = MinimapX + 10, top = MinimapY + 29;
+    constexpr float right = MinimapX + MinimapWidth - 10, bottom = MinimapY + 141;
+    constexpr float centerX = (left + right) / 2, centerY = (top + bottom) / 2;
+    constexpr float scale = 3;
+    const auto mapX = [&](float x) { return centerX + (x - game.player.x) * scale; };
+    const auto mapY = [&](float z) { return centerY + (z - game.player.z) * scale; };
+    const auto rect = [&](float x0, float y0, float x1, float y1, float r, float g, float b)
+    {
+        x0 = std::max(x0, left);
+        y0 = std::max(y0, top);
+        x1 = std::min(x1, right);
+        y1 = std::min(y1, bottom);
+        if (x0 < x1 && y0 < y1)
+            Panel(x0, y0, x1 - x0, y1 - y0, r, g, b);
+    };
+    const auto marker = [&](float x, float z, float size, float r, float g, float b)
+    {
+        const float px = mapX(x), py = mapY(z);
+        rect(px - size, py - size, px + size, py + size, r, g, b);
+    };
+    Panel(MinimapX, MinimapY, MinimapWidth, MinimapHeight, .035f, .065f, .08f, .97f);
+    Panel(left, top, right - left, bottom - top, .10f, .16f, .16f);
+    const auto &villages = novel::Villages();
+    for (const auto &v : villages)
+        rect(mapX(v.x - 11), mapY(v.z - 11), mapX(v.x + 11), mapY(v.z + 11), .2f, .29f, .25f);
+    rect(mapX(-8), mapY(1), mapX(villages.back().x + 11), mapY(5), .44f, .38f, .27f);
+    for (const auto &n : game.npcs)
+        if (n.hp > 0)
+            marker(n.position.x, n.position.z, 2, .32f, .85f, .63f);
+    for (const auto &e : game.enemies)
+        if (e.hp > 0)
+            marker(e.position.x, e.position.z, 2, .95f, .36f, .29f);
+    marker(game.player.x, game.player.z, 3.5f, 1, .86f, .42f);
+    Text(left, MinimapY + 7, "미니맵", 14);
+    Text(left, bottom + 5, "나", 11, 1, .86f, .42f);
+    Text(left + 30, bottom + 5, "주민", 11, .32f, .85f, .63f);
+    Text(left + 75, bottom + 5, "마수", 11, .95f, .36f, .29f);
 }
 
 void Renderer::Hud(const RpgGame &game)
@@ -567,6 +631,8 @@ void Renderer::Hud(const RpgGame &game)
     Text(38, 128, "첫 의뢰 | 실종 사냥꾼 수색", 18, .95f, .85f, .55f);
     Text(38, 157, game.QuestObjective(), 15, .9f, .88f, .75f);
     Text(38, 188, game.QuestHint(), 12);
+    if (ShowMinimap(game))
+        Minimap(game);
     if (state.resting)
         Text(440, 247, "휴식 중 · R 또는 이동으로 중단", 20, .5f, .9f, .7f);
     if (game.inventory)
