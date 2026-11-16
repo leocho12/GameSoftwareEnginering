@@ -277,9 +277,10 @@ void main(){
  {
     base *= 0.80 + noise(world.xz * 8.0 + world.y * 5.0) * 0.30;
  }
- vec3 lit=base*(vec3(0.36,0.44,0.48)+vec3(1.0,0.75,0.46)*nd*(0.20+0.80*shadow));
+ vec3 lit = base * (vec3(0.70, 0.74, 0.82) +
+                    vec3(0.50, 0.44, 0.34) * nd * mix(0.35, 1.0, shadow));
  float haze=smoothstep(30.0,67.0,distanceEye)*0.40;
- gl_FragColor=vec4(mix(lit,vec3(0.23,0.29,0.30),haze),1.0);
+ gl_FragColor = vec4(mix(lit, vec3(0.66, 0.76, 0.88), haze), 1.0);
 })GLSL";
 const char *fireVs = R"GLSL(#version 130
 out vec2 uv;
@@ -310,13 +311,42 @@ const char *postVs = R"GLSL(#version 130
 out vec2 uv;
 void main(){gl_Position=gl_Vertex;uv=gl_MultiTexCoord0.xy;})GLSL";
 const char *postFs = R"GLSL(#version 130
-uniform sampler2D scene;uniform vec2 texel;
+uniform sampler2D scene;
+uniform vec2 texel;
 in vec2 uv;
-void main(){
- vec3 c=texture2D(scene,uv).rgb;
- c=pow(max(c,vec3(0)),vec3(0.94));c*=vec3(1.045,1.01,0.96);
- float vignette=1.0-0.20*dot(uv-0.5,uv-0.5)*2.0;
- gl_FragColor=vec4(c*vignette,1);
+
+const vec3 lumaWeights = vec3(0.2126, 0.7152, 0.0722);
+const float bloomStep = 3.5;
+const float bloomStrength = 1.45;
+
+vec3 highlights(vec3 color)
+{
+    float brightness = max(max(color.r, color.g), color.b);
+    return color * smoothstep(0.53, 0.88, brightness);
+}
+
+void main()
+{
+    vec3 source = texture2D(scene, uv).rgb;
+    vec3 bloom = vec3(0.0);
+    vec2 stride = texel * bloomStep;
+    for (int y = 0; y < 4; ++y)
+    {
+        float weightY = (y == 0 || y == 3) ? 1.0 : 3.0;
+        for (int x = 0; x < 4; ++x)
+        {
+            float weightX = (x == 0 || x == 3) ? 1.0 : 3.0;
+            vec2 offset = (vec2(float(x), float(y)) - 1.5) * stride;
+            bloom += highlights(texture2D(scene, uv + offset).rgb) * weightX * weightY;
+        }
+    }
+    bloom = mix(bloom / 64.0, highlights(source), 0.12);
+
+    vec3 color = pow(source, vec3(0.78));
+    color = mix(vec3(dot(color, lumaWeights)), color, 0.80);
+    color = mix(color, vec3(0.91, 0.92, 1.0), 0.10);
+    vec3 glow = clamp(bloom * vec3(1.0, 0.95, 0.90) * bloomStrength, 0.0, 1.0);
+    gl_FragColor = vec4(color + (1.0 - color) * glow, 1.0);
 })GLSL";
 
 const char *contactFs = R"GLSL(#version 130
@@ -549,7 +579,7 @@ void RenderEffects::BeginScene()
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, Ready() ? sceneFbo : 0);
     glViewport(0, 0, sceneWidth, sceneHeight);
-    glClearColor(.16f, .22f, .24f, 1);
+    glClearColor(.66f, .76f, .88f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

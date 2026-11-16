@@ -128,7 +128,8 @@ class WorldResources
                 const std::string &previous = "",
                 float previousTime = 0,
                 float blend = 1,
-                bool flatten = false);
+                bool flatten = false,
+                const std::array<float, 3> *outfitColor = nullptr);
     void Fit(Batch &batch,
              const std::string &name,
              float x,
@@ -152,7 +153,8 @@ class WorldResources
                   float attackStarted,
                   float speed,
                   float targetX,
-                  float targetZ);
+                  float targetZ,
+                  const std::array<float, 3> *outfitColor = nullptr);
     std::vector<float> Sample(const Asset &asset, const std::string &clip, float time) const;
     const std::vector<SkinVertex> &Skin(const Asset &asset,
                                         const std::string &clip,
